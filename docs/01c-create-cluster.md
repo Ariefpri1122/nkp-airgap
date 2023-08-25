@@ -1,22 +1,4 @@
-Setelah kita install Nutanix OS menggunakan bootdrive, selanjutnya adalah kita organize dulu setiap nodenya seperti setting hostname lain-lain.
-
-## Organize nodes
-
-Setup hostname for easyies troubleshoot when you got hardware problem:
-- changed on host ip
-- changed on cvm
-
-```bash
-hostnamectl set-hostname <new-hostname>
-```
-
-Kurang lebih seperti berikut metricnya:
-
-| IPMI          | Node name     | Host IP       | Hostname for HostIP   | CVM IP        | Hostname for CVM      |
-| :---          | :---          | :---          | :---                  | :---          | :---                  |
-| 192.168.88.12 | Node B        | 192.168.88.22 | NTNX-NODE-B           | 192.168.88.27 | NTNX-CVM-B            |
-| 192.168.88.13 | Node C        | 192.168.88.22 | NTNX-NODE-C           | 192.168.88.27 | NTNX-CVM-C            |
-| 192.168.88.14 | Node D        | 192.168.88.22 | NTNX-NODE-D           | 192.168.88.27 | NTNX-CVM-D            |
+Setelah kita install Nutanix OS menggunakan bootdrive, 
 
 ## Create cluster
 
@@ -26,9 +8,12 @@ Setelah kita organize host dan cvm, sekarang kita bisa membuat cluster dengan pe
 cluster -s <cvm-ips> --redundancy_factor=<number-of-factor> create
 ```
 
+Jika dijalankan hasilnya seperti berikut:
+
 ```bash
 nutanix@NTNX-9810330e-A-CVM:192.168.88.27:~$ cluster status
 2023-08-25 02:07:45,107Z CRITICAL MainThread cluster:2930 Cluster is currently unconfigured. Please create the cluster.
+
 nutanix@NTNX-9810330e-A-CVM:192.168.88.27:~$ cluster -s 192.168.88.27,192.168.88.28,192.168.88.29 --redundancy_factor=2 create
 2023-08-25 02:08:28,894Z INFO MainThread cluster:2943 Executing action create on SVMs 192.168.88.27,192.168.88.28,192.168.88.29
 2023-08-25 02:08:31,915Z INFO MainThread cluster:1007 Discovered node:
@@ -127,5 +112,33 @@ Lockdown mode: Disabled
 Kemudian, temen-temen bisa akses salah satu ip cvm dengan port 9440 untuk mengkases Prism Element seperti berikut:
 
 ![first-login](imgs/01-first-login-prism-element.png)
+
+## Organize nodes
+
+selanjutnya adalah kita organize dulu setiap nodenya seperti setting hostname lain-lain: 
+
+Setup hostname for easyies to identified/troubleshoot when you got hardware problem:
+- changed on host ip
+- changed on cvm
+
+Kurang lebih seperti berikut metricnya:
+
+| IPMI          | Node name     | Host IP       | Hostname for HostIP   | CVM IP        | Hostname for CVM      |
+| :---          | :---          | :---          | :---                  | :---          | :---                  |
+| 192.168.88.12 | Node B        | 192.168.88.22 | NTNX-NODE-B           | 192.168.88.27 | NTNX-CVM-B            |
+| 192.168.88.13 | Node C        | 192.168.88.22 | NTNX-NODE-C           | 192.168.88.27 | NTNX-CVM-C            |
+| 192.168.88.14 | Node D        | 192.168.88.22 | NTNX-NODE-D           | 192.168.88.27 | NTNX-CVM-D            |
+
+Untuk mengganti hostname pada AHV Host/Hypervisor IP kita bisa menggunakan perintah berikut:
+
+```bash
+change_ahv_hostname --host_ip=<host-IP-address> --host_name=<new-host-name>
+```
+
+Untu mengganti hostname pada CVM kita bisa menggunakan perintah berikut:
+
+```bash
+change_cvm_display_name --cvm_ip=<CVM-IP> --cvm_name=<new-name>
+```
 
 ## Setup Prism Element
