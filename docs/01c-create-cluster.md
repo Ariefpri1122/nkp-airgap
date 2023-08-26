@@ -268,3 +268,65 @@ Setelah berhasil semuanya, kita bisa lihat vm name pada menu `VM -> tables` hasi
 ![vm-list-host](imgs/05-prism-element/01d-vm-list-name.png)
 
 ## Setup Prism Element
+
+Kemudian kita setup untuk Prism Element seperti:
+
+1. Setup Cluste name
+2. Setup Prism Element Virtual IP
+3. Setup Prism Element iSCSI Data Services IP
+4. Setup Prism Element FQDN
+5. Setup DNS
+6. Setup NTP
+
+Untuk mengganti ClusterName kita bisa menggunakan command berikut:
+
+```bash
+ncli cluster edit-info new-name=<NewPCName>
+```
+
+Jika dijalankan maka hasilnya seperti berikut:
+
+```bash
+nutanix@NTNX-CVM-C:192.168.88.33:~$ ncli cluster edit-info new-name=DevOpsWithDimasMaryanto
+
+    Cluster Id                : 000603c7-8584-365d-7469-0cc47a4138d2::8388249818958477522
+    Cluster Uuid              : 000603c7-8584-365d-7469-0cc47a4138d2
+    Cluster Name              : DevOpsWithDimasMaryanto
+    Cluster Version           : 6.5.2
+    Cluster Full Version      : el7.3-release-fraser-6.5.2-stable-f2ce4db7d67f495ebfd6208bef9ab0afec9c74af
+    Node Count                : 3
+    Block Count               : 3
+    Shadow Clones Status      : Enabled
+    Has Self Encrypting Disk  : no
+    Cluster Masquerading I... :
+    Cluster Masquerading PORT :
+    Is registered to PC       : false
+    Rebuild Reservation       : Disabled
+    Encryption In Transit     : Disabled
+    Is LTS                    : true
+    External Data Services... :
+    Support Verbosity Level   : BASIC_COREDUMP
+    Lock Down Status          : Disabled
+    Password Remote Login ... : Enabled
+    Timezone                  : UTC
+    On-Disk Dedup             : Disabled
+    NCC Version               : ncc-4.6.2.1
+    Common Criteria Mode      : Disabled
+    Degraded Node Monitoring  : Enabled
+```
+
+Jika kita check hasilnya di menu `Settings -> Cluster Detail` seperti berikut:
+
+![cluster-name-changed](imgs/05-prism-element/01e-changed-cluster-name.png)
+
+Kemudian untuk setting Virtual IP, iSCSI Data Services IP bisa kita langsung edit seperti berikut:
+
+![config-cluster-detail](imgs/05-prism-element/01f-cluster-detail-config.png)
+
+Untuk memastikan cluster kita bisa connect ke internet, pastikan kita menambahkan dns google seperti `8.8.8.8, 8.8.4.4` di menu `Setting -> Name Servers` seperti berikut: 
+
+![config-name-servers](imgs/05-prism-element/01g-config-name-servers.png)
+
+Untuk memastikan sync timezone pada cluster, kita harus menambahkan NTP pada menu `Setting -> NTP Server` seperti berikut:
+
+![config-ntp-server](imgs/05-prism-element/01h-config-ntp-server.png)
