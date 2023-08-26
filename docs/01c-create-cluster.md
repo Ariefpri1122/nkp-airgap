@@ -164,12 +164,6 @@ Changing display name to NTNX-B-CVM. This will reboot the CVM. Do you want to pr
 2023-08-26 00:16:26,901Z INFO change_cvm_display_name:248 Checking if shutdown token can be retrieved
 2023-08-26 00:16:26,990Z INFO change_cvm_display_name:254 Shutting down CVM:192.168.88.32 for changing the display name
 2023-08-26 00:16:57,533Z WARNING command.py:175 Timeout executing /usr/bin/ssh -q -o CheckHostIp=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no -o TCPKeepAlive=yes -o UserKnownHostsFile=/dev/null -o ControlPath=/home/nutanix/.ssh/controlmasters/tmp__NS4L -o PreferredAuthentications=publickey  nutanix@192.168.88.32 source /etc/profile; /home/nutanix/cluster/bin/cvm_shutdown -h now: 30 secs elapsed
-2023-08-26 00:16:57,534Z INFO change_cvm_display_name:261 Waiting for CVM to shut down
-2023-08-26 00:16:57,534Z INFO change_cvm_display_name:196 Confirming if the CVM has been shut down
-
-2023-08-26 00:17:57,738Z INFO change_cvm_display_name:261 Waiting for CVM to shut down
-2023-08-26 00:17:57,738Z INFO change_cvm_display_name:196 Confirming if the CVM has been shut down
-2023-08-26 00:18:57,957Z INFO change_cvm_display_name:261 Waiting for CVM to shut down
 2023-08-26 00:18:57,957Z INFO change_cvm_display_name:196 Confirming if the CVM has been shut down
 2023-08-26 00:18:58,120Z INFO change_cvm_display_name:263 CVM was shut down succesfully
 2023-08-26 00:18:58,120Z INFO change_cvm_display_name:67 Running cmd: virsh domrename NTNX-ba60e5b2-A-CVM NTNX-B-CVM on host
@@ -194,9 +188,6 @@ Changing display name to NTNX-C-CVM. This will reboot the CVM. Do you want to pr
 2023-08-26 00:26:57,986Z INFO change_cvm_display_name:248 Checking if shutdown token can be retrieved
 2023-08-26 00:26:58,074Z INFO change_cvm_display_name:254 Shutting down CVM:192.168.88.33 for changing the display name
 2023-08-26 00:27:28,512Z WARNING command.py:175 Timeout executing /usr/bin/ssh -q -o CheckHostIp=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no -o TCPKeepAlive=yes -o UserKnownHostsFile=/dev/null -o ControlPath=/home/nutanix/.ssh/controlmasters/tmpDYJE6l -o PreferredAuthentications=publickey  nutanix@192.168.88.33 source /etc/profile; /home/nutanix/cluster/bin/cvm_shutdown -h now: 30 secs elapsed
-2023-08-26 00:27:28,513Z INFO change_cvm_display_name:261 Waiting for CVM to shut down
-2023-08-26 00:27:28,513Z INFO change_cvm_display_name:196 Confirming if the CVM has been shut down
-2023-08-26 00:27:42,403Z INFO zookeeper_session.py:625 ZK session establishment complete, sessionId=0x18a2f375f5a007c, negotiated timeout=20 secs
 2023-08-26 00:28:28,708Z INFO change_cvm_display_name:261 Waiting for CVM to shut down
 2023-08-26 00:28:28,708Z INFO change_cvm_display_name:196 Confirming if the CVM has been shut down
 2023-08-26 00:28:28,865Z INFO change_cvm_display_name:263 CVM was shut down succesfully
@@ -222,9 +213,6 @@ Changing display name to NTNX-D-CVM. This will reboot the CVM. Do you want to pr
 2023-08-26 00:36:05,639Z INFO change_cvm_display_name:248 Checking if shutdown token can be retrieved
 2023-08-26 00:36:05,734Z INFO change_cvm_display_name:254 Shutting down CVM:192.168.88.34 for changing the display name
 2023-08-26 00:36:36,175Z WARNING command.py:175 Timeout executing /usr/bin/ssh -q -o CheckHostIp=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no -o TCPKeepAlive=yes -o UserKnownHostsFile=/dev/null -o ControlPath=/home/nutanix/.ssh/controlmasters/tmp5pz9sR -o PreferredAuthentications=publickey  nutanix@192.168.88.34 source /etc/profile; /home/nutanix/cluster/bin/cvm_shutdown -h now: 30 secs elapsed
-2023-08-26 00:36:36,175Z INFO change_cvm_display_name:261 Waiting for CVM to shut down
-2023-08-26 00:36:36,176Z INFO change_cvm_display_name:196 Confirming if the CVM has been shut down
-2023-08-26 00:36:49,301Z INFO zookeeper_session.py:625 ZK session establishment complete, sessionId=0x28a2f4015f2007f, negotiated timeout=20 secs
 2023-08-26 00:37:36,415Z INFO change_cvm_display_name:261 Waiting for CVM to shut down
 2023-08-26 00:37:36,416Z INFO change_cvm_display_name:196 Confirming if the CVM has been shut down
 2023-08-26 00:37:36,579Z INFO change_cvm_display_name:263 CVM was shut down succesfully
