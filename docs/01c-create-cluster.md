@@ -5,7 +5,13 @@ Setelah kita install Nutanix OS menggunakan bootdrive,
 Setelah kita organize host dan cvm, sekarang kita bisa membuat cluster dengan perintah berikut:
 
 ```bash
-cluster -s <cvm-ips> --redundancy_factor=<number-of-factor> create
+cluster -s <cvm-ips> \
+--redundancy_factor=<rep-factor> \
+--cluster_name=<cluster-name> \
+--container_name=<container-name> \
+--ntp_servers=<ntp-servers> \
+--dns_servers=<dns-servers> \
+create
 ```
 
 Jika dijalankan hasilnya seperti berikut:
@@ -14,7 +20,7 @@ Jika dijalankan hasilnya seperti berikut:
 nutanix@NTNX-9810330e-A-CVM:192.168.88.27:~$ cluster status
 2023-08-25 02:07:45,107Z CRITICAL MainThread cluster:2930 Cluster is currently unconfigured. Please create the cluster.
 
-nutanix@NTNX-ba60e5b2-A-CVM:192.168.88.32:~$ cluster -s 192.168.88.32,192.168.88.33,192.168.88.34 --redundancy_factor=2 create
+nutanix@NTNX-ba60e5b2-A-CVM:192.168.88.32:~$ cluster -s 10.12.1.31,10.12.1.32,10.12.1.33,10.12.1.34 --redundancy_factor=2 --cluster_name='PE-DevOpsWithDimas' --container_name='default-storage-container' --ntp_servers=10.12.1.10 --dns_servers=8.8.8.8 create
 2023-08-25 23:15:33,673Z INFO MainThread cluster:2943 Executing action create on SVMs 192.168.88.32,192.168.88.33,192.168.88.34
 2023-08-25 23:15:36,700Z INFO MainThread cluster:1007 Discovered node:
 ip: 192.168.88.32
