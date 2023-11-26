@@ -1,4 +1,4 @@
-To enable Nutanix Kubernetes Engine (NKE), we have serveral options such as
+To enable Nutanix Kubernetes Engine (NKE), we have serveral options:
 
 - Online installation
 - Offline installation
@@ -38,12 +38,14 @@ Untuk method online method kita cukup ke menu -> services -> Kubernetes -> OS Im
 ![os-image](imgs/07-karbon/02-os-image-download.png)
 
 
-## Offline installation
+## Download OS image offline method
 
 For Offline installation, litle bit tricky here is how we do enable Nutanix Kubernetes Engine (NKE)
 
 - Create darksite (webserver)
-- Download binary airgap from nutanix portal support
+- Download binary airgap from [nutanix portal support](https://portal.nutanix.com/page/downloads?product=karbon)
+    ![download-binary](imgs/07-karbon/02b-nke-binary.png)
+
 - Extract `airgap.tgz` and `airgap-manifest.json` file to your site
 - Deploying airgap
 - Create kubernetes cluster
@@ -82,4 +84,31 @@ firewall-cmd --reload
 
 Maka hasilnya seperti berikut:
 
-![httpd-instaled]()
+![httpd-instaled](imgs/07-karbon/03-httpd-instaled.png)
+
+### Extract `airgap-package.tgz`
+
+Setelah kita download package `airgap-ntnx-x.x.x.tgz` selanjutnya kita upload ke web server tersebut dengan menggunakan perintah:
+
+```bash
+scp path-download/* admin@10.12.10.50:~/
+```
+
+Kemudian kita extract menggunakan perintah:
+
+```bash
+## create folder and give it access to write
+sudo mkdir -p /var/www/html/release/airgap/x.x.x && \
+sudo chmor -R 777 /var/www/html/**
+
+## extrat to folder target
+tar xvf airgap-ntnx-x.x.x.tgz -C /var/www/html/release/airgap/x.x.x/
+cp airgap-manifest.json /var/www/html/release/airgap/x.x.x/
+```
+
+Sekarang kita bisa akses webappnya dengan url berikut 
+[http://10.12.10.50/release/airgap/2.8]()
+
+Maka outputnya seperti berikut:
+
+![show-package](imgs/07-karbon/03a-packages.png)
