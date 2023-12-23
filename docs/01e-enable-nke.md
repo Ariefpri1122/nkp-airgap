@@ -149,20 +149,20 @@ Setelah itu kita siapkan dulu pre-requisites untuk deploy airgap seperti berikut
 Ok pre-requisite sudah terpenuhi semua sekarang kita enable airgap dengan perintah berikut:
 
 ```bash
-export PRISM_USERNAME=admin
-export PRIMS_CLUSTER_UUID='<prism-cluster-uuid>'
-export NET_VLAN_UUID='<cluster-uuid>'
-export NET_STATIC_IP='10.12.10.51'
-export STORAGE_CONTAINER_NAME='default-container'
-export DARKSITE_URL='http://10.12.10.50/release/airgap/2.8/'
+# export PRISM_USERNAME=admin
+# export PRIMS_CLUSTER_UUID='<prism-cluster-uuid>'
+# export NET_VLAN_UUID='<cluster-uuid>'
+# export NET_STATIC_IP='10.12.10.51'
+# export STORAGE_CONTAINER_NAME='default-container'
+# export DARKSITE_URL='http://10.12.10.50/release/airgap/2.8/'
 
 ./karbon/karbonctl airgap \
---pe-username="$PRISM_USERNAME" \
---vlan-uuid="$NET_STATIC_IP" \
---pe-cluster-uuid="$PRIMS_CLUSTER_UUID" \
---static-ip="$NET_STATIC_IP" \
---storage-container="$STORAGE_CONTAINER_NAME" \
---webserver-url="$DARKSITE_URL" \
+--pe-username='admin' \
+--vlan-uuid='<network-vlan-uuid>' \
+--pe-cluster-uuid='<prism-cluster-uuid>' \
+--static-ip='10.12.10.37' \
+--storage-container='default-container' \
+--webserver-url='http://10.12.10.50/release/airgap/2.8/' \
 enable
 ```
 
