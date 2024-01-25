@@ -281,11 +281,11 @@ ncli cluster edit-info new-name=<NewPCName>
 Jika dijalankan maka hasilnya seperti berikut:
 
 ```bash
-nutanix@NTNX-CVM-C:192.168.88.33:~$ ncli cluster edit-info new-name=DevOpsWithDimasMaryanto
+nutanix@NTNX-CVM-C:192.168.88.33:~$ ncli cluster edit-info new-name=DevOpsWithDimas
 
-    Cluster Id                : 000603c7-8584-365d-7469-0cc47a4138d2::8388249818958477522
-    Cluster Uuid              : 000603c7-8584-365d-7469-0cc47a4138d2
-    Cluster Name              : DevOpsWithDimasMaryanto
+    Cluster Id                : xxxxx
+    Cluster Uuid              : xxxxx
+    Cluster Name              : DevOpsWithDimas
     Cluster Version           : 6.5.2
     Cluster Full Version      : el7.3-release-fraser-6.5.2-stable-f2ce4db7d67f495ebfd6208bef9ab0afec9c74af
     Node Count                : 3
