@@ -69,7 +69,7 @@ VM:
                 swap: 4 Gb
     network:
         gateway: 10.12.10.254
-        ip: 10.12.10.50
+        ip: 10.12.10.1
 ```
 
 Kemudian kita install package httpd dengan perintah berikut:
@@ -97,13 +97,14 @@ scp path-download/* admin@10.12.10.50:~/
 Kemudian kita extract menggunakan perintah:
 
 ```bash
+export AIRGAP_VERSION=2.8.0
 ## create folder and give it access to write
-sudo mkdir -p /var/www/html/release/airgap/x.x.x && \
+sudo mkdir -p /var/www/html/release/airgap/$AIRGAP_VERSION && \
 sudo chmor -R 777 /var/www/html/**
 
 ## extrat to folder target
-tar xvf airgap-ntnx-x.x.x.tgz -C /var/www/html/release/airgap/x.x.x/
-cp airgap-manifest.json /var/www/html/release/airgap/x.x.x/
+tar xvf airgap-ntnx-$AIRGAP_VERSION.tgz -C /var/www/html/release/airgap/$AIRGAP_VERSION/
+cp airgap-manifest.json /var/www/html/release/airgap/$AIRGAP_VERSION/
 ```
 
 Sekarang kita bisa akses webappnya dengan url berikut 
@@ -154,7 +155,7 @@ Ok pre-requisite sudah terpenuhi semua sekarang kita enable airgap dengan perint
 # export NET_VLAN_UUID='<cluster-uuid>'
 # export NET_STATIC_IP='10.12.10.51'
 # export STORAGE_CONTAINER_NAME='default-container'
-# export DARKSITE_URL='http://10.12.10.50/release/airgap/2.8/'
+# export DARKSITE_URL='http://10.12.10.50/release/airgap/2.8.0/'
 
 ./karbon/karbonctl airgap \
 --pe-username='admin' \
@@ -162,7 +163,7 @@ Ok pre-requisite sudah terpenuhi semua sekarang kita enable airgap dengan perint
 --pe-cluster-uuid='<prism-cluster-uuid>' \
 --static-ip='10.12.10.37' \
 --storage-container='default-container' \
---webserver-url='http://10.12.10.50/release/airgap/2.8/' \
+--webserver-url='http://10.12.10.1/release/airgap/2.8.0/' \
 enable
 ```
 
