@@ -55,7 +55,7 @@ For Offline installation, litle bit tricky here is how we do enable Nutanix Kube
 Setelah kita download package `airgap-ntnx-x.x.x.tgz` selanjutnya kita upload ke web server tersebut dengan menggunakan perintah:
 
 ```bash
-scp path-download/* admin@10.12.10.50:~/
+scp path-download/* admin@10.12.10.1:~/
 ```
 
 Kemudian kita extract menggunakan perintah:
