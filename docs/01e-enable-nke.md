@@ -99,16 +99,16 @@ Kemudian kita extract menggunakan perintah:
 ```bash
 export AIRGAP_VERSION=2.8.0
 ## create folder and give it access to write
-sudo mkdir -p /var/www/html/release/airgap/$AIRGAP_VERSION && \
+sudo mkdir -p /var/www/html/release/nke/$AIRGAP_VERSION && \
 sudo chmor -R 777 /var/www/html/**
 
 ## extrat to folder target
 tar xvf airgap-ntnx-$AIRGAP_VERSION.tgz -C /var/www/html/release/airgap/$AIRGAP_VERSION/
-cp airgap-manifest.json /var/www/html/release/airgap/$AIRGAP_VERSION/
+cp airgap-manifest.json /var/www/html/release/nke/$AIRGAP_VERSION/
 ```
 
 Sekarang kita bisa akses webappnya dengan url berikut 
-[http://10.12.10.50/release/airgap/2.8]()
+[http://10.12.10.1/release/nke/2.8.0]()
 
 Maka outputnya seperti berikut:
 
