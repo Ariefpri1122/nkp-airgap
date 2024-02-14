@@ -58,7 +58,7 @@ Sebagai contoh disini saya sudah menyiapkan VM dengan specifikasi seperti beriku
 
 ```yaml
 VM: 
-    os: RockyLinux v9.1
+    os: RockyLinux v9.3
     vcpu: 2 cores
     memory: 4 GB
     storage: 
@@ -100,10 +100,10 @@ Kemudian kita extract menggunakan perintah:
 export AIRGAP_VERSION=2.8.0
 ## create folder and give it access to write
 sudo mkdir -p /var/www/html/release/nke/$AIRGAP_VERSION && \
-sudo chmor -R 777 /var/www/html/**
+sudo chmod -R 777 /var/www/html/**
 
 ## extrat to folder target
-tar xvf airgap-ntnx-$AIRGAP_VERSION.tgz -C /var/www/html/release/nke/$AIRGAP_VERSION/
+tar xvf airgap-ntnx-$AIRGAP_VERSION.tar.gz -C /var/www/html/release/nke/$AIRGAP_VERSION/
 cp airgap-manifest.json /var/www/html/release/nke/$AIRGAP_VERSION/
 ```
 
