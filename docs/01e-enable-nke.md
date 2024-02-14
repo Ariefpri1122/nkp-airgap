@@ -163,7 +163,7 @@ Ok pre-requisite sudah terpenuhi semua sekarang kita enable airgap dengan perint
 --pe-cluster-uuid='<prism-cluster-uuid>' \
 --static-ip='10.12.10.37' \
 --storage-container='default-container' \
---webserver-url='http://10.12.10.1/release/airgap/2.8.0/' \
+--webserver-url='http://10.12.10.1/release/nke/2.8.0/' \
 enable
 ```
 
