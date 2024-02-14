@@ -50,42 +50,6 @@ For Offline installation, litle bit tricky here is how we do enable Nutanix Kube
 - Extract `airgap.tgz` and `airgap-manifest.json` file to your site
 - Deploying airgap
 
-### Create darksite using `httpd`
-
-Siapkan Physical/Virtual machine yang akan dipasangkan untuk webserver untuk menyimpan binary seperti release, image, patch dan lain-lain sehinga proses download dari internet di gantikan ke mekanisme ini.
-
-Sebagai contoh disini saya sudah menyiapkan VM dengan specifikasi seperti berikut:
-
-```yaml
-VM: 
-    os: RockyLinux v9.3
-    vcpu: 2 cores
-    memory: 4 GB
-    storage: 
-        size: 50 GB
-        partision:
-            lvm:
-                /: 40 Gb
-                swap: 4 Gb
-    network:
-        gateway: 10.12.10.254
-        ip: 10.12.10.1
-```
-
-Kemudian kita install package httpd dengan perintah berikut:
-
-```bash
-yum update && \
-yum install -y httpd && \
-systemctl enable --now httpd && \
-firewall-cmd --zone=public --add-port=80/tcp --permanent && \
-firewall-cmd --reload
-```
-
-Maka hasilnya seperti berikut:
-
-![httpd-instaled](imgs/07-karbon/03-httpd-instaled.png)
-
 ### Extract `airgap-package.tgz`
 
 Setelah kita download package `airgap-ntnx-x.x.x.tgz` selanjutnya kita upload ke web server tersebut dengan menggunakan perintah:
