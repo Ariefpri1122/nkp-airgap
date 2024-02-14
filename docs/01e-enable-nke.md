@@ -103,7 +103,7 @@ sudo mkdir -p /var/www/html/release/nke/$AIRGAP_VERSION && \
 sudo chmor -R 777 /var/www/html/**
 
 ## extrat to folder target
-tar xvf airgap-ntnx-$AIRGAP_VERSION.tgz -C /var/www/html/release/airgap/$AIRGAP_VERSION/
+tar xvf airgap-ntnx-$AIRGAP_VERSION.tgz -C /var/www/html/release/nke/$AIRGAP_VERSION/
 cp airgap-manifest.json /var/www/html/release/nke/$AIRGAP_VERSION/
 ```
 
