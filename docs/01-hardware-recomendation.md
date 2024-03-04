@@ -25,3 +25,7 @@ Kemudian terdapat 4 servers yaitu
 - Dell R730 sebagai storage system
 - Dell R730XD sebagai Nutanix 1 node
 - Supermicro 2027-TR sebagai Nutanix 4 node
+
+### Nutanix `1` Node
+
+Server 1 node ada beberapa 
