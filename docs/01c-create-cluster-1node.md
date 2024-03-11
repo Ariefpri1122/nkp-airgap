@@ -137,10 +137,6 @@ nutanix@NTNX-ba60e5b2-A-CVM:10.12.1.30:~$ change_ahv_hostname --host_ip=10.12.1.
 2023-08-25 23:34:25,759Z INFO change_ahv_hostname:69 Host name is successfully updated
 ```
 
-Setelah berhasil semuanya, kita bisa lihat vm name pada menu `VM -> tables` hasilnya seperti berikut:
-
-![vm-list-host](imgs/05-prism-element/01d-vm-list-name.png)
-
 ## Setup Prism Element
 
 Kemudian kita setup untuk Prism Element seperti:
