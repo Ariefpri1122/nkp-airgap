@@ -12,6 +12,8 @@ cluster -s <cvm-ips> \
 --ntp_servers=<ntp-servers> \
 --dns_servers=<dns-servers> \
 create
+
+# cluster -s 10.12.1.31,10.12.1.32,10.12.1.33,10.12.1.34 --redundancy_factor=2 --cluster_name='Sys2027TR-H72RF-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
 ```
 
 Jika dijalankan hasilnya seperti berikut:
@@ -153,6 +155,11 @@ Untuk mengganti Node Name pada CVM IP kita bisa menggunakan perintah berikut:
 
 ```bash
 change_cvm_display_name --cvm_ip=<cvm-ip> --cvm_name=<cvm-display-name>
+
+# change_cvm_display_name --cvm_ip=10.12.1.31 --cvm_name=NTNX-Sys2027TR-A-CVM
+# change_cvm_display_name --cvm_ip=10.12.1.32 --cvm_name=NTNX-Sys2027TR-B-CVM
+# change_cvm_display_name --cvm_ip=10.12.1.33 --cvm_name=NTNX-Sys2027TR-C-CVM
+# change_cvm_display_name --cvm_ip=10.12.1.34 --cvm_name=NTNX-Sys2027TR-D-CVM
 ```
 
 Jika kita exekusi hasilnya seperti berikut:
@@ -181,81 +188,26 @@ Changing display name to NTNX-B-CVM. This will reboot the CVM. Do you want to pr
 2023-08-26 00:19:46,527Z INFO change_cvm_display_name:105 Running cmd: virsh dumpxml NTNX-B-CVM > NTNX-CVM.xml on host
 2023-08-26 00:19:46,688Z INFO change_cvm_display_name:111 Successful in creating the XML file for the CVM.
 2023-08-26 00:19:46,688Z INFO change_cvm_display_name:297 CVM rename successful
-
-nutanix@NTNX-CVM-D:192.168.88.34:~$ change_cvm_display_name --cvm_ip=192.168.88.33 --cvm_name=NTNX-C-CVM
-2023-08-26 00:26:55,578Z INFO change_cvm_display_name:207 Attempting to change the display name of the CVM
-2023-08-26 00:26:55,580Z INFO zookeeper_session.py:191 change_cvm_display_name is attempting to connect to Zookeeper
-2023-08-26 00:26:55,589Z INFO change_cvm_display_name:125 Retrieving the name of the CVM for the host
-2023-08-26 00:26:55,594Z INFO zookeeper_session.py:625 ZK session establishment complete, sessionId=0x18a2f375f5a007c, negotiated timeout=20 secs
-2023-08-26 00:26:56,156Z INFO change_cvm_display_name:156 Running prechecks before execution of script
-2023-08-26 00:26:56,156Z INFO change_cvm_display_name:162 Running on AHV host
-2023-08-26 00:26:56,156Z INFO change_cvm_display_name:168 Running on different CVM
-2023-08-26 00:26:56,157Z INFO change_cvm_display_name:175 Display name is validated
-Changing display name to NTNX-C-CVM. This will reboot the CVM. Do you want to proceed? (Y/N): Y
-2023-08-26 00:26:57,986Z INFO change_cvm_display_name:248 Checking if shutdown token can be retrieved
-2023-08-26 00:26:58,074Z INFO change_cvm_display_name:254 Shutting down CVM:192.168.88.33 for changing the display name
-2023-08-26 00:27:28,512Z WARNING command.py:175 Timeout executing /usr/bin/ssh -q -o CheckHostIp=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no -o TCPKeepAlive=yes -o UserKnownHostsFile=/dev/null -o ControlPath=/home/nutanix/.ssh/controlmasters/tmpDYJE6l -o PreferredAuthentications=publickey  nutanix@192.168.88.33 source /etc/profile; /home/nutanix/cluster/bin/cvm_shutdown -h now: 30 secs elapsed
-2023-08-26 00:28:28,708Z INFO change_cvm_display_name:261 Waiting for CVM to shut down
-2023-08-26 00:28:28,708Z INFO change_cvm_display_name:196 Confirming if the CVM has been shut down
-2023-08-26 00:28:28,865Z INFO change_cvm_display_name:263 CVM was shut down succesfully
-2023-08-26 00:28:28,865Z INFO change_cvm_display_name:67 Running cmd: virsh domrename NTNX-9e7742d3-A-CVM NTNX-C-CVM on host
-2023-08-26 00:28:44,033Z INFO change_cvm_display_name:67 Running cmd: virsh start NTNX-C-CVM on host
-2023-08-26 00:29:02,063Z INFO change_cvm_display_name:67 Running cmd: virsh autostart NTNX-C-CVM on host
-2023-08-26 00:29:17,237Z INFO change_cvm_display_name:284 Attempting to create a backup of the NTNX-CVM.xml file on host
-2023-08-26 00:29:17,339Z INFO change_cvm_display_name:103 Creating new CVM XML config file
-2023-08-26 00:29:17,340Z INFO change_cvm_display_name:105 Running cmd: virsh dumpxml NTNX-C-CVM > NTNX-CVM.xml on host
-2023-08-26 00:29:17,504Z INFO change_cvm_display_name:111 Successful in creating the XML file for the CVM.
-2023-08-26 00:29:17,505Z INFO change_cvm_display_name:297 CVM rename successful
-
-nutanix@NTNX-CVM-B:192.168.88.32:~$ change_cvm_display_name --cvm_ip=192.168.88.34 --cvm_name=NTNX-D-CVM
-2023-08-26 00:36:01,801Z INFO change_cvm_display_name:207 Attempting to change the display name of the CVM
-2023-08-26 00:36:01,803Z INFO zookeeper_session.py:191 change_cvm_display_name is attempting to connect to Zookeeper
-2023-08-26 00:36:01,811Z INFO change_cvm_display_name:125 Retrieving the name of the CVM for the host
-2023-08-26 00:36:01,816Z INFO zookeeper_session.py:625 ZK session establishment complete, sessionId=0x28a2f4015f2007f, negotiated timeout=20 secs
-2023-08-26 00:36:02,495Z INFO change_cvm_display_name:156 Running prechecks before execution of script
-2023-08-26 00:36:02,496Z INFO change_cvm_display_name:162 Running on AHV host
-2023-08-26 00:36:02,496Z INFO change_cvm_display_name:168 Running on different CVM
-2023-08-26 00:36:02,496Z INFO change_cvm_display_name:175 Display name is validated
-Changing display name to NTNX-D-CVM. This will reboot the CVM. Do you want to proceed? (Y/N): Y
-2023-08-26 00:36:05,639Z INFO change_cvm_display_name:248 Checking if shutdown token can be retrieved
-2023-08-26 00:36:05,734Z INFO change_cvm_display_name:254 Shutting down CVM:192.168.88.34 for changing the display name
-2023-08-26 00:36:36,175Z WARNING command.py:175 Timeout executing /usr/bin/ssh -q -o CheckHostIp=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no -o TCPKeepAlive=yes -o UserKnownHostsFile=/dev/null -o ControlPath=/home/nutanix/.ssh/controlmasters/tmp5pz9sR -o PreferredAuthentications=publickey  nutanix@192.168.88.34 source /etc/profile; /home/nutanix/cluster/bin/cvm_shutdown -h now: 30 secs elapsed
-2023-08-26 00:37:36,415Z INFO change_cvm_display_name:261 Waiting for CVM to shut down
-2023-08-26 00:37:36,416Z INFO change_cvm_display_name:196 Confirming if the CVM has been shut down
-2023-08-26 00:37:36,579Z INFO change_cvm_display_name:263 CVM was shut down succesfully
-2023-08-26 00:37:36,579Z INFO change_cvm_display_name:67 Running cmd: virsh domrename NTNX-350f3275-A-CVM NTNX-D-CVM on host
-2023-08-26 00:37:51,687Z INFO change_cvm_display_name:67 Running cmd: virsh start NTNX-D-CVM on host
-2023-08-26 00:38:09,616Z INFO change_cvm_display_name:67 Running cmd: virsh autostart NTNX-D-CVM on host
-2023-08-26 00:38:24,793Z INFO change_cvm_display_name:284 Attempting to create a backup of the NTNX-CVM.xml file on host
-2023-08-26 00:38:24,903Z INFO change_cvm_display_name:103 Creating new CVM XML config file
-2023-08-26 00:38:24,903Z INFO change_cvm_display_name:105 Running cmd: virsh dumpxml NTNX-D-CVM > NTNX-CVM.xml on host
-2023-08-26 00:38:25,057Z INFO change_cvm_display_name:111 Successful in creating the XML file for the CVM.
-2023-08-26 00:38:25,057Z INFO change_cvm_display_name:297 CVM rename successful
 ```
 
 Untuk mengganti hostname pada AHV Host/Hypervisor IP kita bisa menggunakan perintah berikut:
 
 ```bash
 change_ahv_hostname --host_ip=<host-IP-address> --host_name=<new-host-name>
+
+# change_ahv_hostname --host_ip=10.12.1.21 --host_name=AHV-Sys2027TR-A
+# change_ahv_hostname --host_ip=10.12.1.22 --host_name=AHV-Sys2027TR-B
+# change_ahv_hostname --host_ip=10.12.1.23 --host_name=AHV-Sys2027TR-C
+# change_ahv_hostname --host_ip=10.12.1.24 --host_name=AHV-Sys2027TR-D
 ```
 
 Jika kita eksekusi hasilnya seperti berikut:
 
 ```bash
-nutanix@NTNX-ba60e5b2-A-CVM:192.168.88.32:~$ change_ahv_hostname --host_ip=192.168.88.22 --host_name=NTNX-AHV-B
+nutanix@NTNX-ba60e5b2-A-CVM:10.12.1.33:~$ change_ahv_hostname --host_ip=10.12.1.24 --host_name=AHV-Sys2027TR-D
 2023-08-25 23:34:20,658Z INFO ahv_host_agent.py:230 Setting response time out None for host agent
 2023-08-25 23:34:21,881Z INFO ahv_host_agent.py:741 Event listener thread started
 2023-08-25 23:34:25,759Z INFO change_ahv_hostname:69 Host name is successfully updated
-
-nutanix@NTNX-ba60e5b2-A-CVM:192.168.88.32:~$ change_ahv_hostname --host_ip=192.168.88.23 --host_name=NTNX-AHV-C
-2023-08-25 23:34:35,959Z INFO ahv_host_agent.py:230 Setting response time out None for host agent
-2023-08-25 23:34:37,161Z INFO ahv_host_agent.py:741 Event listener thread started
-2023-08-25 23:34:40,890Z INFO change_ahv_hostname:69 Host name is successfully updated
-
-nutanix@NTNX-ba60e5b2-A-CVM:192.168.88.32:~$ change_ahv_hostname --host_ip=192.168.88.24 --host_name=NTNX-AHV-D
-2023-08-25 23:34:48,477Z INFO ahv_host_agent.py:230 Setting response time out None for host agent
-2023-08-25 23:34:49,685Z INFO ahv_host_agent.py:741 Event listener thread started
-2023-08-25 23:34:53,467Z INFO change_ahv_hostname:69 Host name is successfully updated
 ```
 
 Setelah berhasil semuanya, kita bisa lihat vm name pada menu `VM -> tables` hasilnya seperti berikut:
@@ -266,55 +218,13 @@ Setelah berhasil semuanya, kita bisa lihat vm name pada menu `VM -> tables` hasi
 
 Kemudian kita setup untuk Prism Element seperti:
 
-1. Setup Cluste name
-2. Setup Prism Element Virtual IP
-3. Setup Prism Element iSCSI Data Services IP
-4. Setup Prism Element FQDN
-5. Setup DNS
-6. Setup NTP
+1. Setup Virtual IP, iSCSI Data Services IP
+2. Setup DNS
+3. Setup NTP
 
-Untuk mengganti ClusterName kita bisa menggunakan command berikut:
+### Setup Virtual IP, iSCSI Data Services IP
 
-```bash
-ncli cluster edit-info new-name=<NewPCName>
-```
-
-Jika dijalankan maka hasilnya seperti berikut:
-
-```bash
-nutanix@NTNX-CVM-C:192.168.88.33:~$ ncli cluster edit-info new-name=DevOpsWithDimas
-
-    Cluster Id                : xxxxx
-    Cluster Uuid              : xxxxx
-    Cluster Name              : DevOpsWithDimas
-    Cluster Version           : 6.5.2
-    Cluster Full Version      : el7.3-release-fraser-6.5.2-stable-f2ce4db7d67f495ebfd6208bef9ab0afec9c74af
-    Node Count                : 3
-    Block Count               : 3
-    Shadow Clones Status      : Enabled
-    Has Self Encrypting Disk  : no
-    Cluster Masquerading I... :
-    Cluster Masquerading PORT :
-    Is registered to PC       : false
-    Rebuild Reservation       : Disabled
-    Encryption In Transit     : Disabled
-    Is LTS                    : true
-    External Data Services... :
-    Support Verbosity Level   : BASIC_COREDUMP
-    Lock Down Status          : Disabled
-    Password Remote Login ... : Enabled
-    Timezone                  : UTC
-    On-Disk Dedup             : Disabled
-    NCC Version               : ncc-4.6.2.1
-    Common Criteria Mode      : Disabled
-    Degraded Node Monitoring  : Enabled
-```
-
-Jika kita check hasilnya di menu `Settings -> Cluster Detail` seperti berikut:
-
-![cluster-name-changed](imgs/05-prism-element/01e-changed-cluster-name.png)
-
-Kemudian untuk setting Virtual IP, iSCSI Data Services IP bisa kita langsung edit seperti berikut:
+Untuk setting Virtual IP, iSCSI Data Services IP bisa kita langsung edit seperti berikut:
 
 ![config-cluster-detail](imgs/05-prism-element/01f-cluster-detail-config.png)
 
