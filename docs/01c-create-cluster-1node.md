@@ -12,6 +12,8 @@ cluster -s <cvm-ips> \
 --ntp_servers=<ntp-servers> \
 --dns_servers=<dns-servers> \
 create
+
+# cluster -s 10.12.1.30 --redundancy_factor=2 --cluster_name='DELL-R730XD-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
 ```
 
 Jika dijalankan hasilnya seperti berikut:
@@ -148,6 +150,7 @@ Kemudian kita setup untuk Prism Element seperti:
 4. Setup DNS
 5. Setup NTP
 6. Update disk tier
+7. Update CVM memory
 
 Untuk mengganti ClusterName kita bisa menggunakan command berikut:
 
@@ -172,3 +175,5 @@ ncli disk list
 # update tier by id -- for example: ncli disk update tier-name=SSD-SATA id='0006135a-3086-f58f-4cd0-c81f66ef483f::13'
 ncli disk update tier-name=SSD-SATA id='<disk-id>'
 ```
+
+Update memory on CVM is importance, by default is `20 Gi` so we need update to `32 Gi` for faster startup all service.
