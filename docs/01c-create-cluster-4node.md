@@ -13,7 +13,7 @@ cluster -s <cvm-ips> \
 --dns_servers=<dns-servers> \
 create
 
-# cluster -s 10.12.1.31,10.12.1.32,10.12.1.33,10.12.1.34 --redundancy_factor=2 --cluster_name='Sys2027TR-H72RF-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
+# cluster -s 10.12.1.31,10.12.1.32,10.12.1.33,10.12.1.34 --redundancy_factor=2 --cluster_name='Sys2027TR-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
 ```
 
 Jika dijalankan hasilnya seperti berikut:
