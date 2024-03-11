@@ -124,12 +124,14 @@ Untuk mengganti hostname pada AHV Host/Hypervisor IP kita bisa menggunakan perin
 
 ```bash
 change_ahv_hostname --host_ip=<host-IP-address> --host_name=<new-host-name>
+
+# change_ahv_hostname --host_ip=10.12.1.20 --host_name=DELL-R730XD-A
 ```
 
 Jika kita eksekusi hasilnya seperti berikut:
 
 ```bash
-nutanix@NTNX-ba60e5b2-A-CVM:10.12.1.30:~$ change_ahv_hostname --host_ip=10.12.1.20 --host_name=DELL-R730XD-A-AHV
+nutanix@NTNX-ba60e5b2-A-CVM:10.12.1.30:~$ change_ahv_hostname --host_ip=10.12.1.20 --host_name=DELL-R730XD-A
 2023-08-25 23:34:20,658Z INFO ahv_host_agent.py:230 Setting response time out None for host agent
 2023-08-25 23:34:21,881Z INFO ahv_host_agent.py:741 Event listener thread started
 2023-08-25 23:34:25,759Z INFO change_ahv_hostname:69 Host name is successfully updated
@@ -143,12 +145,11 @@ Setelah berhasil semuanya, kita bisa lihat vm name pada menu `VM -> tables` hasi
 
 Kemudian kita setup untuk Prism Element seperti:
 
-1. Setup Prism Element Virtual IP
-2. Setup Prism Element iSCSI Data Services IP
-3. Setup DNS
-4. Setup NTP
-5. Update disk tier (optinal)
-6. Update CVM memory
+1. Setup VirtualIP, iSCSI Data Services IP
+2. Setup NTP
+3. Update disk tier (optinal)
+4. Update CVM memory
+5. Update Host, CVM user linux
 
 ### Setup VirtualIP, iSCSI Data
 
@@ -178,3 +179,21 @@ ncli disk update tier-name=SSD-SATA id='<disk-id>'
 ### Update CVM memory
 
 Update memory on CVM is importance, by default is `20 Gi` so we need update to `32 Gi` for faster startup all service.
+
+### Update Host, CVM user linux
+
+The an other importance think is update credential for user `root` for Host/AHV and `nutanix` user for CVM
+
+First update the credential for AHV/Host using this command:
+
+```bash
+# login to host/ahv
+passwd
+```
+
+Finaly update the credential for CVM using this command:
+
+```bash
+# login to cvm
+sudo passwd nutanix
+```
