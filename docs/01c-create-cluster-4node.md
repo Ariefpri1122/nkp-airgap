@@ -20,7 +20,7 @@ Jika dijalankan hasilnya seperti berikut:
 nutanix@NTNX-9810330e-A-CVM:192.168.88.27:~$ cluster status
 2023-08-25 02:07:45,107Z CRITICAL MainThread cluster:2930 Cluster is currently unconfigured. Please create the cluster.
 
-nutanix@NTNX-ba60e5b2-A-CVM:192.168.88.32:~$ cluster -s 10.12.1.31,10.12.1.32,10.12.1.33,10.12.1.34 --redundancy_factor=2 --cluster_name='PE-DevOpsWithDimas' --container_name='default-storage-container' --ntp_servers=10.12.1.10 --dns_servers=8.8.8.8 create
+nutanix@NTNX-ba60e5b2-A-CVM:192.168.88.32:~$ cluster -s 10.12.1.31,10.12.1.32,10.12.1.33,10.12.1.34 --redundancy_factor=2 --cluster_name='Sys2027TR-H72RF-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
 2023-08-25 23:15:33,673Z INFO MainThread cluster:2943 Executing action create on SVMs 192.168.88.32,192.168.88.33,192.168.88.34
 2023-08-25 23:15:36,700Z INFO MainThread cluster:1007 Discovered node:
 ip: 192.168.88.32
@@ -144,9 +144,10 @@ Kurang lebih seperti berikut metricnya:
 
 | IPMI          | Node name     | Host IP       | Hostname for HostIP   | CVM IP        | Hostname for CVM      |
 | :---          | :---          | :---          | :---                  | :---          | :---                  |
-| 192.168.88.12 | NTNX-B-CVM    | 192.168.88.22 | NTNX-NODE-B           | 192.168.88.32 | NTNX-CVM-B            |
-| 192.168.88.13 | NTNX-C-CVM    | 192.168.88.22 | NTNX-NODE-C           | 192.168.88.33 | NTNX-CVM-C            |
-| 192.168.88.14 | NTNX-D-CVM    | 192.168.88.22 | NTNX-NODE-D           | 192.168.88.34 | NTNX-CVM-D            |
+| 10.10.1.16 | NTNX-A-CVM    | 10.12.1.21 | NTNX-NODE-B           | 10.12.1.31 | NTNX-CVM-B            |
+| 10.10.1.17 | NTNX-B-CVM    | 10.12.1.22 | NTNX-NODE-C           | 10.12.1.32 | NTNX-CVM-C            |
+| 10.10.1.18 | NTNX-C-CVM    | 10.12.1.23 | NTNX-NODE-D           | 10.12.1.33 | NTNX-CVM-D            |
+| 10.10.1.19 | NTNX-D-CVM    | 10.12.1.24 | NTNX-NODE-D           | 10.12.1.34 | NTNX-CVM-D            |
 
 Untuk mengganti Node Name pada CVM IP kita bisa menggunakan perintah berikut:
 
@@ -157,7 +158,7 @@ change_cvm_display_name --cvm_ip=<cvm-ip> --cvm_name=<cvm-display-name>
 Jika kita exekusi hasilnya seperti berikut:
 
 ```bash
-nutanix@NTNX-CVM-D:192.168.88.34:~$ change_cvm_display_name --cvm_ip=192.168.88.32 --cvm_name=NTNX-B-CVM
+nutanix@NTNX-CVM-D:192.168.88.34:~$ change_cvm_display_name --cvm_ip=10.12.1.31 --cvm_name=NTNX-Sys2027TR-A-CVM
 2023-08-26 00:16:22,135Z INFO change_cvm_display_name:207 Attempting to change the display name of the CVM
 2023-08-26 00:16:22,136Z INFO zookeeper_session.py:191 change_cvm_display_name is attempting to connect to Zookeeper
 2023-08-26 00:16:22,145Z INFO change_cvm_display_name:125 Retrieving the name of the CVM for the host
