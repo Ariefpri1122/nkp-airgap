@@ -178,7 +178,9 @@ ncli disk update tier-name=SSD-SATA id='<disk-id>'
 ```
 ### Update CVM memory
 
-Update memory on CVM is importance, by default is `20 Gi` so we need update to `32 Gi` for faster startup all service.
+Update memory on CVM is importance, by default is `20 Gi` so we need update to `32 Gi` for faster startup all service, Seperti berikut:
+
+![UpgradeCVMRam](./imgs/05-prism-element/01i-upgrade-cvm-ram.png)
 
 ### Update Host, CVM user linux
 

@@ -9,6 +9,16 @@ Ada beberapa operational yang perlu kita lakukan setelah install nutanix cluster
 
 ## LCM update software
 
+Setelah cluster nutanix di configure, tahap selanjutnya adalah melakukan update software. Pertama kita lakukan Inventory terlebih dahulu pada menu LCM seperti berikut:
+
+![LCM-Inventory](./imgs/06-post-install/01a-do-inventory.png)
+
+Setelah selesai, kita download component yang dibutuhkan dari Nutanix Portal kemudian ke Menu **Direct Uploads** upload semua component seperti berikut:
+
+![DirectUpload](./imgs/06-post-install/01e-direct-uploads.png)
+
+Dan lakkukan update pada tab Software.
+
 ## Deploy Prism Central
 
 Download **Prism Central 1-click deploy from Prism Element** dari Nutanix portal [downloads page](https://portal.nutanix.com/page/downloads?product=prism) dengan version yang sesuai/compatible dengan Prism Element dalam case ini saya menggunakan AOS `6.5.x` maka menggunakan Prism Central `pc.2022.6.xx`
