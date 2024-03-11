@@ -7,9 +7,17 @@ Ada beberapa operational yang perlu kita lakukan setelah install nutanix cluster
 3. Register Prism Central to Prism Element
 4. Lakukan update software dengan menggunakan Menu LCM pada Prism Central
 
-### LCM update software
+## LCM update software
 
-### NTP Server (offsite)
+## Deploy Prism Central
+
+Download **Prism Central 1-click deploy from Prism Element** dari Nutanix portal [downloads page](https://portal.nutanix.com/page/downloads?product=prism) dengan version yang sesuai/compatible dengan Prism Element dalam case ini saya menggunakan AOS `6.5.x` maka menggunakan Prism Central `pc.2022.6.xx`
+
+![download](imgs/06a-prism-central/01-download.png)
+
+Setelah di download, kita balik lagi ke menu Prism Element pada cluster kita. Kita perlu buat dulu Network/Subnet infterfacenya.
+
+## NTP Server (offsite)
 
 Siapkan Physical/Virtual machine yang akan dipasangkan untuk mirror NTP Server secara offline.
 
@@ -28,7 +36,7 @@ VM:
                 swap: 4 Gb
     network:
         gateway: 10.12.10.254
-        ip: 10.12.10.2
+        ip: 10.12.10.1
 ```
 
 Kemudian kita install package ntp server dengan perintah berikut:
@@ -71,7 +79,7 @@ Setelah itu kita set NTP Server pada Prism Central pada menu `Setting -> NTP Ser
 
 ![prism-central](imgs/06-post-install/02b-add-local-ntpserver.png)
 
-### Darksite webserver (offline LCM)
+## Darksite webserver (offline LCM)
 
 Siapkan Physical/Virtual machine yang akan dipasangkan untuk webserver untuk menyimpan binary seperti release, image, patch dan lain-lain sehinga proses download dari internet di gantikan ke mekanisme ini.
 
@@ -90,7 +98,7 @@ VM:
                 swap: 4 Gb
     network:
         gateway: 10.12.10.254
-        ip: 10.12.10.1
+        ip: 10.12.10.2
 ```
 
 Kemudian kita install package httpd dengan perintah berikut:

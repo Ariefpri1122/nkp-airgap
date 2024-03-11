@@ -125,7 +125,7 @@ Ok pre-requisite sudah terpenuhi semua sekarang kita enable airgap dengan perint
 --pe-username='admin' \
 --vlan-uuid='<network-vlan-uuid>' \
 --pe-cluster-uuid='<prism-cluster-uuid>' \
---static-ip='10.12.10.37' \
+--static-ip='10.12.10.2' \
 --storage-container='default-container' \
 --webserver-url='http://10.12.10.1/release/nke/2.8.0/' \
 enable
