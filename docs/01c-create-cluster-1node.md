@@ -105,7 +105,7 @@ Setelah itu temen-temen login dengan credential yang baru, dan setelah itu temen
 
 Pada mesin tersebut harus terkoneksi ke internet, supaya bisa login ke Nutanix Prism Element. Jika tidak bisa login, silahkan coba ganti password dengan click reset password pada account [my.nutanix.com](https://my.nutanix.com) jika berhasil maka outputnya seperti berikut:
 
-![prism-element-dashboard](imgs/05-prism-element/01c-pe-dashboard.png)
+![prism-element-dashboard](imgs/05-prism-element/01c-pe-dashboard-1node.png)
 
 ## Organize nodes
 
