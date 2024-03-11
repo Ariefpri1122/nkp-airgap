@@ -112,8 +112,7 @@ Pada mesin tersebut harus terkoneksi ke internet, supaya bisa login ke Nutanix P
 selanjutnya adalah kita organize dulu setiap nodenya seperti setting hostname lain-lain: 
 
 Setup hostname for easyies to identified/troubleshoot when you got hardware problem:
-- changed on host ip
-- changed on cvm
+- changed hostname on host ip
 
 Kurang lebih seperti berikut metricnya:
 
@@ -146,13 +145,12 @@ Kemudian kita setup untuk Prism Element seperti:
 
 1. Setup Prism Element Virtual IP
 2. Setup Prism Element iSCSI Data Services IP
-3. Setup Prism Element FQDN
-4. Setup DNS
-5. Setup NTP
-6. Update disk tier
-7. Update CVM memory
+3. Setup DNS
+4. Setup NTP
+5. Update disk tier (optinal)
+6. Update CVM memory
 
-Untuk mengganti ClusterName kita bisa menggunakan command berikut:
+### Setup VirtualIP, iSCSI Data
 
 Kemudian untuk setting Virtual IP, iSCSI Data Services IP bisa kita langsung edit seperti berikut:
 
@@ -166,6 +164,8 @@ Untuk memastikan sync timezone pada cluster, kita harus menambahkan NTP pada men
 
 ![config-ntp-server](imgs/05-prism-element/01h-config-ntp-server.png)
 
+### Update disk tier (optinal)
+
 Untuk meng-update disk tier kita bisa menggunakan perintah `ncli disk update` seperti berikut:
 
 ```bash
@@ -175,5 +175,6 @@ ncli disk list
 # update tier by id -- for example: ncli disk update tier-name=SSD-SATA id='0006135a-3086-f58f-4cd0-c81f66ef483f::13'
 ncli disk update tier-name=SSD-SATA id='<disk-id>'
 ```
+### Update CVM memory
 
 Update memory on CVM is importance, by default is `20 Gi` so we need update to `32 Gi` for faster startup all service.
