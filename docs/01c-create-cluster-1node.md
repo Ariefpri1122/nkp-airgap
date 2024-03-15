@@ -137,15 +137,31 @@ nutanix@NTNX-ba60e5b2-A-CVM:10.12.1.30:~$ change_ahv_hostname --host_ip=10.12.1.
 2023-08-25 23:34:25,759Z INFO change_ahv_hostname:69 Host name is successfully updated
 ```
 
+## Update cvm name for 1 node
+
+Untuk meng-update cvm pada 1 node, agak sedikit berbeda yaitu kita perlu poweroff cvm melalui `virsh` di host ip login sebagai root `ssh root@10.x.x.20` dengan perintah berikut:
+
+```bash
+# check domain name of cvm
+virsh list --all
+
+# poweroff the cvm domain
+virsh poweroff NTNX-xxxx-x-CVM
+
+# rename domain configuration
+virsh domrename NTNX-xxxx-x-CVM NTNX-DellR730XD-A-CVM
+virsh autostart NTNX-DellR730XD-A-CVM
+virsh start NTNX-DellR730XD-A-CVM
+```
+
 ## Setup Prism Element
 
 Kemudian kita setup untuk Prism Element seperti:
 
 1. Setup VirtualIP, iSCSI Data Services IP
 2. Setup NTP
-3. Update disk tier (optinal)
-4. Update CVM memory
-5. Update Host, CVM user linux
+3. Update CVM memory
+4. Update Host, CVM user linux
 
 ### Setup VirtualIP, iSCSI Data
 
@@ -161,17 +177,6 @@ Untuk memastikan sync timezone pada cluster, kita harus menambahkan NTP pada men
 
 ![config-ntp-server](imgs/05-prism-element/01h-config-ntp-server.png)
 
-### Update disk tier (optinal)
-
-Untuk meng-update disk tier kita bisa menggunakan perintah `ncli disk update` seperti berikut:
-
-```bash
-# check id of list disks
-ncli disk list
-
-# update tier by id -- for example: ncli disk update tier-name=SSD-SATA id='0006135a-3086-f58f-4cd0-c81f66ef483f::13'
-ncli disk update tier-name=SSD-SATA id='<disk-id>'
-```
 ### Update CVM memory
 
 Update memory on CVM is importance, by default is `20 Gi` so we need update to `32 Gi` for faster startup all service, Seperti berikut:
