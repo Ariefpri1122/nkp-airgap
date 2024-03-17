@@ -212,3 +212,27 @@ Kemudian setelah itu kita reboot, dan cleanup package yang sudah tidak digunakan
 ```bash
 yum clean all
 ```
+
+## Export image as OVA
+
+Selanjutnya kita akan export image vm tersebut menjadi OVA berextension `.qcow2` pertama kita perlu Turn Off / Power Off dengan perintah 
+
+```bash
+sudo poweroff
+```
+
+Setelah status vm menjadi Powering Off, sekarang kita bisa click [More]() -> [Export OVA]() seperti berikut:
+
+![do-export-ova](imgs/06b-create-vm-oraclelinux8/04-export-ova.png)
+
+Dan kita bisa input name ova file dengan `oraclelinux-8.7-20240317.qcow2` seperti berikut:
+
+![export-ova](imgs/06b-create-vm-oraclelinux8/04a-export-as-qcow2.png)
+
+Hasilnya seperti berikut pada menu [Compute & Storage]() -> [OVAs]() seperti berikut:
+
+![ova-list](imgs/06b-create-vm-oraclelinux8/04b-ova-list.png)
+
+Sekarang temen-temen bisa Download file ova tersebut, kemudian simpan di-external storage sebagai backup.
+
+## Export image as disk
