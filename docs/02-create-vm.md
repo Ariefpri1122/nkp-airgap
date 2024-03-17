@@ -236,3 +236,16 @@ Hasilnya seperti berikut pada menu [Compute & Storage]() -> [OVAs]() seperti ber
 Sekarang temen-temen bisa Download file ova tersebut, kemudian simpan di-external storage sebagai backup.
 
 ## Export image as disk
+
+Dan yang terakhir kita akan export vm as disk untuk operational, berikut step-by-step.
+Pertama temen-temen akses ke menu [Compute & Storage]() -> [Images] -> click button [Add Image]() dan pilih Image sourcenya [VM Disk]() seperti berikut:
+
+![vm-disk-add](imgs/06b-create-vm-oraclelinux8/05-export-as-disk.png)
+
+Kemudian image placement disimpen pada cluster seperti berikut:
+
+![vm-image-placement](imgs/06b-create-vm-oraclelinux8/05a-placement-location.png)
+
+Maka hasilnya seperti berikut:
+
+![vm-image-list](imgs/06b-create-vm-oraclelinux8/05b-image-list.png)
