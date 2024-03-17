@@ -153,6 +153,7 @@ Setelah installasi ada beberapa hal yang perlu di setting dan configure, tahap p
 ```conf
 # set selinux to permissive
 SELINUX=permissive
+# SELINUX=enforcing
 ```
 
 Kemudian selanjutnya kita perlu modif disk mapping pada file `/etc/lvm/lvm.conf` seperti berikut:
@@ -160,13 +161,15 @@ Kemudian selanjutnya kita perlu modif disk mapping pada file `/etc/lvm/lvm.conf`
 ```conf
 # uncommend bellow and set value to 1
 use_devicesfile = 1
+# use_devicesfile = 0
 ```
 
 Selanjutnya demi keamanan security biasanya kita juga perlu disable login user as `root` dengan cara edit file `/etc/ssh/sshd_config` seperti berikut:
 
 ```ini
 # set permit root login to no
-PermitRootLogin yes
+PermitRootLogin no
+# PermitRootLogin yes
 ```
 
 Jika sudah sekarang kita reboot system, sekarang setelah di reboot kita check statusnya dengan perintah berikut:
