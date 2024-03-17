@@ -11,6 +11,8 @@ Tahap-tahap untuk membuat Virtual Machine seperti berikut:
     - Addons commons package seperti `curl`, `wget`, `tmux` dll
     - Setup `/etc/selinux/conf`
     - Setup `/etc/lvm.conf`
+- Export image as OVA / `qcow2`
+- Import image as disk
 
 ## Download ISOs for OracleLinux 8.7
 
@@ -143,3 +145,67 @@ Setelah itu lanjutkan installasi dengan click button [Begin Installation]() sepe
 Jika installasi sudah complate, kita click reboot seperti berikut:
 
 ![os-deployed](imgs/06b-create-vm-oraclelinux8/03l-os-deployed.png)
+
+## Post Intallation
+
+Setelah installasi ada beberapa hal yang perlu di setting dan configure, tahap pertama kita akan disable dulu selinux dengan meng-edit file `/etc/selinux/config` seperti berikut:
+
+```conf
+# set selinux to permissive
+SELINUX=permissive
+```
+
+Kemudian selanjutnya kita perlu modif disk mapping pada file `/etc/lvm/lvm.conf` seperti berikut:
+
+```conf
+# uncommend bellow and set value to 1
+use_devicesfile = 1
+```
+
+Selanjutnya demi keamanan security biasanya kita juga perlu disable login user as `root` dengan cara edit file `/etc/ssh/sshd_config` seperti berikut:
+
+```ini
+# set permit root login to no
+PermitRootLogin yes
+```
+
+Jika sudah sekarang kita reboot system, sekarang setelah di reboot kita check statusnya dengan perintah berikut:
+
+```bash
+sestatus
+```
+
+Jika dijalankan seperti berikut:
+
+```bash
+[admin@template-oraclelinux-8 ~]$ sestatus
+SELinux status:                 enabled
+SELinuxfs mount:                /sys/fs/selinux
+SELinux root directory:         /etc/selinux
+Loaded policy name:             targeted
+Current mode:                   permissive
+Mode from config file:          permissive
+Policy MLS status:              enabled
+Policy deny_unknown status:     allowed
+Memory protection checking:     actual (secure)
+Max kernel policy version:      33
+```
+
+Jika sudah statusnya menjadi `permissive`, kita bisa lanjutkan ke tahap selanjutnya ada update system dengan perintah berikut:
+
+```bash
+dnf update -y
+```
+
+Setelah di update, kita bisa install beberapa package commons seperti berikut:
+
+```bash
+dnf install -y epel-release && \
+dnf install -y htop vim tmux curl wget
+```
+
+Kemudian setelah itu kita reboot, dan cleanup package yang sudah tidak digunakan dengan perintah berikut:
+
+```bash
+yum clean all
+```
