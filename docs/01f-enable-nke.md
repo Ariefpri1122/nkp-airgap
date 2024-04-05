@@ -63,16 +63,16 @@ Kemudian kita extract menggunakan perintah:
 ```bash
 export AIRGAP_VERSION=2.8.0
 ## create folder and give it access to write
-sudo mkdir -p /var/www/html/release/nke/$AIRGAP_VERSION && \
+sudo mkdir -p /var/www/html/release/nke && \
 sudo chmod -R 777 /var/www/html/**
 
 ## extrat to folder target
-tar xvf airgap-ntnx-$AIRGAP_VERSION.tar.gz -C /var/www/html/release/nke/$AIRGAP_VERSION/
-cp airgap-manifest.json /var/www/html/release/nke/$AIRGAP_VERSION/
+tar xvf airgap-ntnx-$AIRGAP_VERSION.tar.gz -C /var/www/html/release/nke/
+cp airgap-manifest.json /var/www/html/release/nke/
 ```
 
 Sekarang kita bisa akses webappnya dengan url berikut 
-[http://10.12.10.1/release/nke/2.8.0]()
+[http://10.12.10.1/release/nke]()
 
 Maka outputnya seperti berikut:
 
@@ -119,15 +119,15 @@ Ok pre-requisite sudah terpenuhi semua sekarang kita enable airgap dengan perint
 # export NET_VLAN_UUID='<cluster-uuid>'
 # export NET_STATIC_IP='10.12.10.51'
 # export STORAGE_CONTAINER_NAME='default-container'
-# export DARKSITE_URL='http://10.12.10.50/release/airgap/2.8.0/'
+# export DARKSITE_URL='http://10.12.10.50/release/airgap/'
 
 ./karbon/karbonctl airgap \
 --pe-username='admin' \
---vlan-uuid='<network-vlan-uuid>' \
---pe-cluster-uuid='<prism-cluster-uuid>' \
+--vlan-uuid='<changed-me>' \
+--pe-cluster-uuid='<changed-me>' \
 --static-ip='10.12.10.2' \
 --storage-container='default-container' \
---webserver-url='http://10.12.10.1/release/nke/2.8.0/' \
+--webserver-url='http://10.12.10.1/release/nke/' \
 enable
 ```
 
