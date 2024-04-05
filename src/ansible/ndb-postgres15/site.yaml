@@ -1,0 +1,51 @@
+- name: Include variables by OS
+  hosts: ['ndb-postgres15']
+  become: true
+  tasks:
+    - name: debug
+      debug: 
+        msg: "os name: {{ ansible_distribution }}"
+    - name: Load a variable file based on the OS type
+      include_vars: "{{ lookup('first_found', params) }}"
+      vars:
+        params:
+          files:
+            - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}-dependencies.yaml'
+          paths:
+            - 'vars'
+
+- name: Provision PostgreSQL for NDB
+  hosts: ['ndb-postgres15']
+  become: true
+  tasks:
+    - name: debug vars
+      debug:
+        msg: "{{ keepalived_version }}"
+  roles: 
+    - dimmaryanto93.keepalived
+    - dimmaryanto93.ha_proxy
+    - dimmaryanto93.postgres_community
+    - dimmaryanto93.nutanix_db-patch-os
+
+- name: Post install config
+  hosts: ['ndb-postgres15']
+  become: true
+  tasks:
+    - name: Remove data etcd
+      command: "rm -rf {{ etcd_working_dir }}/*"
+    - name: Disable and Stop service etcd
+      service: 
+        name: etcd 
+        state: stopped 
+        enabled: false
+
+- name: Running precheck postgresql
+  hosts: ['ndb-postgres15']
+  become: true
+  tasks:
+    - name: Check NDB precheck
+      command: /opt/ndb/era_linux_prechecks.sh -t postgres_database -d
+      register: ndb_precheck_result
+
+    - debug: 
+        msg: "{{ ndb_precheck_result.stdout_lines }}"
