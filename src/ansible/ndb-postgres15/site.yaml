@@ -25,7 +25,7 @@
     - dimmaryanto93.keepalived
     - dimmaryanto93.ha_proxy
     - dimmaryanto93.postgres_community
-    - dimmaryanto93.nutanix_db-patch-os
+    - dimMaryanto93.nutanix_db-patch-os
 
 - name: Post install config
   hosts: ['ndb-postgres15']
@@ -36,6 +36,13 @@
     - name: Disable and Stop service etcd
       service: 
         name: etcd 
+        state: stopped 
+        enabled: false
+    - name: Remove config keepalived
+      command: "rm -rf /etc/keepalived/keepalived.conf"
+    - name: Disable and Stop service keepalived
+      service: 
+        name: keepalived 
         state: stopped 
         enabled: false
 
