@@ -38,6 +38,13 @@
         name: etcd 
         state: stopped 
         enabled: false
+    - name: Remove config keepalived
+      command: "rm -rf /etc/keepalived/keepalived.conf"
+    - name: Disable and Stop service keepalived
+      service: 
+        name: keepalived 
+        state: stopped 
+        enabled: false
 
 - name: Running precheck postgresql
   hosts: ['ndb-postgres15']
