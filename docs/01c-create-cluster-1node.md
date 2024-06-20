@@ -13,7 +13,7 @@ cluster -s <cvm-ips> \
 --dns_servers=<dns-servers> \
 create
 
-# cluster -s 10.12.1.30 --redundancy_factor=2 --cluster_name='DELL-R730XD-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
+# cluster -s 10.10.10.21 --redundancy_factor=2 --cluster_name='DELL-R730XD-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
 ```
 
 Jika dijalankan hasilnya seperti berikut:
@@ -22,26 +22,26 @@ Jika dijalankan hasilnya seperti berikut:
 nutanix@NTNX-9810330e-A-CVM:192.168.88.27:~$ cluster status
 2023-08-25 02:07:45,107Z CRITICAL MainThread cluster:2930 Cluster is currently unconfigured. Please create the cluster.
 
-nutanix@NTNX-ba60e5b2-A-CVM:10.12.1.30:~$ cluster -s 10.12.1.30 --redundancy_factor=2 --cluster_name='DELL-R730XD-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
+nutanix@NTNX-ba60e5b2-A-CVM:10.10.10.21:~$ cluster -s 10.10.10.21 --redundancy_factor=2 --cluster_name='DELL-R730XD-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
 2023-08-25 23:15:33,673Z INFO MainThread cluster:2943 Executing action create on SVMs 
 2023-08-25 23:15:36,700Z INFO MainThread cluster:1007 Discovered node:
-ip: 10.12.1.30
+ip: 10.10.10.21
         rackable_unit_serial: ba60e5b2
         node_position: A
         node_uuid: 599cd71a-b97f-4a5f-8294-7787e5892888
 
 2023-08-25 23:15:36,701Z INFO MainThread cluster:1025 Cluster is on arch x86_64
 2023-08-25 23:15:36,701Z INFO MainThread genesis_utils.py:8077 Maximum node limit corresponding to the hypervisors on the cluster (set([u'kvm'])) : 32
-2023-08-25 23:16:02,958Z INFO MainThread cluster:1396 Creating cluster with SVMs: 10.12.1.30
+2023-08-25 23:16:02,958Z INFO MainThread cluster:1396 Creating cluster with SVMs: 10.10.10.21
 2023-08-25 23:16:03,147Z INFO MainThread cluster:1407 Will seed prism with password hash $6$Ej223/QPGNcQB$Pp1plB7W2.hxswYWiywajdfgS0YYBCyxa/fK7eDoy8FzaDpZFjdJZLprFpCY8O.Y0dpdBNP.XQWT12WvRWCAQ/
 2023-08-25 23:16:57,925Z INFO MainThread cluster:1425 Zeus is not ready yet, trying again in 5 seconds
 2023-08-25 23:17:35,895Z INFO MainThread cluster:1444 Waiting for services to start
-Waiting on 10.12.1.30 (Up) to start:  SysStatCollector IkatProxy IkatControlPlane SSLTerminator SecureFileSync Medusa DynamicRingChanger Pithos InsightsDB Athena Mercury Mantle Stargate InsightsDataTransfer Ergon GoErgon Cerebro Chronos Curator Prism Hera CIM AlertManager Arithmos Catalog Acropolis Uhura NutanixGuestTools MinervaCVM ClusterConfig APLOSEngine APLOS PlacementSolver Lazan Polaris Delphi Security Flow Anduril XTrim ClusterHealth
+Waiting on 10.10.10.21 (Up) to start:  SysStatCollector IkatProxy IkatControlPlane SSLTerminator SecureFileSync Medusa DynamicRingChanger Pithos InsightsDB Athena Mercury Mantle Stargate InsightsDataTransfer Ergon GoErgon Cerebro Chronos Curator Prism Hera CIM AlertManager Arithmos Catalog Acropolis Uhura NutanixGuestTools MinervaCVM ClusterConfig APLOSEngine APLOS PlacementSolver Lazan Polaris Delphi Security Flow Anduril XTrim ClusterHealth
 
 The state of the cluster: start
 Lockdown mode: Disabled
 
-        CVM: 10.12.1.30 Up
+        CVM: 10.10.10.21 Up
                                 Zeus   UP       [12935, 12983, 12984, 12985, 12994, 13012]
                            Scavenger   UP       [17030, 17210, 17211, 17212]
                               Xmount   UP       [17027, 17185, 17186, 17221]
@@ -118,7 +118,7 @@ Kurang lebih seperti berikut metricnya:
 
 | IPMI          | Node name     | Host IP       | Hostname for HostIP   | CVM IP        | Hostname for CVM      |
 | :---          | :---          | :---          | :---                  | :---          | :---                  |
-| 10.10.1.13 | DELL-R730XD-A-AHV    | 10.12.1.20 | DELL-R730XD-A        | 10.12.1.30 | DELL-R730XD-A            |
+| 10.1.1.11 | DELL-R730XD-A-AHV    | 10.12.1.20 | DELL-R730XD-A        | 10.10.10.21 | DELL-R730XD-A            |
 
 Untuk mengganti hostname pada AHV Host/Hypervisor IP kita bisa menggunakan perintah berikut:
 
@@ -131,7 +131,7 @@ change_ahv_hostname --host_ip=<host-IP-address> --host_name=<new-host-name>
 Jika kita eksekusi hasilnya seperti berikut:
 
 ```bash
-nutanix@NTNX-ba60e5b2-A-CVM:10.12.1.30:~$ change_ahv_hostname --host_ip=10.12.1.20 --host_name=DELL-R730XD-A
+nutanix@NTNX-ba60e5b2-A-CVM:10.10.10.21:~$ change_ahv_hostname --host_ip=10.12.1.20 --host_name=DELL-R730XD-A
 2023-08-25 23:34:20,658Z INFO ahv_host_agent.py:230 Setting response time out None for host agent
 2023-08-25 23:34:21,881Z INFO ahv_host_agent.py:741 Event listener thread started
 2023-08-25 23:34:25,759Z INFO change_ahv_hostname:69 Host name is successfully updated

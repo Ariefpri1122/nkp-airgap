@@ -13,62 +13,62 @@ cluster -s <cvm-ips> \
 --dns_servers=<dns-servers> \
 create
 
-# cluster -s 10.12.1.31,10.12.1.32,10.12.1.33,10.12.1.34 --redundancy_factor=2 --cluster_name='Sys2027TR-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
+# cluster -s 10.20.10.31,10.20.10.32,10.20.10.33,10.20.10.34 --redundancy_factor=2 --cluster_name='Sys2027TR-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
 ```
 
 Jika dijalankan hasilnya seperti berikut:
 
 ```bash
-nutanix@NTNX-9810330e-A-CVM:192.168.88.27:~$ cluster status
+nutanix@NTNX-9810330e-A-CVM:10.20.10.27:~$ cluster status
 2023-08-25 02:07:45,107Z CRITICAL MainThread cluster:2930 Cluster is currently unconfigured. Please create the cluster.
 
-nutanix@NTNX-ba60e5b2-A-CVM:192.168.88.32:~$ cluster -s 10.12.1.31,10.12.1.32,10.12.1.33,10.12.1.34 --redundancy_factor=2 --cluster_name='Sys2027TR-H72RF-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
-2023-08-25 23:15:33,673Z INFO MainThread cluster:2943 Executing action create on SVMs 192.168.88.32,192.168.88.33,192.168.88.34
+nutanix@NTNX-ba60e5b2-A-CVM:10.20.10.32:~$ cluster -s 10.20.10.31,10.20.10.32,10.20.10.33,10.20.10.34 --redundancy_factor=2 --cluster_name='Sys2027TR-H72RF-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
+2023-08-25 23:15:33,673Z INFO MainThread cluster:2943 Executing action create on SVMs 10.20.10.32,10.20.10.33,10.20.10.34
 2023-08-25 23:15:36,700Z INFO MainThread cluster:1007 Discovered node:
-ip: 192.168.88.32
+ip: 10.20.10.32
         rackable_unit_serial: ba60e5b2
         node_position: A
         node_uuid: 599cd71a-b97f-4a5f-8294-7787e5892888
 
 2023-08-25 23:15:36,701Z INFO MainThread cluster:1007 Discovered node:
-ip: 192.168.88.33
+ip: 10.20.10.33
         rackable_unit_serial: 9e7742d3
         node_position: A
         node_uuid: 0495d08d-3e7d-43bb-a785-4e5850c6b851
 
 2023-08-25 23:15:36,701Z INFO MainThread cluster:1007 Discovered node:
-ip: 192.168.88.34
+ip: 10.20.10.34
         rackable_unit_serial: 350f3275
         node_position: A
         node_uuid: 3ebcaca5-1e34-4700-969e-824eec66dc88
 
 2023-08-25 23:15:36,701Z INFO MainThread cluster:1025 Cluster is on arch x86_64
 2023-08-25 23:15:36,701Z INFO MainThread genesis_utils.py:8077 Maximum node limit corresponding to the hypervisors on the cluster (set([u'kvm'])) : 32
-2023-08-25 23:15:36,705Z INFO MainThread genesis_rack_utils.py:50 Rack not configured on node (svm_ip: 192.168.88.32)
-2023-08-25 23:15:36,710Z INFO MainThread genesis_rack_utils.py:50 Rack not configured on node (svm_ip: 192.168.88.33)
-2023-08-25 23:15:36,714Z INFO MainThread genesis_rack_utils.py:50 Rack not configured on node (svm_ip: 192.168.88.34)
-2023-08-25 23:15:41,693Z INFO MainThread cluster:1332 iptables configured on SVM 192.168.88.32
-2023-08-25 23:15:46,799Z INFO MainThread cluster:1332 iptables configured on SVM 192.168.88.33
-2023-08-25 23:15:51,877Z INFO MainThread cluster:1332 iptables configured on SVM 192.168.88.34
+2023-08-25 23:15:36,705Z INFO MainThread genesis_rack_utils.py:50 Rack not configured on node (svm_ip: 10.20.10.32)
+2023-08-25 23:15:36,710Z INFO MainThread genesis_rack_utils.py:50 Rack not configured on node (svm_ip: 10.20.10.33)
+2023-08-25 23:15:36,714Z INFO MainThread genesis_rack_utils.py:50 Rack not configured on node (svm_ip: 10.20.10.34)
+2023-08-25 23:15:41,693Z INFO MainThread cluster:1332 iptables configured on SVM 10.20.10.32
+2023-08-25 23:15:46,799Z INFO MainThread cluster:1332 iptables configured on SVM 10.20.10.33
+2023-08-25 23:15:51,877Z INFO MainThread cluster:1332 iptables configured on SVM 10.20.10.34
 2023-08-25 23:15:51,880Z INFO MainThread cluster:1351 Creating certificates
-2023-08-25 23:15:56,715Z INFO MainThread cluster:1368 Setting the cluster functions on SVM node 192.168.88.32
-2023-08-25 23:15:56,717Z INFO MainThread cluster:1373 Configuring Zeus mapping ({u'192.168.88.34': 3, u'192.168.88.33': 2, u'192.168.88.32': 1}) on SVM node 192.168.88.32
-2023-08-25 23:15:58,254Z INFO MainThread cluster:1368 Setting the cluster functions on SVM node 192.168.88.33
-2023-08-25 23:15:58,256Z INFO MainThread cluster:1373 Configuring Zeus mapping ({u'192.168.88.34': 3, u'192.168.88.33': 2, u'192.168.88.32': 1}) on SVM node 192.168.88.33
-2023-08-25 23:16:00,615Z INFO MainThread cluster:1368 Setting the cluster functions on SVM node 192.168.88.34
-2023-08-25 23:16:00,617Z INFO MainThread cluster:1373 Configuring Zeus mapping ({u'192.168.88.34': 3, u'192.168.88.33': 2, u'192.168.88.32': 1}) on SVM node 192.168.88.34
-2023-08-25 23:16:02,958Z INFO MainThread cluster:1396 Creating cluster with SVMs: 192.168.88.32,192.168.88.33,192.168.88.34
+2023-08-25 23:15:56,715Z INFO MainThread cluster:1368 Setting the cluster functions on SVM node 10.20.10.32
+2023-08-25 23:15:56,717Z INFO MainThread cluster:1373 Configuring Zeus mapping ({u'10.20.10.34': 3, u'10.20.10.33': 2, u'10.20.10.32': 1}) on SVM node 10.20.10.32
+2023-08-25 23:15:58,254Z INFO MainThread cluster:1368 Setting the cluster functions on SVM node 10.20.10.33
+2023-08-25 23:15:58,256Z INFO MainThread cluster:1373 Configuring Zeus mapping ({u'10.20.10.34': 3, u'10.20.10.33': 2, u'10.20.10.32': 1}) on SVM node 10.20.10.33
+2023-08-25 23:16:00,615Z INFO MainThread cluster:1368 Setting the cluster functions on SVM node 10.20.10.34
+2023-08-25 23:16:00,617Z INFO MainThread cluster:1373 Configuring Zeus mapping ({u'10.20.10.34': 3, u'10.20.10.33': 2, u'10.20.10.32': 1}) on SVM node 10.20.10.34
+2023-08-25 23:16:02,958Z INFO MainThread cluster:1396 Creating cluster with SVMs: 10.20.10.32,10.20.10.33,10.20.10.34
 2023-08-25 23:16:03,147Z INFO MainThread cluster:1407 Will seed prism with password hash $6$Ej223/QPGNcQB$Pp1plB7W2.hxswYWiywajdfgS0YYBCyxa/fK7eDoy8FzaDpZFjdJZLprFpCY8O.Y0dpdBNP.XQWT12WvRWCAQ/
 2023-08-25 23:16:57,925Z INFO MainThread cluster:1425 Zeus is not ready yet, trying again in 5 seconds
 2023-08-25 23:17:35,895Z INFO MainThread cluster:1444 Waiting for services to start
-Waiting on 192.168.88.32 (Up) to start:  SysStatCollector IkatProxy IkatControlPlane SSLTerminator SecureFileSync Medusa DynamicRingChanger Pithos InsightsDB Athena Mercury Mantle Stargate InsightsDataTransfer Ergon GoErgon Cerebro Chronos Curator Prism Hera CIM AlertManager Arithmos Catalog Acropolis Uhura NutanixGuestTools MinervaCVM ClusterConfig APLOSEngine APLOS PlacementSolver Lazan Polaris Delphi Security Flow Anduril XTrim ClusterHealth
-Waiting on 192.168.88.33 (Up) to start:  SysStatCollector IkatProxy IkatControlPlane SSLTerminator SecureFileSync Medusa DynamicRingChanger Pithos InsightsDB Athena Mercury Mantle Stargate InsightsDataTransfer Ergon GoErgon Cerebro Chronos Curator Prism Hera CIM AlertManager Arithmos Catalog Acropolis Uhura NutanixGuestTools MinervaCVM ClusterConfig APLOSEngine APLOS PlacementSolver Lazan Polaris Delphi Security Flow Anduril XTrim ClusterHealth
-Waiting on 192.168.88.34 (Up, ZeusLeader) to start:  SysStatCollector IkatProxy IkatControlPlane SSLTerminator SecureFileSync Medusa DynamicRingChanger Pithos InsightsDB Athena Mercury Mantle Stargate InsightsDataTransfer Ergon GoErgon Cerebro Chronos Curator Prism Hera CIM AlertManager Arithmos Catalog Acropolis Uhura NutanixGuestTools MinervaCVM ClusterConfig APLOSEngine APLOS PlacementSolver Lazan Polaris Delphi Security Flow Anduril XTrim ClusterHealth
+Waiting on 10.20.10.32 (Up) to start:  SysStatCollector IkatProxy IkatControlPlane SSLTerminator SecureFileSync Medusa DynamicRingChanger Pithos InsightsDB Athena Mercury Mantle Stargate InsightsDataTransfer Ergon GoErgon Cerebro Chronos Curator Prism Hera CIM AlertManager Arithmos Catalog Acropolis Uhura NutanixGuestTools MinervaCVM ClusterConfig APLOSEngine APLOS PlacementSolver Lazan Polaris Delphi Security Flow Anduril XTrim ClusterHealth
+Waiting on 10.20.10.33 (Up) to start:  SysStatCollector IkatProxy IkatControlPlane SSLTerminator SecureFileSync Medusa DynamicRingChanger Pithos InsightsDB Athena Mercury Mantle Stargate InsightsDataTransfer Ergon GoErgon Cerebro Chronos Curator Prism Hera CIM AlertManager Arithmos Catalog Acropolis Uhura NutanixGuestTools MinervaCVM ClusterConfig APLOSEngine APLOS PlacementSolver Lazan Polaris Delphi Security Flow Anduril XTrim ClusterHealth
+Waiting on 10.20.10.34 (Up, ZeusLeader) to start:  SysStatCollector IkatProxy IkatControlPlane SSLTerminator SecureFileSync Medusa DynamicRingChanger Pithos InsightsDB Athena Mercury Mantle Stargate InsightsDataTransfer Ergon GoErgon Cerebro Chronos Curator Prism Hera CIM AlertManager Arithmos Catalog Acropolis Uhura NutanixGuestTools MinervaCVM ClusterConfig APLOSEngine APLOS PlacementSolver Lazan Polaris Delphi Security Flow Anduril XTrim ClusterHealth
 
 The state of the cluster: start
 Lockdown mode: Disabled
 
-        CVM: 192.168.88.33 Up
+        CVM: 10.20.10.33 Up
                                 Zeus   UP       [12935, 12983, 12984, 12985, 12994, 13012]
                            Scavenger   UP       [17030, 17210, 17211, 17212]
                               Xmount   UP       [17027, 17185, 17186, 17221]
@@ -146,26 +146,26 @@ Kurang lebih seperti berikut metricnya:
 
 | IPMI          | Node name     | Host IP       | Hostname for HostIP   | CVM IP        | Hostname for CVM      |
 | :---          | :---          | :---          | :---                  | :---          | :---                  |
-| 10.10.1.16 | NTNX-A-CVM    | 10.12.1.21 | NTNX-NODE-B           | 10.12.1.31 | NTNX-CVM-B            |
-| 10.10.1.17 | NTNX-B-CVM    | 10.12.1.22 | NTNX-NODE-C           | 10.12.1.32 | NTNX-CVM-C            |
-| 10.10.1.18 | NTNX-C-CVM    | 10.12.1.23 | NTNX-NODE-D           | 10.12.1.33 | NTNX-CVM-D            |
-| 10.10.1.19 | NTNX-D-CVM    | 10.12.1.24 | NTNX-NODE-D           | 10.12.1.34 | NTNX-CVM-D            |
+| 10.1.1.16 | NTNX-A-CVM    | 10.20.10.21 | NTNX-NODE-B           | 10.20.10.31 | NTNX-CVM-B            |
+| 10.1.1.17 | NTNX-B-CVM    | 10.20.10.22 | NTNX-NODE-C           | 10.20.10.32 | NTNX-CVM-C            |
+| 10.1.1.18 | NTNX-C-CVM    | 10.20.10.23 | NTNX-NODE-D           | 10.20.10.33 | NTNX-CVM-D            |
+| 10.1.1.19 | NTNX-D-CVM    | 10.20.10.24 | NTNX-NODE-D           | 10.20.10.34 | NTNX-CVM-D            |
 
 Untuk mengganti Node Name pada CVM IP kita bisa menggunakan perintah berikut:
 
 ```bash
 change_cvm_display_name --cvm_ip=<cvm-ip> --cvm_name=<cvm-display-name>
 
-# change_cvm_display_name --cvm_ip=10.12.1.31 --cvm_name=NTNX-Sys2027TR-A-CVM
-# change_cvm_display_name --cvm_ip=10.12.1.32 --cvm_name=NTNX-Sys2027TR-B-CVM
-# change_cvm_display_name --cvm_ip=10.12.1.33 --cvm_name=NTNX-Sys2027TR-C-CVM
-# change_cvm_display_name --cvm_ip=10.12.1.34 --cvm_name=NTNX-Sys2027TR-D-CVM
+# change_cvm_display_name --cvm_ip=10.20.10.31 --cvm_name=NTNX-Sys2027TR-A-CVM
+# change_cvm_display_name --cvm_ip=10.20.10.32 --cvm_name=NTNX-Sys2027TR-B-CVM
+# change_cvm_display_name --cvm_ip=10.20.10.33 --cvm_name=NTNX-Sys2027TR-C-CVM
+# change_cvm_display_name --cvm_ip=10.20.10.34 --cvm_name=NTNX-Sys2027TR-D-CVM
 ```
 
 Jika kita exekusi hasilnya seperti berikut:
 
 ```bash
-nutanix@NTNX-CVM-D:192.168.88.34:~$ change_cvm_display_name --cvm_ip=10.12.1.31 --cvm_name=NTNX-Sys2027TR-A-CVM
+nutanix@NTNX-CVM-D:10.20.10.34:~$ change_cvm_display_name --cvm_ip=10.20.10.31 --cvm_name=NTNX-Sys2027TR-A-CVM
 2023-08-26 00:16:22,135Z INFO change_cvm_display_name:207 Attempting to change the display name of the CVM
 2023-08-26 00:16:22,136Z INFO zookeeper_session.py:191 change_cvm_display_name is attempting to connect to Zookeeper
 2023-08-26 00:16:22,145Z INFO change_cvm_display_name:125 Retrieving the name of the CVM for the host
@@ -176,8 +176,8 @@ nutanix@NTNX-CVM-D:192.168.88.34:~$ change_cvm_display_name --cvm_ip=10.12.1.31 
 2023-08-26 00:16:22,707Z INFO change_cvm_display_name:175 Display name is validated
 Changing display name to NTNX-B-CVM. This will reboot the CVM. Do you want to proceed? (Y/N): Y
 2023-08-26 00:16:26,901Z INFO change_cvm_display_name:248 Checking if shutdown token can be retrieved
-2023-08-26 00:16:26,990Z INFO change_cvm_display_name:254 Shutting down CVM:192.168.88.32 for changing the display name
-2023-08-26 00:16:57,533Z WARNING command.py:175 Timeout executing /usr/bin/ssh -q -o CheckHostIp=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no -o TCPKeepAlive=yes -o UserKnownHostsFile=/dev/null -o ControlPath=/home/nutanix/.ssh/controlmasters/tmp__NS4L -o PreferredAuthentications=publickey  nutanix@192.168.88.32 source /etc/profile; /home/nutanix/cluster/bin/cvm_shutdown -h now: 30 secs elapsed
+2023-08-26 00:16:26,990Z INFO change_cvm_display_name:254 Shutting down CVM:10.20.10.32 for changing the display name
+2023-08-26 00:16:57,533Z WARNING command.py:175 Timeout executing /usr/bin/ssh -q -o CheckHostIp=no -o ConnectTimeout=15 -o StrictHostKeyChecking=no -o TCPKeepAlive=yes -o UserKnownHostsFile=/dev/null -o ControlPath=/home/nutanix/.ssh/controlmasters/tmp__NS4L -o PreferredAuthentications=publickey  nutanix@10.20.10.32 source /etc/profile; /home/nutanix/cluster/bin/cvm_shutdown -h now: 30 secs elapsed
 2023-08-26 00:18:57,957Z INFO change_cvm_display_name:196 Confirming if the CVM has been shut down
 2023-08-26 00:18:58,120Z INFO change_cvm_display_name:263 CVM was shut down succesfully
 2023-08-26 00:18:58,120Z INFO change_cvm_display_name:67 Running cmd: virsh domrename NTNX-ba60e5b2-A-CVM NTNX-B-CVM on host
@@ -195,16 +195,16 @@ Untuk mengganti hostname pada AHV Host/Hypervisor IP kita bisa menggunakan perin
 ```bash
 change_ahv_hostname --host_ip=<host-IP-address> --host_name=<new-host-name>
 
-# change_ahv_hostname --host_ip=10.12.1.21 --host_name=AHV-Sys2027TR-A
-# change_ahv_hostname --host_ip=10.12.1.22 --host_name=AHV-Sys2027TR-B
-# change_ahv_hostname --host_ip=10.12.1.23 --host_name=AHV-Sys2027TR-C
-# change_ahv_hostname --host_ip=10.12.1.24 --host_name=AHV-Sys2027TR-D
+# change_ahv_hostname --host_ip=10.20.10.21 --host_name=AHV-Sys2027TR-A
+# change_ahv_hostname --host_ip=10.20.10.22 --host_name=AHV-Sys2027TR-B
+# change_ahv_hostname --host_ip=10.20.10.23 --host_name=AHV-Sys2027TR-C
+# change_ahv_hostname --host_ip=10.20.10.24 --host_name=AHV-Sys2027TR-D
 ```
 
 Jika kita eksekusi hasilnya seperti berikut:
 
 ```bash
-nutanix@NTNX-ba60e5b2-A-CVM:10.12.1.33:~$ change_ahv_hostname --host_ip=10.12.1.24 --host_name=AHV-Sys2027TR-D
+nutanix@NTNX-ba60e5b2-A-CVM:10.20.10.33:~$ change_ahv_hostname --host_ip=10.20.10.24 --host_name=AHV-Sys2027TR-D
 2023-08-25 23:34:20,658Z INFO ahv_host_agent.py:230 Setting response time out None for host agent
 2023-08-25 23:34:21,881Z INFO ahv_host_agent.py:741 Event listener thread started
 2023-08-25 23:34:25,759Z INFO change_ahv_hostname:69 Host name is successfully updated
