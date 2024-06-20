@@ -21,7 +21,7 @@
     - dimmaryanto93.keepalived
     - dimmaryanto93.ha_proxy
     - dimmaryanto93.postgres_community
-    - dimmaryanto93.nutanix_db-patch-os
+    - dimMaryanto93.nutanix_db-patch-os
 
 - name: Post install config
   hosts: ['ndb-postgres15']
