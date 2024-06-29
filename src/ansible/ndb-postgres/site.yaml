@@ -34,11 +34,19 @@
         name: etcd 
         state: stopped 
         enabled: false
-    - name: Remove config keepalived
-      command: "rm -rf /etc/keepalived/keepalived.conf"
     - name: Disable and Stop service keepalived
       service: 
         name: keepalived 
+        state: stopped 
+        enabled: false
+    - name: Disable and Stop service patroni
+      service: 
+        name: patroni 
+        state: stopped 
+        enabled: false
+    - name: Disable and Stop service ha-proxy
+      service: 
+        name: haproxy 
         state: stopped 
         enabled: false
 
