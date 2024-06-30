@@ -29,6 +29,8 @@
   tasks:
     - name: Remove data etcd
       command: "rm -rf {{ etcd_working_dir }}/*"
+    - name: Remove config etcd
+      command: "rm -rf {{ etcd_conf_file }}/*"
     - name: Disable and Stop service etcd
       service: 
         name: etcd 
@@ -39,11 +41,11 @@
         name: keepalived 
         state: stopped 
         enabled: false
-    - name: Disable and Stop service patroni
-      service: 
-        name: patroni 
-        state: stopped 
-        enabled: false
+    # - name: Disable and Stop service patroni
+    #   service: 
+    #     name: patroni 
+    #     state: stopped 
+    #     enabled: false
     - name: Disable and Stop service ha-proxy
       service: 
         name: haproxy 
