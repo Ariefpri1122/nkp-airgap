@@ -23,7 +23,7 @@
     - dimmaryanto93.postgres_community
     - dimMaryanto93.nutanix_db-patch-os
 
-- name: Post install config
+- name: Post install
   hosts: ['ndb-postgres15']
   become: true
   tasks:
