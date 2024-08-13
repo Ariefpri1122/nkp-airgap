@@ -14,11 +14,10 @@
   hosts: ['ndb-mysql']
   become: true
   roles: 
-    - dimmaryanto93.postgres_community
     - dimMaryanto93.nutanix_db-patch-os
 
 - name: Running precheck postgresql
-  hosts: ['ndb-postgres15']
+  hosts: ['ndb-mysql']
   become: true
   tasks:
     - name: Check NDB precheck
