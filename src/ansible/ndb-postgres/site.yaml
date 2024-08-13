@@ -11,7 +11,7 @@
             - 'vars'
 
 - name: Provision PostgreSQL for NDB
-  hosts: ['ndb-postgres15']
+  hosts: ['ndb-postgres']
   become: true
   tasks:
     - name: debug vars
@@ -24,7 +24,7 @@
     - dimMaryanto93.nutanix_db-patch-os
 
 - name: Post install
-  hosts: ['ndb-postgres15']
+  hosts: ['ndb-postgres']
   become: true
   tasks:
     - name: Remove data etcd
@@ -58,7 +58,7 @@
         enabled: false
 
 - name: Running precheck postgresql
-  hosts: ['ndb-postgres15']
+  hosts: ['ndb-postgres']
   become: true
   tasks:
     - name: Check NDB precheck

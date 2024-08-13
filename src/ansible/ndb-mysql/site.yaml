@@ -1,0 +1,29 @@
+- name: Include variables by OS
+  hosts: ['ndb']
+  tasks:
+    - name: Load a variable file based on the OS type
+      include_vars: "{{ lookup('first_found', params) }}"
+      vars:
+        params:
+          files:
+            - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}-dependencies.yaml'
+          paths:
+            - 'vars'
+
+- name: Provision PostgreSQL for NDB
+  hosts: ['ndb-mysql']
+  become: true
+  roles: 
+    - dimmaryanto93.postgres_community
+    - dimMaryanto93.nutanix_db-patch-os
+
+- name: Running precheck postgresql
+  hosts: ['ndb-postgres15']
+  become: true
+  tasks:
+    - name: Check NDB precheck
+      command: /opt/ndb/era_linux_prechecks.sh -t mysql_database -d
+      register: ndb_precheck_result
+
+    - debug: 
+        msg: "{{ ndb_precheck_result.stdout_lines }}"
