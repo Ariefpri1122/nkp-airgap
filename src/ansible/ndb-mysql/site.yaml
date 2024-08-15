@@ -10,15 +10,14 @@
           paths:
             - 'vars'
 
-- name: Provision PostgreSQL for NDB
+- name: Provision MySQL for NDB
   hosts: ['ndb-mysql']
   become: true
   roles: 
-    - dimmaryanto93.postgres_community
     - dimMaryanto93.nutanix_db-patch-os
 
-- name: Running precheck postgresql
-  hosts: ['ndb-postgres15']
+- name: Running precheck MySQL DB
+  hosts: ['ndb-mysql']
   become: true
   tasks:
     - name: Check NDB precheck
