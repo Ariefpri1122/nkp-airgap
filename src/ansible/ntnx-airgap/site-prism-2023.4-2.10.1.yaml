@@ -1,0 +1,13 @@
+---
+- hosts: ["airgap"]
+  become: true
+  vars:
+    direct_download: false
+    enable_airgap_object: false
+    default_nke_airgap_version: 2.10.1
+    default_nke_airgap_site_folder: /release/nke/2.10.1
+    default_nke_airgap_folder: /Volumes/packages/Nutanix/nke/2.10.1
+    default_object_airgap_folder: /Volumes/data-1/packages/Nutanix/object/3.6
+  roles:
+    - dimMaryanto93.ntnx_airgap
+      
