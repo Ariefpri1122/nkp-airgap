@@ -1,4 +1,3 @@
 postgres_version: 15
-enabled_postgresql_ha: false
 etcd_working_dir: /var/lib/etcd
 etcd_conf_file: /etc/etcd

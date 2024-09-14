@@ -13,6 +13,8 @@
 - name: Provision PostgreSQL for NDB
   hosts: ['ndb-postgres']
   become: true
+  vars:
+    enabled_postgresql_ha: false
   tasks:
     - name: debug vars
       debug:
@@ -25,6 +27,8 @@
 
 - name: Post install
   hosts: ['ndb-postgres']
+  vars:
+    enabled_postgresql_ha: false
   become: true
   tasks:
     - name: Remove data etcd
@@ -59,6 +63,8 @@
 
 - name: Running precheck postgresql
   hosts: ['ndb-postgres']
+  vars:
+    enabled_postgresql_ha: false
   become: true
   tasks:
     - name: Check NDB precheck
