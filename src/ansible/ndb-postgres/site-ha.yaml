@@ -37,6 +37,9 @@
     - name: Remove config etcd
       command: "rm -rf {{ etcd_conf_file }}/*"
       when: enabled_postgresql_ha == true
+    - name: Remove config keepalived
+      command: "rm -rf {{ keepalived_conf_file }}/*"
+      when: enabled_postgresql_ha == true
     - name: Disable and Stop service etcd
       when: enabled_postgresql_ha == true
       service: 
