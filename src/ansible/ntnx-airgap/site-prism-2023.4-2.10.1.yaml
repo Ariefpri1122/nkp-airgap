@@ -5,8 +5,8 @@
     direct_download: false
     default_nke_airgap_version: 2.10.1
     default_nke_airgap_site_folder: /release/nke/2.10.1
-    default_nke_airgap_folder: /Volumes/Packages/Nutanix/nke/2.10.1
-    default_object_airgap_folder: /Volumes/Packages/Nutanix/object/3.6
+    default_nke_airgap_folder: /Volumes/dell-r330/Packages/Nutanix/nke/2.10.1
+    default_object_airgap_folder: /Volumes/dell-r330/Packages/Nutanix/object/4.3.0.2
   roles:
     - dimMaryanto93.ntnx_airgap
       
