@@ -1,0 +1,9 @@
+---
+- hosts: ["nkp-bastion"]
+  become: true
+  vars:
+    docker_insecure_registries_enabled: false
+    helm_version: 'v3.16.3'
+  roles:
+    - dimmaryanto93.docker
+    - dimmaryanto93.helm_charts

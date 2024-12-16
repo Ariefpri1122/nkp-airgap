@@ -3,9 +3,12 @@ collections:
   - ansible.posix
   - community.postgresql
   - community.general
+  - community.docker
 roles:
   - dimmaryanto93.keepalived
   - dimmaryanto93.ha_proxy
   - dimmaryanto93.postgres_community
   - dimMaryanto93.nutanix_db-patch-os
   - dimMaryanto93.ntnx_airgap
+  - dimmaryanto93.docker
+  - dimmaryanto93.helm_charts
