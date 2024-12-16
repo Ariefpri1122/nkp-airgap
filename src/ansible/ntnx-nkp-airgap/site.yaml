@@ -7,3 +7,4 @@
   roles:
     - dimmaryanto93.docker
     - dimmaryanto93.helm_charts
+    - dimmaryanto93.kubectl
