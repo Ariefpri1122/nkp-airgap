@@ -13,9 +13,6 @@
         - wget
         - git
 
-# - hosts: ["nkp-registry"]
-#   become: true
-
 - hosts: ["nkp-airgap"]
   become: true
   vars:
@@ -28,4 +25,3 @@
     - dimmaryanto93.kubectl
     - dimmaryanto93.helm_charts
     - dimmaryanto93.docker
-    # - dimMaryanto93.docker_post_install
