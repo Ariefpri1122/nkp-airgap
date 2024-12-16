@@ -16,7 +16,7 @@
 - hosts: ["nkp-registry"]
   become: true
 
-- hosts: ["nkp-airgap"]
+- hosts: ["nkp-bastion"]
   become: true
   vars:
     docker_insecure_registries_enabled: false
