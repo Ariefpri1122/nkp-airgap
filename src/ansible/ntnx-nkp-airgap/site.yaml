@@ -1,10 +1,24 @@
 ---
-- hosts: ["nkp-bastion"]
+- hosts: ["nkp-airgap"]
+  become: true
+  tasks:
+    - ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - zip
+        - unzip
+        - tar
+
+- hosts: ["nkp-airgap"]
   become: true
   vars:
     docker_insecure_registries_enabled: false
     helm_version: 'v3.16.3'
+    kubectl_download_filetype: 'archive'
+    kubectl_version: '1.29.9'
+    kubectl_tmp_directory: '/tmp'
   roles:
-    - dimmaryanto93.docker
-    - dimmaryanto93.helm_charts
     - dimmaryanto93.kubectl
+    - dimmaryanto93.helm_charts
+    - dimmaryanto93.docker
