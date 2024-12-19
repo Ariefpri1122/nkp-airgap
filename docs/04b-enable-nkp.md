@@ -54,7 +54,10 @@ So here, i'm already enabled the NKE airgap look like this:
 
 ![nke-airgap-enable](./imgs/07-nkp/02-private-registry-nke-airgap.png)
 
-Next, please increase size of volume group for `airgap-registry-volume` at least `150GB` through Prism look like this:
+Next, please increase size of volume group for `airgap-registry-volume` at least `150GB` through The Prism:
 
 ![increase-size-vg-airgap](./imgs/07-nkp/02a-increse-size-vg-airgap.png)
 
+Then you need configure DNS for `airgap-0` domain, by default NKE airgap configure at `/etc/hosts` level so this mean only node/vm have contain `airgap-0` on file `/etc/hosts` can pointing to the ip address of NKE airgap, if not it's will not able to accessed.
+
+The solution has 2 method, using network applicance or if you can't reach the network device also you can use sofware based such as bind for RHEL based / bind9 for debian based.
