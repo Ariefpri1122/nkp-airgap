@@ -12,7 +12,7 @@ To enable NKP is not strigh forward as Nutanix Kubernetes Engine which just one 
 
 There 2 method for installation Nutanix Kubernetes Platform:
 
-1. Online Installation (may failed expiriances)
+1. Online Installation (you may experience some failures)
     - Required stable & high speed internet access
     - Recommended using Bastion VM to provision NKP Kommander HOST
 
@@ -22,4 +22,4 @@ There 2 method for installation Nutanix Kubernetes Platform:
     - Recommended using Bastion VM to provision NKP Komander HOST
     - [Download bundle](https://portal.nutanix.com/page/downloads?product=nkp) image, tools, nkp-cli from nutainx portal.
 
-    So this article we will goes through step by step for *Enablement Nutanix Kubernetes Platform (NKP)*
+So this article we will goes through step by step for *Enablement Nutanix Kubernetes Platform (NKP)*
