@@ -64,3 +64,154 @@ The solution has 2 method, using network appliance or if you can't reach the net
 
 ## DNS Server with bind/bind9
 
+To use DNS Server as software, please install `bind` for RHEL OS Bases and `bind9` for Debian OS Based on your environment either physical or virtual machine. i will like to use **Rocky Linux 9** for this, so please adjust with your own way if you have to use another operating system.
+
+For install bind on Rocky Linux 9 you can use package-manager with this command:
+
+```yum
+sudo dnf install bind bind-utils
+```
+
+After installing BIND, you'll need to configure it. bind configuration files are located in `/etc/named` directory. The main configuration file is `named.conf`. Please backup it file first:
+
+```bash
+sudo cp /etc/named/named.conf /etc/named/named.conf.orig
+```
+
+Then edit this file with preferred text editor such as `vim`, `nano` or whatever you like, several property you need to adjust:
+
+```conf
+options {
+# please comment this 2 lines
+#	listen-on port 53 { 0.0.0.0; };
+#	listen-on-v6 port 53 { ::1; };
+...
+```
+
+And than the second file you should edit is `named.rfc1912.zones`, before you edit please backup first as usual:
+
+```bash
+sudo cp named.rfc1912.zones named.rfc1912.zones.orig
+```
+
+So please add this line to create your own name record:
+
+```ini
+zone "airgap-0" IN {
+    type master;
+    file "airgap-0.db";
+    allow-update { none; };
+    allow-query {any; };
+};
+
+zone "20.10.10.in-addr.arpa" IN {
+     type master;
+     file "airgap-0.rev";
+     allow-update { none; };
+     allow-query { any; };
+};
+```
+
+Replase zone `xx.xx.xx.in-addr.arpa` with your ip address. Next you'll create file zone for hold DNS record for your domain on `/var/named/` directory.
+
+```bash
+touch /var/named/airgap-0.db && \
+touch /var/named/airgap-0.rev
+```
+
+Put this line into file `/var/named/airgap-0.db`:
+
+```ini
+$TTL 86400
+@ IN SOA ns1.airgap-0. admin.airgap-0. (
+    2019061800 ;Serial
+    3600 ;Refresh
+    1800 ;Retry
+    604800 ;Expire
+    86400 ;Minimum TTL
+)
+
+;Name Server Information
+@    IN NS ns1.airgap-0.
+
+;IP for Name Server
+ns1 IN A 10.10.20.1
+@   IN A 10.10.20.2
+```
+
+Replace the IP for name server with your ip address, than the last one for `/var/named/airgap-0.rev` file:
+
+```ini
+$TTL 86400
+@ IN SOA ns1.airgap-0. admin.airgap-0. (
+    2019061800 ;Serial
+    3600 ;Refresh
+    1800 ;Retry
+    604800 ;Expire
+    86400 ;Minimum TTL
+)
+;Name Server Information
+    IN NS ns1.airgap-0.
+
+;Reverse lookup for Name Server
+136 IN PTR ns1.airgap-0.
+
+;PTR Record IP address to HostName
+13 IN PTR airgap-0.
+```
+
+When you have all of your files created, you need to ensure that the configuration files and zones are in good working order before you start the bind service again.
+
+```bash
+named-checkconf
+```
+
+> This will return an empty result if everything is OK.
+
+Check the forward zone:
+
+```bash
+named-checkzone airgap-0 /var/named/airgap-0.db
+```
+
+This will return something like this if all is well:
+
+```bash
+zone airgap-0/IN: loaded serial 2019061800
+OK
+```
+
+Finally, check the reverse zone:
+
+```bash
+named-checkzone 10.10.20.2 /var/named/airgap-0.rev
+```
+
+Which will return something like this if all is well:
+
+```bash
+zone 192.168.1.136/IN: loaded serial 2019061800
+OK
+```
+
+Assuming that everything looks good, go ahead and start bind and enable it to start on boot:
+
+```bash
+sudo systemctl enable --now named
+```
+
+Ensure that your firewall allows traffic to the DNS server:
+
+```bash
+sudo firewall-cmd --add-service=dns --permanent
+sudo firewall-cmd --reload
+```
+
+You need to add the DNS server (in our example 10.10.20.3) to each machine that you want to have access to the servers that you added to your local DNS. for global configure you might need set DNS at Nutanix Subnet with ipam configured though Prism look like this:
+
+![dns-local-subnet-nutanix](./imgs/07-nkp/02b-local-dns-bind.png)
+
+Then you can test on your virtual machine (VM) with vNic has configure local dns ()`10.10.20.1`) so please try `ping airgap-0`. If successfuly the domain `airgap-0` will resolve like this:
+
+![vm-domain-resolve](./imgs/07-nkp/02c-airgap0-domain-resolve.png)
+
