@@ -3,7 +3,7 @@
 export IMAGE="nkp-rocky-9.5-release-cis-1.30.5-20241204003513.qcow2"
 export SUBNET="mgnt.ntnx.ipam.local"
 export NKP_CLUSTER_NAME="nkp-kommander-hpoc"
-export CONTROLPLANE_VIP="10.10.20.5:6443"
+export CONTROLPLANE_VIP="10.10.20.5"
 export METALLB_IP_RANGE="10.10.20.6-10.10.20.9"
 export NUTANIX_USER="admin"
 export NUTANIX_PASSWORD="Nutanix/4u@2024"
@@ -11,8 +11,8 @@ export NUTANIX_ENDPOINT="https://10.10.20.31:9440"
 export CLUSTER_NAME="DELL-R730XD-AHV"
 export STORAGE_CONTAINER="default-storage"
 export SSH_PUBLIC_KEY="/home/user/.ssh/id_ed25519.pub"
-export REGISTRY_CACERT="/etc/docker/certs.d/airgap-0\:5000/registry-ca.crt"
-export REGISTRY_URL="airgap-0:5000"
+export REGISTRY_CACERT="/etc/docker/certs.d/airgap-0:5000/registry-ca.crt"
+export REGISTRY_URL="https://airgap-0:5000"
 export REGISTRY_USERNAME="admin"
 export REGISTRY_PASSWORD="nutanix/4u"
 
@@ -43,4 +43,4 @@ nkp create cluster nutanix \
     --worker-memory 16 \
     --airgapped \
     --insecure \
-    --selfmanaged
+    --self-managed
