@@ -12,7 +12,7 @@ To enable NKP is not strigh forward as Nutanix Kubernetes Engine which just one 
 
 There 2 method for installation Nutanix Kubernetes Platform:
 
-1. Online Installation (you may experience some failures)
+1. Online Installation (you may experience some failures `error: coz maximum pull request from docker.io`)
     - Required stable & high speed internet access
     - Recommended using Bastion VM to provision NKP Kommander HOST
 
