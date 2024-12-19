@@ -21,3 +21,5 @@ There 2 method for installation Nutanix Kubernetes Platform:
     - Private Registry ([Nexus OSS](https://www.sonatype.com/products/sonatype-nexus-oss-download), [distribution](https://distribution.github.io/distribution/), [harbor](https://goharbor.io/), etc...)
     - Recommended using Bastion VM to provision NKP Komander HOST
     - [Download bundle](https://portal.nutanix.com/page/downloads?product=nkp) image, tools, nkp-cli from nutainx portal.
+
+    So this article we will goes through step by step for *Enablement Nutanix Kubernetes Platform (NKP)*
