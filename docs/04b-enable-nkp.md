@@ -47,3 +47,14 @@ Please consult to us, if you have any trouble
 Private container registry is one of the most important components for enablement Nutanix Kubernetes Platform with airgap mode (offline / without internet). So private registry we gonna using is build-in NKE has previously enabled
 
 Please refer to [this doc](./04a-enable-nke.md) to enable NKE airgap
+
+But if you have another private container registry such as Nexus OSS, Harbor, distribution.io. It's also possible use to.
+
+So here, i'm already enabled the NKE airgap look like this:
+
+![nke-airgap-enable](./imgs/07-nkp/02-private-registry-nke-airgap.png)
+
+Next, please increase size of volume group for `airgap-registry-volume` at least `150GB` through Prism look like this:
+
+![increase-size-vg-airgap](./imgs/07-nkp/02a-increse-size-vg-airgap.png)
+
