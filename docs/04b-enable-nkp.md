@@ -26,7 +26,21 @@ So this article we will goes through step by step for *Enablement Nutanix Kubern
 
 ## Upgrade Infrastructure
 
-As you can see, there is several requirement to enable Nutanix Kubernetes Platform from instrastructure prospective is Updated Nutanix Cloud Platform Software (AOS & Prism Central).
+As i mension previously there is several requirement to enable Nutanix Kubernetes Platform from instrastructure prospective is Updated Nutanix Cloud Platform Software (AOS & Prism Central). **If you have done it before you can skip this step**, if not please upgrade Prism Central first with following upgrade path:
+
+Example if currently Prism Central has `2022.6.x` version please upgrade to `2023.x` then to `2024.2` look like this
+
+![pc-upgrade-path](./imgs/07-nkp/01-pc-upgrade-path.png)
+
+After Prism Central successfully upgrade, then you can upgrade the AOS version. If you currently running `6.5.6.6` then you can upgrade to `6.10`
+
+![pe-aos-upgrade-path](./imgs/07-nkp/01-pe-aos-upgrade-path.png)
+
+Also you need to upgrade AHV version to `AHV-20230302.102001`
+
+![pe-ahv-upgrade](./imgs/07-nkp/01-pe-ahv-upgrade.png)
+
+Please consult to us, if you have any trouble
 
 ## Private registry
 
