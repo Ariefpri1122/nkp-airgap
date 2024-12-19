@@ -22,4 +22,11 @@ There 2 method for installation Nutanix Kubernetes Platform:
     - Recommended using Bastion VM to provision NKP Komander HOST
     - [Download bundle](https://portal.nutanix.com/page/downloads?product=nkp) image, tools, nkp-cli from nutainx portal.
 
-So this article we will goes through step by step for *Enablement Nutanix Kubernetes Platform (NKP)*
+So this article we will goes through step by step for *Enablement Nutanix Kubernetes Platform (NKP) with Offline Mode / Airgap*
+
+## Upgrade Infrastructure
+
+As you can see, there is several requirement to enable Nutanix Kubernetes Platform from instrastructure prospective is Updated Nutanix Cloud Platform Software (AOS & Prism Central).
+
+## Private registry
+
