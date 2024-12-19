@@ -17,7 +17,7 @@ There 2 method for installation Nutanix Kubernetes Platform:
     - Recommended using Bastion VM to provision NKP Kommander HOST
 
 2. Offline Installation (Recommended)
-    - DNS Server ([bind/bind9](https://www.isc.org/bind/), DNS Server on windows)
+    - DNS Server ([bind/bind9](https://www.isc.org/bind/), DNS Server on windows, DNS on Network appliance)
     - Private Registry ([Nexus OSS](https://www.sonatype.com/products/sonatype-nexus-oss-download), [distribution](https://distribution.github.io/distribution/), [harbor](https://goharbor.io/), etc...)
     - Recommended using Bastion VM to provision NKP Komander HOST
     - [Download bundle](https://portal.nutanix.com/page/downloads?product=nkp) image, tools, nkp-cli from nutainx portal.
@@ -26,9 +26,9 @@ So this article we will goes through step by step for *Enablement Nutanix Kubern
 
 ## Upgrade Infrastructure
 
-As i mension previously there is several requirement to enable Nutanix Kubernetes Platform from instrastructure prospective is Updated Nutanix Cloud Platform Software (AOS & Prism Central). **If you have done it before you can skip this step**, if not please upgrade Prism Central first with following upgrade path:
+As i mentioned previously there is several requirement to enable Nutanix Kubernetes Platform from instrastructure perspective is need to up to date of Nutanix Cloud Platform Software (AOS & Prism Central). **If you have done it before you can skip this step**, if not please upgrade Prism Central first with following upgrade path:
 
-Example how if currently the Prism Central has `2022.6.x` please find the way to upgrade to `2024.2` or later, So if you see Upgrade path from nutanix portal roadmap is you need to upgrade to `2023.x` then `2024.2` look like this
+Example how if currently the Prism Central has `2022.6.x` deployed so please find the way to upgrade to `2024.2` or later, So if you see Upgrade path from nutanix portal roadmap is you need to upgrade to `2023.x` then `2024.2` look like this
 
 ![pc-upgrade-path](./imgs/07-nkp/01-pc-upgrade-path.png)
 
@@ -42,5 +42,8 @@ Also you need to upgrade AHV version to `AHV-20230302.102001`
 
 Please consult to us, if you have any trouble
 
-## Private registry
+## Private registry (airgap)
 
+Private container registry is one of the most important components for enablement Nutanix Kubernetes Platform with airgap mode (offline / without internet). So private registry we gonna using is build-in NKE has previously enabled
+
+Please refer to [this doc](./04a-enable-nke.md) to enable NKE airgap
