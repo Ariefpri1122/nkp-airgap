@@ -211,7 +211,12 @@ You need to add the DNS server (in our example 10.10.20.3) to each machine that 
 
 ![dns-local-subnet-nutanix](./imgs/07-nkp/02b-local-dns-bind.png)
 
-Then you can test on your virtual machine (VM) with vNic has configure local dns ()`10.10.20.1`) so please try `ping airgap-0`. If successfuly the domain `airgap-0` will resolve like this:
+Then you can test on your virtual machine (VM) with vNic has configure local dns (`10.10.20.1`) so please try 
+```bash
+ping airgap-0
+```
+
+If successfuly the domain `airgap-0` will resolve like this:
 
 ![vm-domain-resolve](./imgs/07-nkp/02c-airgap0-domain-resolve.png)
 
