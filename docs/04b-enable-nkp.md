@@ -17,7 +17,7 @@ There 2 method for installation Nutanix Kubernetes Platform:
     - Recommended using Bastion VM to provision NKP Kommander HOST
 
 2. Offline Installation (Recommended)
-    - DNS Server
-    - Private Registry (Nexus OSS, opendistribution.io, harbor, etc...)
+    - DNS Server ([bind/bind9](https://www.isc.org/bind/), DNS Server on windows)
+    - Private Registry ([Nexus OSS](https://www.sonatype.com/products/sonatype-nexus-oss-download), [distribution](https://distribution.github.io/distribution/), [harbor](https://goharbor.io/), etc...)
     - Recommended using Bastion VM to provision NKP Komander HOST
-    - Download bundle image, tools, nkp-cli from nutainx portal.
+    - [Download bundle](https://portal.nutanix.com/page/downloads?product=nkp) image, tools, nkp-cli from nutainx portal.
