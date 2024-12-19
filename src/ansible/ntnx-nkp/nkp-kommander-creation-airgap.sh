@@ -8,18 +8,18 @@ export METALLB_IP_RANGE="10.10.20.6-10.10.20.9"
 export NUTANIX_USER="admin"
 export NUTANIX_PASSWORD="Nutanix/4u@2024"
 export NUTANIX_ENDPOINT="https://10.10.20.31:9440"
-export CLUSTER="DELL-R730XD-AHV"
+export CLUSTER_NAME="DELL-R730XD-AHV"
 export STORAGE_CONTAINER="default-storage"
 export SSH_PUBLIC_KEY="/home/user/.ssh/id_ed25519.pub"
 export REGISTRY_CACERT="/etc/docker/certs.d/airgap-0\:5000/registry-ca.crt"
-export REGISTRY_URL="https://airgap-0:5000"
+export REGISTRY_URL="airgap-0:5000"
 export REGISTRY_USERNAME="admin"
 export REGISTRY_PASSWORD="nutanix/4u"
 
 nkp create cluster nutanix \
-    --cluster-name=${CLUSTER_NAME} \
-    --control-plane-prism-element-cluster=${CLUSTER} \
-    --worker-prism-element-cluster=${CLUSTER} \
+    --cluster-name=${NKP_CLUSTER_NAME} \
+    --control-plane-prism-element-cluster=${CLUSTER_NAME} \
+    --worker-prism-element-cluster=${CLUSTER_NAME} \
     --control-plane-subnets=${SUBNET} \
     --worker-subnets=${SUBNET} \
     --control-plane-endpoint-ip=${CONTROLPLANE_VIP} \
