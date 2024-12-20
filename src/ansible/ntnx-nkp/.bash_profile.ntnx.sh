@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export IMAGE="nkp-rocky-9.5-release-cis-1.30.5-20241204003513.qcow2"
+export IMAGE="nkp-rocky-9.5-release-1.30.5-20241204003513.qcow2"
 export NUTANIX_USER="admin"
 export NUTANIX_PASSWORD="Nutanix/4u@2024"
 export NUTANIX_ENDPOINT="https://10.10.20.31:9440"
