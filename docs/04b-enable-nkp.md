@@ -255,7 +255,15 @@ After installing Operating System, you should config and install basic package h
     yum install -y curl wget tar zip tmux git 
     ```
 
-4. Install docker ce package
+4. Generate private/public ssh key
+
+    ```bash
+    ssh-keygen -t ed25519 -C "dimas.maryanto@nutanix.com" && \
+    eval "$(ssh-agent -s)" && \
+    ssh-add ~/.ssh/id_ed25519
+    ```
+
+5. Install docker ce package
 
     ```bash
     dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
@@ -264,7 +272,7 @@ After installing Operating System, you should config and install basic package h
     usermod -aG docker nutanix
     ```
 
-5. Setting certificate from airgap registry
+6. Setting certificate from airgap registry
 
     ```bash
     # login from vm airgap registry then copy the certs into your 
@@ -275,9 +283,11 @@ After installing Operating System, you should config and install basic package h
     sudo mv registry.crt /etc/docker/certs.d/airgap-0\:5000/registry.crt
     ```
 
-6. Login into private registry
+7. Login into private registry
 
     ```bash
-    # login with user `admin` and password is `nutanix/4u`
+    # login with user `admin` and the password of private registry with nke airgap is `nutanix/4u`
     docker login -u admin airgap-0:5000
     ```
+
+8. 
