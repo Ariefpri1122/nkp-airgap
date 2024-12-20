@@ -295,8 +295,44 @@ After installing Operating System, you should config and install basic package h
     ```bash
     # install kubectl
     sudo curl -Lo /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
-    sudo chmod +x /usr/local/bin/kubectl
+    sudo chmod +x /usr/local/bin/kubectl && \
+    kubectl version --client
 
     # install helm
-    sudo curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    sudo curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
+    helm version
+    ```
+
+9. [Download bundle](https://portal.nutanix.com/page/downloads?product=nkp) `NKP Airgapped Bundle` from the nutanix portal:
+
+    ![download-package-bundle](./imgs/07-nkp/03-download-nkp-airgaped-bundle.png)
+
+    After download extract it using this command:
+
+    ```bash
+    tar -zxvf nkp-air-gapped-bundle* && \
+    cd $(ls -1 -d nkp-v2* | tail -1 | sort -r)
+
+    # install nkp-cli
+    sudo mv cli/nkp /usr/local/bin/ && \
+    sudo chmod +x /usr/local/bin/nkp && \
+    nkp version
+    ```
+
+10. Load the `nkp-image-builder` and `nkp-bootstrap` from `NKP Airgap Bundle`:
+
+    ```bash
+    docker load -i konvoy-bootstrap-image* && \
+    docker load -i nkp-image-builder-image*
+    ```
+
+11. Publish container to private registry used by NKP
+
+    ```bash
+    export REGISTRY_URL=https://airgap-0:5000
+    export REGISTRY_USERNAME='admin'
+    export REGISTRY_PASSWORD='nutanix/4u'
+    export REGISTRY_CACERT='/etc/docker/certs.d/airgap-0:5000/registry-ca.crt'
+
+    nkp push bundle --bundle ./container-images/konvoy-image-bundle*.tar --to-registry=${REGISTRY_URL} --to-registry-username=${REGISTRY_USERNAME} --to-registry-password=${REGISTRY_PASSWORD} --to-registry-ca-cert-file=${REGISTRY_CACERT}
     ```
