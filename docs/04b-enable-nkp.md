@@ -249,4 +249,35 @@ After installing Operating System, you should config and install basic package h
     ethtool --offload ens3 rx-gro-hw off && \
     nmcli c modify ens3 ethtool.feature-rx-gro-hw off
     ```
-3. 
+3. Install basic package such as curl, wget, tar, zip etc...
+    
+    ```bash
+    yum install -y curl wget tar zip tmux git 
+    ```
+
+4. Install docker ce package
+
+    ```bash
+    dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
+    dnf -y install docker-ce docker-ce-cli containerd.io && \
+    systemctl --now enable docker && \
+    usermod -aG docker nutanix
+    ```
+
+5. Setting certificate from airgap registry
+
+    ```bash
+    # login from vm airgap registry then copy the certs into your 
+    scp /etc/docker/certs.d/airgap-0\:5000/registry.crt nutanix@10.10.20.3:~/
+    
+    # logout, and than login into bastion vm
+    sudo mkdir -p /etc/docker/certs.d/airgap-0:5000 && \
+    sudo mv registry.crt /etc/docker/certs.d/airgap-0\:5000/registry.crt
+    ```
+
+6. Login into private registry
+
+    ```bash
+    # login with user `admin` and password is `nutanix/4u`
+    docker login -u admin airgap-0:5000
+    ```
