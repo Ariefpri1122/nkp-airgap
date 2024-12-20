@@ -290,4 +290,13 @@ After installing Operating System, you should config and install basic package h
     docker login -u admin airgap-0:5000
     ```
 
-8. 
+8. Install kubernetes client
+
+    ```bash
+    # install kubectl
+    curl -Lo /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
+    chmod +x /usr/local/bin/kubectl
+
+    # install helm
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    ```
