@@ -338,3 +338,7 @@ After installing Operating System, you should config and install basic package h
     nkp push bundle --bundle ./container-images/kommander-image-bundle*.tar --to-registry=${REGISTRY_URL} --to-registry-username=${REGISTRY_USERNAME} --to-registry-password=${REGISTRY_PASSWORD} --to-registry-ca-cert-file=${REGISTRY_CACERT} && \
     nkp push bundle --bundle ./container-images/nkp-catalog-applications-image-bundle*.tar --to-registry=${REGISTRY_URL} --to-registry-username=${REGISTRY_USERNAME} --to-registry-password=${REGISTRY_PASSWORD} --to-registry-ca-cert-file=${REGISTRY_CACERT}
     ```
+
+    After finished publish the images bundle, you can see at private registry look like this:
+
+    ![nkp-image-airgaped](./imgs/07-nkp/03a-nkp-image-airgaped.png)
