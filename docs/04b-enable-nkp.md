@@ -329,10 +329,12 @@ After installing Operating System, you should config and install basic package h
 11. Publish container to private registry used by NKP
 
     ```bash
-    export REGISTRY_URL=https://airgap-0:5000
+    export REGISTRY_URL='https://airgap-0:5000'
     export REGISTRY_USERNAME='admin'
     export REGISTRY_PASSWORD='nutanix/4u'
     export REGISTRY_CACERT='/etc/docker/certs.d/airgap-0:5000/registry-ca.crt'
 
-    nkp push bundle --bundle ./container-images/konvoy-image-bundle*.tar --to-registry=${REGISTRY_URL} --to-registry-username=${REGISTRY_USERNAME} --to-registry-password=${REGISTRY_PASSWORD} --to-registry-ca-cert-file=${REGISTRY_CACERT}
+    nkp push bundle --bundle ./container-images/konvoy-image-bundle*.tar --to-registry=${REGISTRY_URL} --to-registry-username=${REGISTRY_USERNAME} --to-registry-password=${REGISTRY_PASSWORD} --to-registry-ca-cert-file=${REGISTRY_CACERT} && \    
+    nkp push bundle --bundle ./container-images/kommander-image-bundle*.tar --to-registry=${REGISTRY_URL} --to-registry-username=${REGISTRY_USERNAME} --to-registry-password=${REGISTRY_PASSWORD} --to-registry-ca-cert-file=${REGISTRY_CACERT} && \
+    nkp push bundle --bundle ./container-images/nkp-catalog-applications-image-bundle*.tar --to-registry=${REGISTRY_URL} --to-registry-username=${REGISTRY_USERNAME} --to-registry-password=${REGISTRY_PASSWORD} --to-registry-ca-cert-file=${REGISTRY_CACERT}
     ```
