@@ -246,8 +246,8 @@ After installing Operating System, you should config and install basic package h
 2. Disable module `rx-gro-hw` using this command:
 
     ```bash
-    ethtool --offload ens3 rx-gro-hw off && \
-    nmcli c modify ens3 ethtool.feature-rx-gro-hw off
+    sudo ethtool --offload ens3 rx-gro-hw off && \
+    sudo nmcli c modify ens3 ethtool.feature-rx-gro-hw off
     ```
 3. Install basic package such as curl, wget, tar, zip etc...
     
@@ -266,16 +266,16 @@ After installing Operating System, you should config and install basic package h
 5. Install docker ce package
 
     ```bash
-    dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
-    dnf -y install docker-ce docker-ce-cli containerd.io && \
-    systemctl --now enable docker && \
-    usermod -aG docker nutanix
+    sudo dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo && \
+    sudo dnf -y install docker-ce docker-ce-cli containerd.io && \
+    sudo systemctl --now enable docker && \
+    sudo usermod -aG docker nutanix
     ```
 
 6. Setting certificate from airgap registry
 
     ```bash
-    # login from vm airgap registry then copy the certs into your 
+    # login as root from vm airgap registry then copy the certs into your 
     scp /etc/docker/certs.d/airgap-0\:5000/registry.crt nutanix@10.10.20.3:~/
     
     # logout, and than login into bastion vm
@@ -294,9 +294,9 @@ After installing Operating System, you should config and install basic package h
 
     ```bash
     # install kubectl
-    curl -Lo /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
-    chmod +x /usr/local/bin/kubectl
+    sudo curl -Lo /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
+    sudo chmod +x /usr/local/bin/kubectl
 
     # install helm
-    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+    sudo curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
     ```
