@@ -342,3 +342,85 @@ After installing Operating System, you should config and install basic package h
     After finished publish the images bundle, you can see at private registry look like this:
 
     ![nkp-image-airgaped](./imgs/07-nkp/03a-nkp-image-airgaped.png)
+
+## Deploy NKP Kommander node
+
+To deploying NKP first, you should create kommander host with command `nkp create cluster nutanix`. So basicly we have 2 option which is TUI (Terminal UI) / Prompt-based installation and CLI installation. At this time i will deploy cli installation because that's more easies and fully customize your cluster configuration.
+
+Because this cluster only for starter lisences so the configuration of nodes i'll created is
+
+```yaml
+master:
+    size: 1
+    cpu: 8
+    ram: 16
+worker:
+    size: 3
+    cpus: 8
+    ram: 16
+```
+
+So here is the command to execute that configuration
+
+```bash
+export IMAGE="nkp-rocky-9.5-release-1.30.5-20241204003513.qcow2"
+export NUTANIX_USER="<your-pc-username>"
+export NUTANIX_PASSWORD="<your-pc-password>"
+export NUTANIX_ENDPOINT="https://<your-pc-ipaddress|domain>:9440"
+export CLUSTER_NAME="<your-pe-cluster-name>"
+export STORAGE_CONTAINER="<your-pe-storage-container>"
+export SSH_PUBLIC_KEY="<your-ssh-public-key-location>" # ex: /home/user/.ssh/id_ed25519.pub
+export REGISTRY_CACERT="/etc/docker/certs.d/airgap-0:5000/registry-ca.crt"
+export REGISTRY_URL="https://airgap-0:5000"
+export REGISTRY_USERNAME="admin"
+export REGISTRY_PASSWORD="nutanix/4u"
+export NKP_CLUSTER_NAME="nkp-kommander-<unique-name>" # ex: nkp-kommander-hpoc1020
+export SUBNET="<your-network-subnet-name>" # ex: mgnt.ntnx.ipam.local
+export CONTROLPLANE_VIP="<your-vip-controlplane>" # ex: 10.10.20.5
+export METALLB_IP_RANGE="<your-lb-ip-start>-<your-lb-ip-end>" # ex: 10.10.20.6-10.10.20.9
+
+nkp create cluster nutanix \
+    --cluster-name=${NKP_CLUSTER_NAME} \
+    --control-plane-prism-element-cluster=${CLUSTER_NAME} \
+    --worker-prism-element-cluster=${CLUSTER_NAME} \
+    --control-plane-subnets=${SUBNET} \
+    --worker-subnets=${SUBNET} \
+    --control-plane-endpoint-ip=${CONTROLPLANE_VIP} \
+    --csi-storage-container=${STORAGE_CONTAINER} \
+    --endpoint=${NUTANIX_ENDPOINT} \
+    --control-plane-vm-image=${IMAGE} \
+    --worker-vm-image=${IMAGE} \
+    --registry-mirror-url=${REGISTRY_URL} \
+    --registry-mirror-username=${REGISTRY_USERNAME} \
+    --registry-mirror-password=${REGISTRY_PASSWORD} \
+    --registry-mirror-cacert=${REGISTRY_CACERT} \
+    --kubernetes-service-load-balancer-ip-range=${METALLB_IP_RANGE} \
+    --ssh-public-key-file=${SSH_PUBLIC_KEY} \
+    --control-plane-replicas 1 \
+    --control-plane-cores-per-vcpu 1 \
+    --control-plane-vcpus 8 \
+    --control-plane-memory 16 \
+    --worker-replicas 3 \
+    --worker-vcpus 8 \
+    --worker-cores-per-vcpu 1 \
+    --worker-memory 16 \
+    --insecure \
+    --self-managed
+```
+
+If everything is okay no issue at all, you can see this message
+
+![nkp-deployed](./imgs/07-nkp/04d-nkp-deployed.png)
+
+And you can access the dashboard of NKP using this command
+
+```bash
+export KUBECONFIG=./nkp-kommander-hpoc1020.conf
+nkp open dashboard
+```
+
+![nkp-expose-dashboard](./imgs/07-nkp/04e-nkp-dashboard-expose.png)
+
+Please open the url on the browser, and you can see look like this:
+
+![nkp-dashboard](./imgs/07-nkp/04g-nkp-dashboard.png)
