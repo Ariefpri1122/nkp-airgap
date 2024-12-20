@@ -41,6 +41,5 @@ nkp create cluster nutanix \
     --worker-vcpus 8 \
     --worker-cores-per-vcpu 1 \
     --worker-memory 16 \
-    --airgapped \
     --insecure \
     --self-managed
