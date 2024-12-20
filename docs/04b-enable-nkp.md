@@ -220,3 +220,33 @@ If successfuly the domain `airgap-0` will resolve like this:
 
 ![vm-domain-resolve](./imgs/07-nkp/02c-airgap0-domain-resolve.png)
 
+## Prepared Bastion VM
+
+For Bastion VM please use supported Operation System take a look [from documentation](https://portal.nutanix.com/page/documents/details?targetId=Nutanix-Kubernetes-Platform-v2_13:top-nutanix-baseOS-image-c.html) currently only Rocky Linux 9 and Ubuntu 22.04.
+
+I would like to use Rocky Linux 9.5 from scratch, So create VM from Prism Central with this configuration:
+
+```yaml
+name: NTNX-NKP-Bastion
+resources:
+    cpu: 
+        core: 2
+        thread: 2
+    memory: 8 GB
+    storage: 
+        size: 128 GB
+        partisions:
+            /: 128 GB
+        mode: UEFI
+```
+
+After installing Operating System, you should config and install basic package here is following settings need to configure:
+
+1. Set `SELINUX=permissive` on `/etc/selinux/config` file
+2. Disable module `rx-gro-hw` using this command:
+
+    ```bash
+    ethtool --offload ens3 rx-gro-hw off && \
+    nmcli c modify ens3 ethtool.feature-rx-gro-hw off
+    ```
+3. 
