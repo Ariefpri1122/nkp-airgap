@@ -13,7 +13,7 @@ cluster -s <cvm-ips> \
 --dns_servers=<dns-servers> \
 create
 
-# cluster -s 10.10.10.21 --redundancy_factor=2 --cluster_name='DELL-R730XD-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
+# cluster -s 10.10.10.21 --cluster_external_ip='10.10.10.20' --redundancy_factor=2 --cluster_name='DELL-R730XD-AHV' --container_name='default-storage' --ntp_servers='id.pool.ntp.org' --dns_servers='8.8.8.8' create
 ```
 
 Jika dijalankan hasilnya seperti berikut:
