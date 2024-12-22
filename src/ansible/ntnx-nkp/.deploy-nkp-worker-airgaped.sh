@@ -15,6 +15,10 @@ nkp create cluster nutanix \
     --endpoint=${NUTANIX_ENDPOINT} \
     --control-plane-vm-image=${IMAGE} \
     --worker-vm-image=${IMAGE} \
+    --registry-url=${PRIVATE_REGISTRY_URL} \
+    --registry-username=${PRIVATE_REGISTRY_USERNAME} \
+    --registry-password=${PRIVATE_REGISTRY_PASSWORD} \
+    --registry-cacert=${PRIVATE_REGISTRY_CACERT} \
     --registry-mirror-url=${REGISTRY_URL} \
     --registry-mirror-username=${REGISTRY_USERNAME} \
     --registry-mirror-password=${REGISTRY_PASSWORD} \
