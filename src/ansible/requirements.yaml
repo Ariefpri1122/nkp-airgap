@@ -13,3 +13,4 @@ roles:
   - dimmaryanto93.docker
   - dimmaryanto93.helm_charts
   - dimmaryanto93.kubectl
+  - dimMaryanto93.docker_post_install
