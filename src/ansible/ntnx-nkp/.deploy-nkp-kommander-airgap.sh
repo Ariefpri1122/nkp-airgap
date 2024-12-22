@@ -15,10 +15,10 @@ nkp create cluster nutanix \
     --endpoint=${NUTANIX_ENDPOINT} \
     --control-plane-vm-image=${IMAGE} \
     --worker-vm-image=${IMAGE} \
-    --registry-mirror-url=${REGISTRY_URL} \
-    --registry-mirror-username=${REGISTRY_USERNAME} \
-    --registry-mirror-password=${REGISTRY_PASSWORD} \
-    --registry-mirror-cacert=${REGISTRY_CACERT} \
+    --registry-mirror-url=${MIRROR_REGISTRY_URL} \
+    --registry-mirror-username=${MIRROR_REGISTRY_USERNAME} \
+    --registry-mirror-password=${MIRROR_REGISTRY_PASSWORD} \
+    --registry-mirror-cacert=${MIRROR_REGISTRY_CACERT} \
     --kubernetes-service-load-balancer-ip-range=${METALLB_IP_RANGE} \
     --ssh-public-key-file=${SSH_PUBLIC_KEY} \
     --control-plane-replicas 1 \
