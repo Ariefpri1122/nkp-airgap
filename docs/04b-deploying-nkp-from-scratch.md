@@ -296,10 +296,10 @@ After installing Operating System, you should config and install basic package h
 11. Publish container to private registry used by NKP
 
     ```bash
-    export REGISTRY_URL='https://airgap-0:5000'
+    export REGISTRY_URL='https://airgap.nutanix.local:5000'
     export REGISTRY_USERNAME='admin'
     export REGISTRY_PASSWORD='nutanix/4u'
-    export REGISTRY_CACERT='/etc/docker/certs.d/airgap-0:5000/registry-ca.crt'
+    export REGISTRY_CACERT='/etc/docker/certs.d/airgap.nutanix.local:5000/registry.crt'
 
     nkp push bundle --bundle ./container-images/konvoy-image-bundle*.tar --to-registry=${REGISTRY_URL} --to-registry-username=${REGISTRY_USERNAME} --to-registry-password=${REGISTRY_PASSWORD} --to-registry-ca-cert-file=${REGISTRY_CACERT} && \    
     nkp push bundle --bundle ./container-images/kommander-image-bundle*.tar --to-registry=${REGISTRY_URL} --to-registry-username=${REGISTRY_USERNAME} --to-registry-password=${REGISTRY_PASSWORD} --to-registry-ca-cert-file=${REGISTRY_CACERT} && \
@@ -337,8 +337,8 @@ export NUTANIX_ENDPOINT="https://<your-pc-ipaddress|domain>:9440"
 export CLUSTER_NAME="<your-pe-cluster-name>"
 export STORAGE_CONTAINER="<your-pe-storage-container>"
 export SSH_PUBLIC_KEY="<your-ssh-public-key-location>" # ex: /home/user/.ssh/id_ed25519.pub
-export REGISTRY_CACERT="/etc/docker/certs.d/airgap-0:5000/registry-ca.crt"
-export REGISTRY_URL="https://airgap-0:5000"
+export REGISTRY_CACERT="/etc/docker/certs.d/airgap.nutanix.local:5000/registry.crt"
+export REGISTRY_URL="https://airgap.nutanix.local:5000"
 export REGISTRY_USERNAME="admin"
 export REGISTRY_PASSWORD="nutanix/4u"
 export NKP_CLUSTER_NAME="nkp-kommander-<unique-name>" # ex: nkp-kommander-hpoc1020
