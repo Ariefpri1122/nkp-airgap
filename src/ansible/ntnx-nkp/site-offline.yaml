@@ -1,5 +1,5 @@
 ---
-- hosts: ["nkp-airgap"]
+- hosts: ["nkp"]
   become: true
   tasks:
     - ansible.builtin.package:
@@ -17,7 +17,7 @@
     - command:
         cmd: nmcli c modify ens3 ethtool.feature-rx-gro-hw off
 
-- hosts: ["nkp-registry"]
+- hosts: ["nkp-airgap"]
   become: true
   vars:
     docker_insecure_registries_enabled: false
@@ -75,7 +75,20 @@
     kubectl_download_filetype: 'archive'
     kubectl_version: '1.29.9'
     kubectl_tmp_directory: '/tmp'
-  roles:
-    - dimmaryanto93.kubectl
-    - dimmaryanto93.helm_charts
-    - dimmaryanto93.docker
+  tasks:
+    - include_role: 
+        name: dimmaryanto93.kubectl
+    - include_role: 
+        name: dimmaryanto93.helm_charts
+    - include_role: 
+        name: dimmaryanto93.docker
+    - ansible.builtin.file:
+        path: /etc/docker/certs.d/airgap.nutanix.local:5000
+        state: directory
+        mode: '0755'
+        recurse: yes
+    - ansible.builtin.file:
+        path: /etc/docker/certs.d/registry.nutanix.local
+        state: directory
+        mode: '0755'
+        recurse: yes

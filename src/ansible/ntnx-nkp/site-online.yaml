@@ -1,5 +1,5 @@
 ---
-- hosts: ["nkp-airgap"]
+- hosts: ["nkp"]
   become: true
   tasks:
     - ansible.builtin.package:
