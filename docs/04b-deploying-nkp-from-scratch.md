@@ -40,6 +40,15 @@ sudo firewall-cmd --reload
 
 ![nexus-oss-nkp-registry](./imgs/07-nkp/nexus-oss-nkp-registry.png)
 
+Copy your cert into nginx
+
+```bash
+sudo mkdir -p /etc/nginx/certs && \
+sudo cp <path-cert.crt> /etc/nginx/certs/registry-ca.crt && \
+sudo cp <path-cert.key> /etc/nginx/certs/registry-ca.key && \
+sudo chmod -R 777 /etc/nginx/certs/*
+```
+
 File `nginx.conf`
 
 ```conf
