@@ -34,10 +34,65 @@ sudo docker run -d -p 5000:5000  --restart=always --name DockerRegistry -v /mnt/
 
 sudo firewall-cmd --zone=public --add-port=5000/tcp --permanent && \
 sudo firewall-cmd --reload
-
 ```
 
 ## Private Registry (Apps images)
+
+![nexus-oss-nkp-registry](./imgs/07-nkp/nexus-oss-nkp-registry.png)
+
+File `nginx.conf`
+
+```conf
+events {
+  worker_connections 1024; 
+
+http {
+  client_max_body_size 500M;
+
+  server {
+    listen 443 ssl; 
+    server_name registry.nutanix.local;
+
+    ssl_certificate /etc/nginx/certs/registry-ca.crt; 
+    ssl_certificate_key /etc/nginx/certs/registry-ca.key;
+
+    location / {
+        proxy_pass http://localhost:8081; 
+        proxy_set_header Host $host; 
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $server_name;
+    }
+
+    location /v2 {
+        proxy_pass http://localhost:8086; 
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $server_name;
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-Ssl on;
+        proxy_buffering off;
+        proxy_set_header Connection "";
+    }
+
+    location /v2/hosted {
+        proxy_pass http://localhost:8087; 
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $server_name;
+        proxy_http_version 1.1;
+        proxy_set_header X-Forwarded-Ssl on;
+        proxy_buffering off;
+        proxy_set_header Connection "";
+    }
+  }
+}
+```
 
 ## DNS Server with bind/bind9
 
