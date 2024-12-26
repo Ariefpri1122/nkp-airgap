@@ -416,10 +416,10 @@ export NUTANIX_ENDPOINT="https://<your-pc-ipaddress|domain>:9440"
 export CLUSTER_NAME="<your-pe-cluster-name>"
 export STORAGE_CONTAINER="<your-pe-storage-container>"
 export SSH_PUBLIC_KEY="<your-ssh-public-key-location>" # ex: /home/user/.ssh/id_ed25519.pub
-export REGISTRY_CACERT="/etc/docker/certs.d/airgap.nutanix.local:5000/registry.crt"
-export REGISTRY_URL="https://airgap.nutanix.local:5000"
-export REGISTRY_USERNAME="admin"
-export REGISTRY_PASSWORD="nutanix/4u"
+export AIRGAP_REGISTRY_CACERT="/etc/docker/certs.d/airgap.nutanix.local:5000/registry.crt"
+export AIRGAP_REGISTRY_URL="https://airgap.nutanix.local:5000"
+export AIRGAP_REGISTRY_USERNAME="admin"
+export AIRGAP_REGISTRY_PASSWORD="nutanix/4u"
 export NKP_CLUSTER_NAME="nkp-kommander-<unique-name>" # ex: nkp-kommander-hpoc1020
 export SUBNET="<your-network-subnet-name>" # ex: mgnt.ntnx.ipam.local
 export CONTROLPLANE_VIP="<your-vip-controlplane>" # ex: 10.10.20.5
@@ -436,10 +436,10 @@ nkp create cluster nutanix \
     --endpoint=${NUTANIX_ENDPOINT} \
     --control-plane-vm-image=${IMAGE} \
     --worker-vm-image=${IMAGE} \
-    --registry-mirror-url=${REGISTRY_URL} \
-    --registry-mirror-username=${REGISTRY_USERNAME} \
-    --registry-mirror-password=${REGISTRY_PASSWORD} \
-    --registry-mirror-cacert=${REGISTRY_CACERT} \
+    --registry-mirror-url=${AIRGAP_REGISTRY_URL} \
+    --registry-mirror-username=${AIRGAP_REGISTRY_USERNAME} \
+    --registry-mirror-password=${AIRGAP_REGISTRY_PASSWORD} \
+    --registry-mirror-cacert=${AIRGAP_REGISTRY_CACERT} \
     --kubernetes-service-load-balancer-ip-range=${METALLB_IP_RANGE} \
     --ssh-public-key-file=${SSH_PUBLIC_KEY} \
     --control-plane-replicas 1 \
@@ -470,3 +470,60 @@ nkp open dashboard
 Please open the url on the browser, and you can see look like this:
 
 ![nkp-dashboard](./imgs/07-nkp/04g-nkp-dashboard.png)
+
+## Deploy NKP Managed cluster
+
+So here is the command to execute that configuration
+
+```bash
+export IMAGE="nkp-rocky-9.5-release-1.30.5-20241204003513.qcow2"
+export NUTANIX_USER="<your-pc-username>"
+export NUTANIX_PASSWORD="<your-pc-password>"
+export NUTANIX_ENDPOINT="https://<your-pc-ipaddress|domain>:9440"
+export CLUSTER_NAME="<your-pe-cluster-name>"
+export STORAGE_CONTAINER="<your-pe-storage-container>"
+export SSH_PUBLIC_KEY="<your-ssh-public-key-location>" # ex: /home/user/.ssh/id_ed25519.pub
+export AIRGAP_REGISTRY_CACERT="/etc/docker/certs.d/airgap.nutanix.local:5000/registry.crt"
+export AIRGAP_REGISTRY_URL="https://airgap.nutanix.local:5000"
+export AIRGAP_REGISTRY_USERNAME="admin"
+export AIRGAP_REGISTRY_PASSWORD="nutanix/4u"
+export PRIVATE_REGISTRY_URL="https://registry.nutanix.local"
+export PRIVATE_REGISTRY_USERNAME="nkp-user"
+export PRIVATE_REGISTRY_PASSWORD="Nutanix/4u"
+export PRIVATE_REGISTRY_CACERT="/etc/docker/certs.d/registry.nutanix.local/registry.crt"
+export NKP_CLUSTER_NAME="nkp-<unique-name>" # ex: nkp-worker-hpoc1020
+export SUBNET="<your-network-subnet-name>" # ex: mgnt.ntnx.ipam.local
+export CONTROLPLANE_VIP="<your-vip-controlplane>" # ex: 10.10.20.5
+export METALLB_IP_RANGE="<your-lb-ip-start>-<your-lb-ip-end>" # ex: 10.10.20.6-10.10.20.9
+
+nkp create cluster nutanix \
+    --cluster-name=${NKP_CLUSTER_NAME} \
+    --control-plane-prism-element-cluster=${CLUSTER_NAME} \
+    --worker-prism-element-cluster=${CLUSTER_NAME} \
+    --control-plane-subnets=${SUBNET} \
+    --worker-subnets=${SUBNET} \
+    --control-plane-endpoint-ip=${CONTROLPLANE_VIP} \
+    --csi-storage-container=${STORAGE_CONTAINER} \
+    --endpoint=${NUTANIX_ENDPOINT} \
+    --control-plane-vm-image=${IMAGE} \
+    --worker-vm-image=${IMAGE} \
+    --registry-url=${PRIVATE_REGISTRY_URL} \
+    --registry-username=${PRIVATE_REGISTRY_USERNAME} \
+    --registry-password=${PRIVATE_REGISTRY_PASSWORD} \
+    --registry-cacert=${PRIVATE_REGISTRY_CACERT} \
+    --registry-mirror-url=${MIRROR_REGISTRY_URL} \
+    --registry-mirror-username=${MIRROR_REGISTRY_USERNAME} \
+    --registry-mirror-password=${MIRROR_REGISTRY_PASSWORD} \
+    --registry-mirror-cacert=${MIRROR_REGISTRY_CACERT} \
+    --kubernetes-service-load-balancer-ip-range=${METALLB_IP_RANGE} \
+    --ssh-public-key-file=${SSH_PUBLIC_KEY} \
+    --control-plane-replicas 3 \
+    --control-plane-cores-per-vcpu 1 \
+    --control-plane-vcpus 8 \
+    --control-plane-memory 8 \
+    --worker-replicas 3 \
+    --worker-vcpus 8 \
+    --worker-cores-per-vcpu 1 \
+    --worker-memory 8 \
+    --insecure
+```
