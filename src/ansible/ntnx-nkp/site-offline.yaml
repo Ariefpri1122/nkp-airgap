@@ -12,9 +12,60 @@
         - curl
         - wget
         - git
+    - command:
+        cmd: ethtool --offload ens3 rx-gro-hw off
+    - command:
+        cmd: nmcli c modify ens3 ethtool.feature-rx-gro-hw off
 
 - hosts: ["nkp-registry"]
   become: true
+  vars:
+    docker_insecure_registries_enabled: false
+  tasks:
+    - ansible.builtin.package:
+        name: "{{ item }}"
+      loop:
+        - python3-pip
+    - ansible.builtin.pip:
+        name: cryptography
+        executable: pip3
+    - ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - certs
+        - auth
+    - openssl_privatekey:
+        path: 'certs/domain.key'
+        size: 4096
+    - openssl_csr:
+        path: 'certs/domain.crt'
+        privatekey_path: 'certs/domain.key'
+        country_name: 'ID'
+        organization_name: 'Nutanix.inc'
+        email_address: 'dimas.maryanto@nutanix.com'
+        common_name: '*.nutanix.local'
+        subject_alt_name: 'DNS:*.nutanix.local'
+    - openssl_certificate:
+        path: certs/domain.crt
+        privatekey_path: certs/domain.key
+        provider: selfsigned
+    - include_role: 
+        name: dimmaryanto93.docker
+    - ansible.builtin.file:
+        path: /etc/docker/certs.d/airgap.nutanix.local:5000
+        state: directory
+        mode: '0755'
+        recurse: yes
+    - ansible.builtin.copy:
+        src: certs/domain.crt
+        dest: /etc/docker/certs.d/airgap.nutanix.local:5000/registry-ca.crt
+        remote_src: yes
+    - ansible.builtin.copy:
+        src: certs/domain.key
+        dest: /etc/docker/certs.d/airgap.nutanix.local:5000/registry-ca.key
+        remote_src: yes
 
 - hosts: ["nkp-bastion"]
   become: true
@@ -28,4 +79,3 @@
     - dimmaryanto93.kubectl
     - dimmaryanto93.helm_charts
     - dimmaryanto93.docker
-    - dimMaryanto93.docker_post_install
