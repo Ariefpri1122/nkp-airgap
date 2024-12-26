@@ -9,6 +9,12 @@ To enable NKP is not strigh forward as Nutanix Kubernetes Engine which just one 
 - Prism Central, atleast `2024.2` or newer
     - tested `2024.1` at Nutanix Enterprise
     - tested `2024.2` at Nutanix CE & Enterprise
+- DNS Server ([bind/bind9](https://www.isc.org/bind/), DNS Server on windows, DNS on Network appliance)
+- Private Registry ([Nexus OSS](https://www.sonatype.com/products/sonatype-nexus-oss-download), [distribution](https://distribution.github.io/distribution/), [harbor](https://goharbor.io/), etc...)
+- Recommended using Bastion VM to provision NKP Komander HOST
+- [Download bundle](https://portal.nutanix.com/page/downloads?product=nkp) image, tools, nkp-cli from nutainx portal.
+
+So this article we will goes through step by step for *Enablement Nutanix Kubernetes Platform (NKP) with Offline Mode / Airgap*
 
 ## Upgrade Infrastructure
 
