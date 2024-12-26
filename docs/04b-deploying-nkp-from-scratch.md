@@ -103,6 +103,8 @@ http {
 }
 ```
 
+Please refer to [this article](https://kelas.dimas-maryanto.com/posts/devops/docker/registry/03c-using-nexus-oss) for insalling Nexus OSS and how to configure it
+
 ## DNS Server with bind/bind9
 
 To use DNS Server as software, please install `bind` for RHEL OS Bases and `bind9` for Debian OS Based on your environment either physical or virtual machine. i will like to use **Rocky Linux 9** for this, so please adjust with your own way if you have to use another operating system.
