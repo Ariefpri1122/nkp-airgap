@@ -92,3 +92,11 @@
         state: directory
         mode: '0755'
         recurse: yes
+- hosts: ["nkp-bastion"]
+  tasks:
+    - openssh_keypair:
+        path: .ssh/id_ed25519
+        type: ed25519
+    - shell: |
+        eval "$(ssh-agent)"
+        ssh-add .ssh/id_ed25519
