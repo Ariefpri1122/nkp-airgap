@@ -2,6 +2,10 @@
 - hosts: ["nkp"]
   become: true
   tasks:
+    - command:
+        cmd: ethtool --offload ens3 rx-gro-hw off
+    - command:
+        cmd: nmcli c modify ens3 ethtool.feature-rx-gro-hw off
     - ansible.builtin.package:
         name: "{{ item }}"
         state: present
@@ -12,10 +16,6 @@
         - curl
         - wget
         - git
-    - command:
-        cmd: ethtool --offload ens3 rx-gro-hw off
-    - command:
-        cmd: nmcli c modify ens3 ethtool.feature-rx-gro-hw off
 
 - hosts: ["nkp-airgap"]
   become: true
@@ -39,38 +39,27 @@
           mode: '0755'
         loop:
           - certs
-      - openssl_privatekey:
-          path: 'certs/domain.key'
-          size: 4096
-      - openssl_csr:
-          path: 'certs/domain.crt'
-          privatekey_path: 'certs/domain.key'
-          country_name: '{{ selfsigned_cert.country_id }}'
-          organization_name: '{{ selfsigned_cert.organization_name }}'
-          email_address: '{{ selfsigned_cert.email_address }}'
-          common_name: '{{ selfsigned_cert.domain_wildcard }}'
-          subject_alt_name: 'DNS:{{ selfsigned_cert.domain_wildcard }}'
-      - openssl_certificate:
-          path: certs/domain.crt
-          privatekey_path: certs/domain.key
-          provider: selfsigned
+      - shell: 'openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days 365 -out certs/domain.crt -subj "/C={{ selfsigned_cert.country_id }}/ST=Indonesia/L=Jakarta/O={{ selfsigned_cert.organization_name }}/OU=IT/CN={{ selfsigned_cert.domain_wildcard }}" -addext "subjectAltName = DNS:{{ selfsigned_cert.domain_wildcard }}"'
       - include_role: 
           name: dimmaryanto93.docker
       - ansible.builtin.file:
-          path: "/etc/docker/certs.d/{{ airgap_domain }}"
+          path: "/etc/docker/certs.d/{{ airgap_domain }}{{ airgap_port | default('') }}"
           state: directory
           mode: '0755'
           recurse: yes
       - ansible.builtin.copy:
           src: certs/domain.crt
-          dest: "/etc/docker/certs.d/{{ airgap_domain }}/registry-ca.crt"
+          dest: "/etc/docker/certs.d/{{ airgap_domain }}{{ airgap_port | default('') }}/registry-ca.crt"
           remote_src: yes
       - ansible.builtin.copy:
           src: certs/domain.key
-          dest: "/etc/docker/certs.d/{{ airgap_domain }}/registry-ca.key"
+          dest: "/etc/docker/certs.d/{{ airgap_domain }}{{ airgap_port | default('') }}/registry-ca.key"
           remote_src: yes
     - name: Running private registry
       block:
+        - lineinfile:
+            path: /etc/hosts
+            line: "127.0.0.1 {{ airgap_domain }}"
         - ansible.builtin.file:
             path: "/etc/openregistry/{{ item }}"
             state: directory
@@ -104,6 +93,18 @@
               REGISTRY_AUTH_HTPASSWD_PATH: "/auth/htpasswd"
               REGISTRY_HTTP_TLS_CERTIFICATE: "/certs/registry-ca.crt"
               REGISTRY_HTTP_TLS_KEY: "/certs/registry-ca.key"
+        - ansible.posix.firewalld:
+            port: 5000/tcp
+            state: enabled
+            permanent: true
+            immediate: true
+            zone: public
+          when: ansible_os_family == 'RedHat'
+        - community.general.ufw:
+            rule: allow
+            port: '5000'
+            proto: tcp
+          when: ansible_os_family == 'Debian'
     - name: Airgap file bundle
       block:
       - name: Check the file airgap was exists 
@@ -131,12 +132,30 @@
           src: '{{ path_downloaded_airgap }}/{{ airgap_filename }}'
           dest: '/opt/nkp-airgap'
           remote_src: yes
+    - shell: "ls -d /opt/nkp-airgap/nkp-v* | tail -n 1"
+      register: nkp_airgap_dir_loc
+    - name: Install NKP cli
+      block: 
+        - ansible.builtin.copy:
+            src: "{{ nkp_airgap_dir_loc.stdout }}/cli/nkp"
+            dest: "/usr/local/bin/nkp"
+            mode: '0644'
+            remote_src: yes
+        - ansible.builtin.file:
+            src: "{{ nkp_airgap_dir_loc.stdout }}/cli/nkp"
+            dest: "/usr/bin/nkp"
+            state: link
     - name: Publish file bundle into private registry
       block:
-      - shell: "ls -d /opt/nkp-airgap/nkp-v* | tail -n 1"
-        register: nkp_airgap_dir_loc
-      - shell: "nkp push "
-        register: nkp_airgap_dir_loc
+      - shell: "nkp push bundle --bundle ./container-images/konvoy-image-bundle*.tar --to-registry='https://{{ airgap_domain }}{{ airgap_port | default('') }}' --to-registry-username='{{ registry.username }}' --to-registry-password='{{ registry.password }}' --to-registry-insecure-skip-tls-verify"
+        args:
+          chdir: "{{ nkp_airgap_dir_loc.stdout }}"
+      - shell: "nkp push bundle --bundle ./container-images/kommander-image-bundle*.tar --to-registry='https://{{ airgap_domain }}{{ airgap_port | default('') }}' --to-registry-username='{{ registry.username }}' --to-registry-password='{{ registry.password }}' --to-registry-insecure-skip-tls-verify"
+        args:
+          chdir: "{{ nkp_airgap_dir_loc.stdout }}"
+      - shell: "nkp push bundle --bundle ./container-images/nkp-catalog-applications-image-bundle*.tar --to-registry='https://{{ airgap_domain }}{{ airgap_port | default('') }}' --to-registry-username='{{ registry.username }}' --to-registry-password='{{ registry.password }}' --to-registry-insecure-skip-tls-verify"
+        args:
+          chdir: "{{ nkp_airgap_dir_loc.stdout }}"
 
 - hosts: ["nkp-bastion"]
   become: true
@@ -159,37 +178,15 @@
         - include_role: 
             name: dimmaryanto93.docker
         - ansible.builtin.file:
-            path: "/etc/docker/certs.d/{{ airgap_domain }}"
+            path: "/etc/docker/certs.d/{{ airgap_domain }}{{ airgap_port | default('') }}"
             state: directory
             mode: '0755'
             recurse: yes
         - ansible.builtin.file:
-            path: "/etc/docker/certs.d/{{ registry_domain }}"
+            path: "/etc/docker/certs.d/{{ registry_domain }}{{ registry_port | default('') }}"
             state: directory
             mode: '0755'
             recurse: yes
-    - name: Download or upload konvoy image builder
-      block:
-        - name: Check the file Konvoy Image Builder was exists 
-          stat:
-            path: "{{ path_downloaded_airgap }}/{{ kib_filename }}"
-          register: file_kib_uploaded
-        - ansible.builtin.get_url:
-            url: "{{ download_kib_url }}"
-            dest: "{{ path_downloaded_airgap }}/{{ kib_filename }}"
-          when: 
-            - direct_download == true
-            - not file_kib_uploaded.stat.exists
-        - copy:
-            src: "{{ upload_kib_path }}"
-            dest: "{{ path_downloaded_airgap }}/{{ kib_filename }}"
-          when: 
-            - direct_download == false
-            - not file_kib_uploaded.stat.exists
-        - community.docker.docker_image_load:
-            path: "{{ path_downloaded_airgap }}/{{ kib_filename }}"
-          when:
-            - not file_kib_uploaded.stat.exists
     - name: Download or Upload Airgap NKP
       block:
         - name: Check the file NKP Cli was exists 
