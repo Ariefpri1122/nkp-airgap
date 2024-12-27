@@ -1,7 +1,10 @@
----
 - hosts: ["nkp"]
   become: true
   tasks:
+    - command:
+        cmd: ethtool --offload ens3 rx-gro-hw off
+    - command:
+        cmd: nmcli c modify ens3 ethtool.feature-rx-gro-hw off
     - ansible.builtin.package:
         name: "{{ item }}"
         state: present
@@ -16,12 +19,58 @@
 - hosts: ["nkp-bastion"]
   become: true
   vars:
-    docker_insecure_registries_enabled: false
     helm_version: 'v3.16.3'
     kubectl_download_filetype: 'archive'
     kubectl_version: '1.29.9'
     kubectl_tmp_directory: '/tmp'
-  roles:
-    - dimmaryanto93.kubectl
-    - dimmaryanto93.helm_charts
-    - dimmaryanto93.docker
+    path_downloaded_airgap: /tmp
+    nkp_cli_dir_path: /opt/nkp-cli
+    nkp_filename: nkp-cli_linux_amd64.tar.gz
+  tasks:
+    - include_role: 
+        name: dimmaryanto93.kubectl
+    - include_role: 
+        name: dimmaryanto93.helm_charts
+    - name: Install and configure docker
+      block:
+        - include_role: 
+            name: dimmaryanto93.docker
+    - name: Download or Upload Airgap NKP
+      block:
+        - name: Check the file NKP Cli was exists 
+          stat:
+            path: "{{ path_downloaded_airgap }}/{{ nkp_filename }}"
+          register: file_nkp_cli_uploaded
+        - ansible.builtin.get_url:
+            url: "{{ download_nkp_cli_url }}"
+            dest: "{{ path_downloaded_airgap }}/{{ nkp_filename }}"
+          when: 
+            - direct_download == true
+            - not file_nkp_cli_uploaded.stat.exists
+        - copy:
+            src: "{{ upload_nkp_cli_path }}"
+            dest: "{{ path_downloaded_airgap }}/{{ nkp_filename }}"
+          when: 
+            - direct_download == false
+            - not file_nkp_cli_uploaded.stat.exists
+        - ansible.builtin.file:
+            path: "{{ nkp_cli_dir_path }}"
+            state: directory
+            mode: '0755'
+        - name: Extract NKP cli
+          ansible.builtin.unarchive:
+            src: "{{ path_downloaded_airgap }}/{{ nkp_filename }}"
+            dest: "{{ nkp_cli_dir_path }}"
+            remote_src: yes
+        - ansible.builtin.file:
+            src: "{{ nkp_cli_dir_path }}/nkp"
+            dest: "/usr/local/bin/nkp"
+            state: link
+- hosts: ["nkp-bastion"]
+  tasks:
+    - openssh_keypair:
+        path: .ssh/id_ed25519
+        type: ed25519
+    - shell: |
+        eval "$(ssh-agent)"
+        ssh-add .ssh/id_ed25519
