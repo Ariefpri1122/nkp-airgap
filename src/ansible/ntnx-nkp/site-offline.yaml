@@ -27,52 +27,52 @@
     upload_airgap_url: /Volumes/dell-r330/Packages/nutanix/nke/2.13.1/nkp-air-gapped-bundle_v2.13.0_linux_amd64.tar.gz
     airgap_filename: nkp-air-gapped-bundle_v2.13.0_linux_amd64.tar.gz
   tasks:
-    # - name: Prepare Private Registry
-    #   block:
-    #   - ansible.builtin.package:
-    #       name: "{{ item }}"
-    #     loop:
-    #       - python3-pip
-    #   - ansible.builtin.pip:
-    #       name: cryptography
-    #       executable: pip3
-    #   - ansible.builtin.file:
-    #       path: "{{ item }}"
-    #       state: directory
-    #       mode: '0755'
-    #     loop:
-    #       - certs
-    #       - auth
-    #   - openssl_privatekey:
-    #       path: 'certs/domain.key'
-    #       size: 4096
-    #   - openssl_csr:
-    #       path: 'certs/domain.crt'
-    #       privatekey_path: 'certs/domain.key'
-    #       country_name: 'ID'
-    #       organization_name: 'Nutanix.inc'
-    #       email_address: 'dimas.maryanto@nutanix.com'
-    #       common_name: '*.nutanix.local'
-    #       subject_alt_name: 'DNS:*.nutanix.local'
-    #   - openssl_certificate:
-    #       path: certs/domain.crt
-    #       privatekey_path: certs/domain.key
-    #       provider: selfsigned
-    #   - include_role: 
-    #       name: dimmaryanto93.docker
-    #   - ansible.builtin.file:
-    #       path: /etc/docker/certs.d/airgap.nutanix.local:5000
-    #       state: directory
-    #       mode: '0755'
-    #       recurse: yes
-    #   - ansible.builtin.copy:
-    #       src: certs/domain.crt
-    #       dest: /etc/docker/certs.d/airgap.nutanix.local:5000/registry-ca.crt
-    #       remote_src: yes
-    #   - ansible.builtin.copy:
-    #       src: certs/domain.key
-    #       dest: /etc/docker/certs.d/airgap.nutanix.local:5000/registry-ca.key
-    #       remote_src: yes
+    - name: Prepare Private Registry
+      block:
+      - ansible.builtin.package:
+          name: "{{ item }}"
+        loop:
+          - python3-pip
+      - ansible.builtin.pip:
+          name: cryptography
+          executable: pip3
+      - ansible.builtin.file:
+          path: "{{ item }}"
+          state: directory
+          mode: '0755'
+        loop:
+          - certs
+          - auth
+      - openssl_privatekey:
+          path: 'certs/domain.key'
+          size: 4096
+      - openssl_csr:
+          path: 'certs/domain.crt'
+          privatekey_path: 'certs/domain.key'
+          country_name: 'ID'
+          organization_name: 'Nutanix.inc'
+          email_address: 'dimas.maryanto@nutanix.com'
+          common_name: '*.nutanix.local'
+          subject_alt_name: 'DNS:*.nutanix.local'
+      - openssl_certificate:
+          path: certs/domain.crt
+          privatekey_path: certs/domain.key
+          provider: selfsigned
+      - include_role: 
+          name: dimmaryanto93.docker
+      - ansible.builtin.file:
+          path: /etc/docker/certs.d/airgap.nutanix.local:5000
+          state: directory
+          mode: '0755'
+          recurse: yes
+      - ansible.builtin.copy:
+          src: certs/domain.crt
+          dest: /etc/docker/certs.d/airgap.nutanix.local:5000/registry-ca.crt
+          remote_src: yes
+      - ansible.builtin.copy:
+          src: certs/domain.key
+          dest: /etc/docker/certs.d/airgap.nutanix.local:5000/registry-ca.key
+          remote_src: yes
     - name: Running private registry
       block:
         - shell: "docker run --rm --entrypoint htpasswd xmartlabs/htpasswd -Bbn 'admin' 'nutanix/4u' | tee auth/htpasswd"
@@ -94,109 +94,109 @@
               REGISTRY_HTTP_TLS_CERTIFICATE: "/certs/domain.crt"
               REGISTRY_HTTP_TLS_KEY: "/certs/domain.key"
 
-    # - name: Airgap file bundle
-    #   block:
-    #   - name: Check the file airgap was exists 
-    #     stat:
-    #       path: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
-    #     register: file_nkp_airgap_uploaded
-    #   - ansible.builtin.get_url:
-    #       url: "{{ download_airgap_url }}"
-    #       dest: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
-    #     when: 
-    #       - direct_download == true
-    #       - not file_nkp_airgap_uploaded.stat.exists
-    #   - copy:
-    #       src: "{{ upload_airgap_url }}"
-    #       dest: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
-    #     when: 
-    #       - direct_download == false
-    #       - not file_nkp_airgap_uploaded.stat.exists
-    #   - ansible.builtin.file:
-    #       path: "/opt/nkp-airgap"
-    #       state: directory
-    #       mode: '7777'
-    #   - name: Extract NKP airgaped bundle
-    #     ansible.builtin.unarchive:
-    #       src: '{{ path_downloaded_airgap }}/{{ airgap_filename }}'
-    #       dest: '/opt/nkp-airgap'
-    #       remote_src: yes
-    # - name: Publish file bundle into private registry
-    #   block:
-    #   - shell: "ls -d /opt/nkp-airgap/nkp-v* | tail -n 1"
-    #     register: nkp_airgap_dir_loc
-    #   - shell: "docker load -i konvoy-bootstrap-image*"
-    #     args:
-    #       chdir: "{{ nkp_airgap_dir_loc }}"
-    #   - shell: "docker load -i nkp-image-builder-image*"
-    #     args:
-    #       chdir: "{{ nkp_airgap_dir_loc }}"
+    - name: Airgap file bundle
+      block:
+      - name: Check the file airgap was exists 
+        stat:
+          path: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
+        register: file_nkp_airgap_uploaded
+      - ansible.builtin.get_url:
+          url: "{{ download_airgap_url }}"
+          dest: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
+        when: 
+          - direct_download == true
+          - not file_nkp_airgap_uploaded.stat.exists
+      - copy:
+          src: "{{ upload_airgap_url }}"
+          dest: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
+        when: 
+          - direct_download == false
+          - not file_nkp_airgap_uploaded.stat.exists
+      - ansible.builtin.file:
+          path: "/opt/nkp-airgap"
+          state: directory
+          mode: '7777'
+      - name: Extract NKP airgaped bundle
+        ansible.builtin.unarchive:
+          src: '{{ path_downloaded_airgap }}/{{ airgap_filename }}'
+          dest: '/opt/nkp-airgap'
+          remote_src: yes
+    - name: Publish file bundle into private registry
+      block:
+      - shell: "ls -d /opt/nkp-airgap/nkp-v* | tail -n 1"
+        register: nkp_airgap_dir_loc
+      - shell: "docker load -i konvoy-bootstrap-image*"
+        args:
+          chdir: "{{ nkp_airgap_dir_loc }}"
+      - shell: "docker load -i nkp-image-builder-image*"
+        args:
+          chdir: "{{ nkp_airgap_dir_loc }}"
 
-# - hosts: ["nkp-bastion"]
-#   become: true
-#   vars:
-#     helm_version: 'v3.16.3'
-#     kubectl_download_filetype: 'archive'
-#     kubectl_version: '1.29.9'
-#     kubectl_tmp_directory: '/tmp'
-#     direct_download: true
-#     path_downloaded_airgap: /tmp/
-#     download_airgap_url: https://download.nutanix.com/downloads/nkp/v2.13.0/nkp_v2.13.0_linux_amd64.tar.gz?Expires=1735324191&Key-Pair-Id=APKAJTTNCWPEI42QKMSA&Signature=H~u0ADPdQGdnYSFNTPjV25XpyBevWo6Ldmr1S1KN-IBMtxE56cWK4oUPiCYe-BtNzcp97~fOJywsb1IKUKHWMP1yV0TM8URl~fSkzcqS84EbtE7eKB9lB7s7B2Tc2A6lKQJl9uiDY4RSmJD1okzqIzAfmdcBRJ18el1zR9gqZ2m3CyIQlQnNo1gWMrvJjXuprxH7uRa25Tk7dtcUZXdqa1f~MMUxnIopoBZpVT~KMboLpUudAOlK2AUOI98czh7vNKk~HlJZmsEtCpV2PslF3zJWep0-Yx3qgSXMxv4ziT~Ty7cSzNo34OLUG0DQ4BEArBjQd5gRsd3qoBp9mckl6g__
-#     upload_airgap_url: /Volumes/dell-r330/Packages/nutanix/nke/2.13.1/nkp_v2.13.0_linux_amd64.tar.gz
-#     airgap_filename: nkp-v2.13.0
-#   tasks:
-#     - include_role: 
-#         name: dimmaryanto93.kubectl
-#     - include_role: 
-#         name: dimmaryanto93.helm_charts
-#     - include_role: 
-#         name: dimmaryanto93.docker
-#     - ansible.builtin.file:
-#         path: /etc/docker/certs.d/airgap.nutanix.local:5000
-#         state: directory
-#         mode: '0755'
-#         recurse: yes
-#     - ansible.builtin.file:
-#         path: /etc/docker/certs.d/registry.nutanix.local
-#         state: directory
-#         mode: '0755'
-#         recurse: yes
-#     - name: Check the file NKP Cli was exists 
-#       stat:
-#         path: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
-#       register: file_nkp_cli_uploaded
-#     - name: Download or Upload Airgap NKP
-#       block:
-#         - ansible.builtin.get_url:
-#             url: "{{ download_airgap_url }}"
-#             dest: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
-#           when: 
-#             - direct_download == true
-#             - not file_nkp_cli_uploaded.stat.exists
-#         - copy:
-#             src: "{{ upload_airgap_url }}"
-#             dest: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
-#           when: 
-#             - direct_download == false
-#             - not file_nkp_cli_uploaded.stat.exists
-#     - ansible.builtin.file:
-#         path: "/opt/nkp-cli/{{ airgap_filename }}"
-#         state: directory
-#         mode: '0755'
-#     - name: Extract NKP cli
-#       ansible.builtin.unarchive:
-#         src: '{{ path_downloaded_airgap }}/{{ airgap_filename }}'
-#         dest: "/opt/nkp-cli/{{ airgap_filename }}"
-#         remote_src: yes
-#     - ansible.builtin.file:
-#         src: "/opt/nkp-cli/{{ airgap_filename }}/nkp"
-#         dest: "/usr/local/bin/nkp"
-#         state: link
-# - hosts: ["nkp-bastion"]
-#   tasks:
-#     - openssh_keypair:
-#         path: .ssh/id_ed25519
-#         type: ed25519
-#     - shell: |
-#         eval "$(ssh-agent)"
-#         ssh-add .ssh/id_ed25519
+- hosts: ["nkp-bastion"]
+  become: true
+  vars:
+    helm_version: 'v3.16.3'
+    kubectl_download_filetype: 'archive'
+    kubectl_version: '1.29.9'
+    kubectl_tmp_directory: '/tmp'
+    direct_download: true
+    path_downloaded_airgap: /tmp/
+    download_airgap_url: https://download.nutanix.com/downloads/nkp/v2.13.0/nkp_v2.13.0_linux_amd64.tar.gz?Expires=1735324191&Key-Pair-Id=APKAJTTNCWPEI42QKMSA&Signature=H~u0ADPdQGdnYSFNTPjV25XpyBevWo6Ldmr1S1KN-IBMtxE56cWK4oUPiCYe-BtNzcp97~fOJywsb1IKUKHWMP1yV0TM8URl~fSkzcqS84EbtE7eKB9lB7s7B2Tc2A6lKQJl9uiDY4RSmJD1okzqIzAfmdcBRJ18el1zR9gqZ2m3CyIQlQnNo1gWMrvJjXuprxH7uRa25Tk7dtcUZXdqa1f~MMUxnIopoBZpVT~KMboLpUudAOlK2AUOI98czh7vNKk~HlJZmsEtCpV2PslF3zJWep0-Yx3qgSXMxv4ziT~Ty7cSzNo34OLUG0DQ4BEArBjQd5gRsd3qoBp9mckl6g__
+    upload_airgap_url: /Volumes/dell-r330/Packages/nutanix/nke/2.13.1/nkp_v2.13.0_linux_amd64.tar.gz
+    airgap_filename: nkp-v2.13.0
+  tasks:
+    - include_role: 
+        name: dimmaryanto93.kubectl
+    - include_role: 
+        name: dimmaryanto93.helm_charts
+    - include_role: 
+        name: dimmaryanto93.docker
+    - ansible.builtin.file:
+        path: /etc/docker/certs.d/airgap.nutanix.local:5000
+        state: directory
+        mode: '0755'
+        recurse: yes
+    - ansible.builtin.file:
+        path: /etc/docker/certs.d/registry.nutanix.local
+        state: directory
+        mode: '0755'
+        recurse: yes
+    - name: Check the file NKP Cli was exists 
+      stat:
+        path: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
+      register: file_nkp_cli_uploaded
+    - name: Download or Upload Airgap NKP
+      block:
+        - ansible.builtin.get_url:
+            url: "{{ download_airgap_url }}"
+            dest: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
+          when: 
+            - direct_download == true
+            - not file_nkp_cli_uploaded.stat.exists
+        - copy:
+            src: "{{ upload_airgap_url }}"
+            dest: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
+          when: 
+            - direct_download == false
+            - not file_nkp_cli_uploaded.stat.exists
+    - ansible.builtin.file:
+        path: "/opt/nkp-cli/{{ airgap_filename }}"
+        state: directory
+        mode: '0755'
+    - name: Extract NKP cli
+      ansible.builtin.unarchive:
+        src: '{{ path_downloaded_airgap }}/{{ airgap_filename }}'
+        dest: "/opt/nkp-cli/{{ airgap_filename }}"
+        remote_src: yes
+    - ansible.builtin.file:
+        src: "/opt/nkp-cli/{{ airgap_filename }}/nkp"
+        dest: "/usr/local/bin/nkp"
+        state: link
+- hosts: ["nkp-bastion"]
+  tasks:
+    - openssh_keypair:
+        path: .ssh/id_ed25519
+        type: ed25519
+    - shell: |
+        eval "$(ssh-agent)"
+        ssh-add .ssh/id_ed25519
