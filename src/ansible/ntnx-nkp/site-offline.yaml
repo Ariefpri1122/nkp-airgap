@@ -104,7 +104,6 @@
               REGISTRY_AUTH_HTPASSWD_PATH: "/auth/htpasswd"
               REGISTRY_HTTP_TLS_CERTIFICATE: "/certs/registry-ca.crt"
               REGISTRY_HTTP_TLS_KEY: "/certs/registry-ca.key"
-
     - name: Airgap file bundle
       block:
       - name: Check the file airgap was exists 
