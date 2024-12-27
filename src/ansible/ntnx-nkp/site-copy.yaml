@@ -1,0 +1,26 @@
+- hosts: ['nkp']
+  become: true
+  tasks:
+    - ansible.builtin.file:
+        path: /opt/nkp-airgap/nkp-v2.13.0
+        state: directory
+        mode: '7777'
+    - ansible.builtin.file:
+        path: /etc/openregistry/certs
+        state: directory
+        mode: '7777'
+
+- hosts: "{{ groups['nkp'][1] }}"
+  become: true
+  become_user: "{{ ansible_user }}"
+  tasks:
+    - synchronize:
+        dest: "/opt/nkp-airgap/"
+        src: "{{ item }}"
+        mode: push
+      delegate_to: "{{ groups['nkp'][0] }}"
+      tags: sync-push
+      with_items:
+        - /opt/nkp-airgap/nkp-v2.13.0/konvoy-bootstrap-image-v2.13.0.tar
+        - /opt/nkp-airgap/nkp-v2.13.0/nkp-image-builder-image-v0.20.0.tar
+        - /etc/openregistry/certs/registry-ca.crt

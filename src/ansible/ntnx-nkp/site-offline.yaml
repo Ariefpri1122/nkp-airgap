@@ -16,6 +16,15 @@
         - curl
         - wget
         - git
+        - rsync
+    - name: Generate ssh key
+      block: 
+        - openssh_keypair:
+            path: .ssh/id_ed25519
+            type: ed25519
+        - shell: |
+            eval "$(ssh-agent)"
+            ssh-add .ssh/id_ed25519
 
 - hosts: ["nkp-airgap"]
   become: true
@@ -218,11 +227,3 @@
             src: "{{ nkp_cli_dir_path }}/nkp"
             dest: "/usr/local/bin/nkp"
             state: link
-- hosts: ["nkp-bastion"]
-  tasks:
-    - openssh_keypair:
-        path: .ssh/id_ed25519
-        type: ed25519
-    - shell: |
-        eval "$(ssh-agent)"
-        ssh-add .ssh/id_ed25519

@@ -15,6 +15,7 @@
         - curl
         - wget
         - git
+        - rsync
 
 - hosts: ["nkp-bastion"]
   become: true
