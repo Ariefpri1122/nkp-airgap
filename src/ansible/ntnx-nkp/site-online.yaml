@@ -1,22 +1,3 @@
-- hosts: ["nkp"]
-  become: true
-  tasks:
-    - command:
-        cmd: ethtool --offload ens3 rx-gro-hw off
-    - command:
-        cmd: nmcli c modify ens3 ethtool.feature-rx-gro-hw off
-    - ansible.builtin.package:
-        name: "{{ item }}"
-        state: present
-      loop:
-        - zip
-        - unzip
-        - tar
-        - curl
-        - wget
-        - git
-        - rsync
-
 - hosts: ["nkp-bastion"]
   become: true
   vars:
@@ -67,11 +48,3 @@
             src: "{{ nkp_cli_dir_path }}/nkp"
             dest: "/usr/local/bin/nkp"
             state: link
-- hosts: ["nkp-bastion"]
-  tasks:
-    - openssh_keypair:
-        path: .ssh/id_ed25519
-        type: ed25519
-    - shell: |
-        eval "$(ssh-agent)"
-        ssh-add .ssh/id_ed25519
