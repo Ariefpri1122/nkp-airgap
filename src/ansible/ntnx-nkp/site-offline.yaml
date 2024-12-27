@@ -39,18 +39,17 @@
           mode: '0755'
         loop:
           - certs
-          - auth
       - openssl_privatekey:
           path: 'certs/domain.key'
           size: 4096
       - openssl_csr:
           path: 'certs/domain.crt'
           privatekey_path: 'certs/domain.key'
-          country_name: 'ID'
-          organization_name: 'Nutanix.inc'
-          email_address: 'dimas.maryanto@nutanix.com'
-          common_name: '*.nutanix.local'
-          subject_alt_name: 'DNS:*.nutanix.local'
+          country_name: '{{ selfsigned_cert.country_id }}'
+          organization_name: '{{ selfsigned_cert.organization_name }}'
+          email_address: '{{ selfsigned_cert.email_address }}'
+          common_name: '{{ selfsigned_cert.domain_wildcard }}'
+          subject_alt_name: 'DNS:{{ selfsigned_cert.domain_wildcard }}'
       - openssl_certificate:
           path: certs/domain.crt
           privatekey_path: certs/domain.key
@@ -58,38 +57,53 @@
       - include_role: 
           name: dimmaryanto93.docker
       - ansible.builtin.file:
-          path: /etc/docker/certs.d/airgap.nutanix.local:5000
+          path: "/etc/docker/certs.d/{{ airgap_domain }}"
           state: directory
           mode: '0755'
           recurse: yes
       - ansible.builtin.copy:
           src: certs/domain.crt
-          dest: /etc/docker/certs.d/airgap.nutanix.local:5000/registry-ca.crt
+          dest: "/etc/docker/certs.d/{{ airgap_domain }}/registry-ca.crt"
           remote_src: yes
       - ansible.builtin.copy:
           src: certs/domain.key
-          dest: /etc/docker/certs.d/airgap.nutanix.local:5000/registry-ca.key
+          dest: "/etc/docker/certs.d/{{ airgap_domain }}/registry-ca.key"
           remote_src: yes
     - name: Running private registry
       block:
-        - shell: "docker run --rm --entrypoint htpasswd xmartlabs/htpasswd -Bbn 'admin' 'nutanix/4u' | tee auth/htpasswd"
+        - ansible.builtin.file:
+            path: "/etc/openregistry/{{ item }}"
+            state: directory
+            mode: '0755'
+          loop:
+            - certs
+            - auth
+        - ansible.builtin.copy:
+            src: certs/domain.crt
+            dest: "/etc/openregistry/certs/registry-ca.crt"
+            remote_src: yes
+        - ansible.builtin.copy:
+            src: certs/domain.key
+            dest: "/etc/openregistry/certs/registry-ca.key"
+            remote_src: yes
+        - shell: "docker run --rm --entrypoint htpasswd xmartlabs/htpasswd -Bbn '{{ registry.username }}' '{{ registry.password }}' | tee /etc/openregistry/auth/htpasswd"
         - docker_container:
             name: DockerRegistry
             image: registry:2
             state: started
             restart: yes
             volumes:
-              - "/mnt/registry:/var/lib/registry:rwm"
-              - "`pwd`/auth:/auth"
-              - "`pwd`/certs:/certs"
+              - "/mnt/registry:/var/lib/registry:rw"
+              - "/etc/openregistry/auth:/auth"
+              - "/etc/openregistry/certs:/certs"
             ports:
               - "5000:5000"
             env:
               REGISTRY_AUTH: htpasswd
               REGISTRY_AUTH_HTPASSWD_REALM: "Registry Realm"
               REGISTRY_AUTH_HTPASSWD_PATH: "/auth/htpasswd"
-              REGISTRY_HTTP_TLS_CERTIFICATE: "/certs/domain.crt"
-              REGISTRY_HTTP_TLS_KEY: "/certs/domain.key"
+              REGISTRY_HTTP_TLS_CERTIFICATE: "/certs/registry-ca.crt"
+              REGISTRY_HTTP_TLS_KEY: "/certs/registry-ca.key"
 
     - name: Airgap file bundle
       block:
@@ -122,12 +136,8 @@
       block:
       - shell: "ls -d /opt/nkp-airgap/nkp-v* | tail -n 1"
         register: nkp_airgap_dir_loc
-      - community.docker.docker_image_load:
-          path: "{{ nkp_airgap_dir_loc.stdout }}/konvoy-bootstrap-image*"
-        register: konvoy_bootstrap_image
-      - community.docker.docker_image_load:
-          path: "{{ nkp_airgap_dir_loc.stdout }}/nkp-image-builder-image*"
-        register: nkp_image_builder
+      - shell: "nkp push "
+        register: nkp_airgap_dir_loc
 
 - hosts: ["nkp-bastion"]
   become: true
@@ -136,57 +146,82 @@
     kubectl_download_filetype: 'archive'
     kubectl_version: '1.29.9'
     kubectl_tmp_directory: '/tmp'
-    path_downloaded_airgap: /tmp/
+    path_downloaded_airgap: /tmp
     nkp_cli_dir_path: /opt/nkp-cli
-    airgap_filename: nkp-cli_linux_amd64.tar.gz
+    nkp_filename: nkp-cli_linux_amd64.tar.gz
+    kib_filename: kib_linux_amd64.tar.gz
   tasks:
     - include_role: 
         name: dimmaryanto93.kubectl
     - include_role: 
         name: dimmaryanto93.helm_charts
-    - include_role: 
-        name: dimmaryanto93.docker
-    - ansible.builtin.file:
-        path: /etc/docker/certs.d/airgap.nutanix.local:5000
-        state: directory
-        mode: '0755'
-        recurse: yes
-    - ansible.builtin.file:
-        path: /etc/docker/certs.d/registry.nutanix.local
-        state: directory
-        mode: '0755'
-        recurse: yes
-    - name: Check the file NKP Cli was exists 
-      stat:
-        path: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
-      register: file_nkp_cli_uploaded
+    - name: Install and configure docker
+      block:
+        - include_role: 
+            name: dimmaryanto93.docker
+        - ansible.builtin.file:
+            path: "/etc/docker/certs.d/{{ airgap_domain }}"
+            state: directory
+            mode: '0755'
+            recurse: yes
+        - ansible.builtin.file:
+            path: "/etc/docker/certs.d/{{ registry_domain }}"
+            state: directory
+            mode: '0755'
+            recurse: yes
+    - name: Download or upload konvoy image builder
+      block:
+        - name: Check the file Konvoy Image Builder was exists 
+          stat:
+            path: "{{ path_downloaded_airgap }}/{{ kib_filename }}"
+          register: file_kib_uploaded
+        - ansible.builtin.get_url:
+            url: "{{ download_kib_url }}"
+            dest: "{{ path_downloaded_airgap }}/{{ kib_filename }}"
+          when: 
+            - direct_download == true
+            - not file_kib_uploaded.stat.exists
+        - copy:
+            src: "{{ upload_kib_path }}"
+            dest: "{{ path_downloaded_airgap }}/{{ kib_filename }}"
+          when: 
+            - direct_download == false
+            - not file_kib_uploaded.stat.exists
+        - community.docker.docker_image_load:
+            path: "{{ path_downloaded_airgap }}/{{ kib_filename }}"
+          when:
+            - not file_kib_uploaded.stat.exists
     - name: Download or Upload Airgap NKP
       block:
+        - name: Check the file NKP Cli was exists 
+          stat:
+            path: "{{ path_downloaded_airgap }}/{{ nkp_filename }}"
+          register: file_nkp_cli_uploaded
         - ansible.builtin.get_url:
             url: "{{ download_nkp_cli_url }}"
-            dest: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
+            dest: "{{ path_downloaded_airgap }}/{{ nkp_filename }}"
           when: 
             - direct_download == true
             - not file_nkp_cli_uploaded.stat.exists
         - copy:
             src: "{{ upload_nkp_cli_path }}"
-            dest: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
+            dest: "{{ path_downloaded_airgap }}/{{ nkp_filename }}"
           when: 
             - direct_download == false
             - not file_nkp_cli_uploaded.stat.exists
-    - ansible.builtin.file:
-        path: "{{ nkp_cli_dir_path }}"
-        state: directory
-        mode: '0755'
-    - name: Extract NKP cli
-      ansible.builtin.unarchive:
-        src: "{{ path_downloaded_airgap }}/{{ airgap_filename }}"
-        dest: "{{ nkp_cli_dir_path }}"
-        remote_src: yes
-    - ansible.builtin.file:
-        src: "{{ nkp_cli_dir_path }}/nkp"
-        dest: "/usr/local/bin/nkp"
-        state: link
+        - ansible.builtin.file:
+            path: "{{ nkp_cli_dir_path }}"
+            state: directory
+            mode: '0755'
+        - name: Extract NKP cli
+          ansible.builtin.unarchive:
+            src: "{{ path_downloaded_airgap }}/{{ nkp_filename }}"
+            dest: "{{ nkp_cli_dir_path }}"
+            remote_src: yes
+        - ansible.builtin.file:
+            src: "{{ nkp_cli_dir_path }}/nkp"
+            dest: "/usr/local/bin/nkp"
+            state: link
 - hosts: ["nkp-bastion"]
   tasks:
     - openssh_keypair:
