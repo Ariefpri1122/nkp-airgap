@@ -10,7 +10,7 @@
     - shell: "ls -d /etc/openregistry/certs/*.crt | tail -n 1"
       register: registry_cacert_loc
     - ansible.builtin.file:
-        path: "/etc/openregistry/certs/{{ airgap_domain }}{{ airgap_port | default('') }}"
+        path: "/etc/openregistry/certs"
         state: directory
         mode: '7777'
         recurse: yes
