@@ -102,3 +102,13 @@ Number of key(s) added: 1
 Now try logging into the machine, with:   "ssh 'user@10.10.30.2'"
 and check to make sure that only the key(s) you wanted were added.
 ```
+
+## Prepare you environment variable
+
+Please modify file `site.env.yaml` for value of the propery
+
+- `direct_download`, if you decide for download directly nutanix portal please set the value is `true` and get url set into property `download_airgap_url`, `download_nkp_cli_url` else if you set `false` please set value of property `upload_airgap_url`, `upload_nkp_cli_path`
+- `download_airgap_url`, please fill this property with download url with this component
+    ![airgap-url](./imgs/download-nkp-airgaped-bundle.png)
+- `download_nkp_cli_url`, please fill this property with download url with this compenent
+    ![nkp-cli-url](./imgs/download-nkp-cli.png)

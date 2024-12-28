@@ -21,7 +21,7 @@
           mode: '7777'
         loop:
           - certs
-      - shell: 'openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days 365 -out certs/domain.crt -subj "/C={{ selfsigned_cert.country_id }}/ST=Indonesia/L=Jakarta/O={{ selfsigned_cert.organization_name }}/OU=IT/CN={{ selfsigned_cert.domain_wildcard }}" -addext "subjectAltName = DNS:{{ selfsigned_cert.domain_wildcard }}"'
+      - shell: 'openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days 365 -out certs/domain.crt -subj "/C={{ selfsigned_cert.country_id }}/ST=Indonesia/L=Jakarta/O={{ selfsigned_cert.organization_name }}/OU=IT/CN=*.{{ selfsigned_cert.domain_wildcard }}" -addext "subjectAltName = DNS:*.{{ selfsigned_cert.domain_wildcard }}"'
       - include_role: 
           name: dimmaryanto93.docker
       - ansible.builtin.file:
