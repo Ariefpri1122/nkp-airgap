@@ -1,3 +1,4 @@
+
 - hosts: ["nkp-bastion"]
   become: true
   vars:
@@ -8,6 +9,7 @@
     path_downloaded_airgap: /tmp
     nkp_cli_dir_path: /opt/nkp-cli
     nkp_filename: nkp-cli_linux_amd64.tar.gz
+    kib_filename: kib_linux_amd64.tar.gz
   tasks:
     - include_role: 
         name: dimmaryanto93.kubectl
@@ -17,6 +19,16 @@
       block:
         - include_role: 
             name: dimmaryanto93.docker
+        - ansible.builtin.file:
+            path: "/etc/docker/certs.d/{{ airgap_domain }}{{ airgap_port | default('') }}"
+            state: directory
+            mode: '0755'
+            recurse: yes
+        - ansible.builtin.file:
+            path: "/etc/docker/certs.d/{{ registry_domain }}{{ registry_port | default('') }}"
+            state: directory
+            mode: '0755'
+            recurse: yes
     - name: Download or Upload Airgap NKP
       block:
         - name: Check the file NKP Cli was exists 

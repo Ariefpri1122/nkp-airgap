@@ -1,0 +1,40 @@
+- hosts: ['nkp-bastion']
+  become: true
+  tasks:
+    - ansible.builtin.file:
+        path: /opt/nkp-airgap
+        state: directory
+        mode: '7777'
+    - ansible.builtin.file:
+        path: "/etc/docker/certs.d/{{ airgap_domain }}{{ airgap_port | default('') }}"
+        state: directory
+        mode: '7777'
+        recurse: yes
+
+- hosts: "{{ groups['nkp'][1] }}"
+  become: true
+  become_user: "{{ ansible_user }}"
+  tasks:
+    - synchronize:
+        dest: "/opt/nkp-airgap/"
+        src: "{{ item }}"
+        mode: push
+      delegate_to: "{{ groups['nkp'][0] }}"
+      tags: sync-push
+      with_items:
+        - "{{ hostvars['nkp-airgap'].konvoy_bootstrap_image_loc.stdout }}"
+        - "{{ hostvars['nkp-airgap'].nkp_image_builder_loc.stdout }}"
+
+- hosts: "{{ groups['nkp'][1] }}"
+  become: true
+  become_user: "{{ ansible_user }}"
+  tasks:
+    - synchronize:
+        dest: "/etc/docker/certs.d/{{ airgap_domain }}{{ airgap_port | default('') }}"
+        src: "{{ item }}"
+        mode: push
+      delegate_to: "{{ groups['nkp'][0] }}"
+      tags: sync-push
+      with_items:
+        - "{{ hostvars['nkp-airgap'].registry_cacert_loc.stdout }}"
+        
