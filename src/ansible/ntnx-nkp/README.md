@@ -119,4 +119,4 @@ Please modify file `site.env.yaml` for value of the propery
 
 The final look like this:
 
-![site-env-yaml](./imgs/ssh-copy-id-flow.png)
+![site-env-yaml](./imgs/site-env-yaml.png)
