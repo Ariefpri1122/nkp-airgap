@@ -22,12 +22,12 @@
         - ansible.builtin.file:
             path: "/etc/docker/certs.d/{{ airgap_domain }}{{ airgap_port | default('') }}"
             state: directory
-            mode: '0755'
+            mode: '7777'
             recurse: yes
         - ansible.builtin.file:
             path: "/etc/docker/certs.d/{{ registry_domain }}{{ registry_port | default('') }}"
             state: directory
-            mode: '0755'
+            mode: '7777'
             recurse: yes
     - name: Download or Upload Airgap NKP
       block:

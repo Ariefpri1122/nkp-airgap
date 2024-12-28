@@ -1,3 +1,20 @@
+- hosts: ['nkp-airgap']
+  become: true
+  tasks:
+    - shell: "ls -d /opt/nkp-airgap/nkp-v* | tail -n 1"
+      register: nkp_airgap_dir_loc
+    - shell: "ls -d {{ nkp_airgap_dir_loc.stdout }}/konvoy-bootstrap-image-*.tar | tail -n 1"
+      register: konvoy_bootstrap_image_loc
+    - shell: "ls -d {{ nkp_airgap_dir_loc.stdout }}/nkp-image-builder-image-*.tar | tail -n 1"
+      register: nkp_image_builder_loc
+    - shell: "ls -d /etc/openregistry/certs/*.crt | tail -n 1"
+      register: registry_cacert_loc
+    - ansible.builtin.file:
+        path: "/etc/openregistry/certs/{{ airgap_domain }}{{ airgap_port | default('') }}"
+        state: directory
+        mode: '7777'
+        recurse: yes
+
 - hosts: ['nkp-bastion']
   become: true
   tasks:
@@ -5,6 +22,7 @@
         path: /opt/nkp-airgap
         state: directory
         mode: '7777'
+        recurse: yes
     - ansible.builtin.file:
         path: "/etc/docker/certs.d/{{ airgap_domain }}{{ airgap_port | default('') }}"
         state: directory
@@ -24,17 +42,27 @@
       with_items:
         - "{{ hostvars['nkp-airgap'].konvoy_bootstrap_image_loc.stdout }}"
         - "{{ hostvars['nkp-airgap'].nkp_image_builder_loc.stdout }}"
-
-- hosts: "{{ groups['nkp'][1] }}"
-  become: true
-  become_user: "{{ ansible_user }}"
-  tasks:
-    - synchronize:
-        dest: "/etc/docker/certs.d/{{ airgap_domain }}{{ airgap_port | default('') }}"
-        src: "{{ item }}"
-        mode: push
-      delegate_to: "{{ groups['nkp'][0] }}"
-      tags: sync-push
-      with_items:
         - "{{ hostvars['nkp-airgap'].registry_cacert_loc.stdout }}"
-        
+
+- hosts: ['nkp-bastion']
+  become: true
+  tasks:
+    - ansible.builtin.file:
+        path: /opt/nkp-airgap
+        state: directory
+        mode: '7777'
+        recurse: yes
+    - ansible.builtin.copy:
+        src: /opt/nkp-airgap/registry-ca.crt
+        dest: /etc/docker/certs.d/{{ airgap_domain }}{{ airgap_port | default('') }}/registry.crt
+        remote_src: yes
+    - name: Load docker image
+      block:
+      - shell: "ls -d /opt/nkp-airgap/konvoy-bootstrap-image-*.tar | tail -n 1"
+        register: konvoy_bootstrap_image_loc
+      - community.docker.docker_image_load:
+          path: "{{ konvoy_bootstrap_image_loc.stdout }}"
+      - shell: "ls -d /opt/nkp-airgap/nkp-image-builder-image-*.tar | tail -n 1"
+        register: nkp_image_builder_loc
+      - community.docker.docker_image_load:
+          path: "{{ nkp_image_builder_loc.stdout }}"

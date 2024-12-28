@@ -125,12 +125,6 @@
           remote_src: yes
     - shell: "ls -d /opt/nkp-airgap/nkp-v* | tail -n 1"
       register: nkp_airgap_dir_loc
-    - shell: "ls -d {{ nkp_airgap_dir_loc.stdout }}/konvoy-bootstrap-image-*.tar | tail -n 1"
-      register: konvoy_bootstrap_image_loc
-    - shell: "ls -d {{ nkp_airgap_dir_loc.stdout }}/nkp-image-builder-image-*.tar | tail -n 1"
-      register: nkp_image_builder_loc
-    - shell: "ls -d /etc/openregistry/certs/*.crt | tail -n 1"
-      register: registry_cacert_loc
     - name: Install NKP cli
       block: 
         - ansible.builtin.copy:
