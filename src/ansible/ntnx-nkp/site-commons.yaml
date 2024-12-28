@@ -16,6 +16,8 @@
         - wget
         - git
         - rsync
+- hosts: ["nkp"]
+  tasks:
     - name: Generate ssh key
       block: 
         - openssh_keypair:
