@@ -1,5 +1,9 @@
 # Provision NKP deployment with Ansible playbook
 
+This playbook will provision NKP base installation with airgap method, look like this architecture
+
+![ansible-nkp](./imgs/ansible-flow.png)
+
 Pertama yang perlu kita siapkan adalah minimum 2 Virtual Machine dengan spesifikasi seperti berikut:
 
 ```yaml
