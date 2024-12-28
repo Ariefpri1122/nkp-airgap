@@ -131,3 +131,7 @@ ansible-playbook -i inventory.ini \
 --extra-vars=@ntnx-nkp/site.env.yaml \
 ntnx-nkp/site-airgap.yaml ntnx-nkp/site-bastion.yaml ntnx-nkp/site-rsync.yaml
 ```
+
+After all component are installed and configure so this is how final look like
+
+![vm-bastion-installed](./imgs/vm-bastion-installed.png)
