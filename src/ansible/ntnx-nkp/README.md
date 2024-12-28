@@ -120,3 +120,14 @@ Please modify file `site.env.yaml` for value of the propery
 The final look like this:
 
 ![site-env-yaml](./imgs/site-env-yaml.png)
+
+## Deploy airgap & nkp-bastion
+
+To deploy airgap and NKP-Bastion, so you need to run this command:
+
+```bash
+ansible-playbook -i inventory.ini \
+--ask-become-pass \
+--extra-vars=@ntnx-nkp/site.env.yaml \
+ntnx-nkp/site-airgap.yaml ntnx-nkp/site-bastion.yaml ntnx-nkp/site-rsync.yaml
+```
