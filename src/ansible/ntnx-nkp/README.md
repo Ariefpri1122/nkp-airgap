@@ -112,3 +112,7 @@ Please modify file `site.env.yaml` for value of the propery
     ![airgap-url](./imgs/download-nkp-airgaped-bundle.png)
 - `download_nkp_cli_url`, please fill this property with download url with this compenent
     ![nkp-cli-url](./imgs/download-nkp-cli.png)
+
+The final look like this:
+
+![site-env-yaml](./imgs/ssh-copy-id-flow.png)
