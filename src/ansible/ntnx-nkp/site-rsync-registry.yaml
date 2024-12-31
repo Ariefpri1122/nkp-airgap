@@ -1,0 +1,45 @@
+- hosts: ['nkp-registry']
+  become: true
+  tasks:
+  - shell: "ls -d {{ nexus_installation_path }}/sonatype-work/nexus3/certs.d/*.crt | tail -n 1"
+    register: registry_cacert_loc
+
+- hosts: ['nkp-bastion']
+  become: true
+  tasks:
+    - ansible.builtin.file:
+        path: /opt/nkp-registry
+        state: directory
+        mode: '7777'
+        recurse: yes
+    - ansible.builtin.file:
+        path: "/etc/docker/certs.d/{{ registry_domain }}{{ airgap_port | default('') }}"
+        state: directory
+        mode: '7777'
+        recurse: yes
+
+- hosts: ['nkp-bastion']
+  become: true
+  become_user: "{{ ansible_user }}"
+  tasks:
+    - synchronize:
+        dest: "/opt/nkp-registry/"
+        src: "{{ item }}"
+        mode: push
+      delegate_to: 'nkp-registry'
+      tags: sync-push
+      with_items:
+        - "{{ hostvars['nkp-registry'].registry_cacert_loc.stdout }}"
+
+- hosts: ['nkp-bastion']
+  become: true
+  tasks:
+    - ansible.builtin.file:
+        path: /opt/nkp-registry
+        state: directory
+        mode: '7777'
+        recurse: yes
+    - ansible.builtin.copy:
+        src: /opt/nkp-registry/registry-ca.crt
+        dest: /etc/docker/certs.d/{{ registry_domain }}{{ registry_port | default('') }}/registry.crt
+        remote_src: yes

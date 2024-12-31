@@ -8,7 +8,7 @@
     - shell: "ls -d {{ nkp_airgap_dir_loc.stdout }}/nkp-image-builder-image-*.tar | tail -n 1"
       register: nkp_image_builder_loc
     - shell: "ls -d /etc/openregistry/certs/*.crt | tail -n 1"
-      register: registry_cacert_loc
+      register: airgap_cacert_loc
     - ansible.builtin.file:
         path: "/etc/openregistry/certs"
         state: directory
@@ -42,7 +42,7 @@
       with_items:
         - "{{ hostvars['nkp-airgap'].konvoy_bootstrap_image_loc.stdout }}"
         - "{{ hostvars['nkp-airgap'].nkp_image_builder_loc.stdout }}"
-        - "{{ hostvars['nkp-airgap'].registry_cacert_loc.stdout }}"
+        - "{{ hostvars['nkp-airgap'].airgap_cacert_loc.stdout }}"
 
 - hosts: ['nkp-bastion']
   become: true
