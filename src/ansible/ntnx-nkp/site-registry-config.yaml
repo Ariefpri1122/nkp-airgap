@@ -5,7 +5,6 @@
     nexus_create_new_user: true
     nexus_new_user: "nkp-user"
     nexus_new_user_pass: "nutanix/4u"
-    nexus_installation_path: /opt/nexus
     nexus_default_port: 8081
     docker_registry_group_port: 8086
     docker_registry_hosted_port: 8087
