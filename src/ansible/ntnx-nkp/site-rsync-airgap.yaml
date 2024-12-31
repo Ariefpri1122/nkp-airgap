@@ -14,6 +14,10 @@
         state: directory
         mode: '7777'
         recurse: yes
+    - fetch: 
+        src: "{{ airgap_cacert_loc.stdout }}" 
+        dest: ~/Downloads/airgap-ca.crt
+        flat: yes
 
 - hosts: ['nkp-bastion']
   become: true

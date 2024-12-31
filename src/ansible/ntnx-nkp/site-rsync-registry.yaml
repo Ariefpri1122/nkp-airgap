@@ -3,6 +3,10 @@
   tasks:
   - shell: "ls -d {{ nexus_installation_path }}/sonatype-work/nexus3/certs.d/*.crt | tail -n 1"
     register: registry_cacert_loc
+  - fetch: 
+      src: "{{ registry_cacert_loc.stdout }}" 
+      dest: ~/Downloads/registry-ca.crt
+      flat: yes
 
 - hosts: ['nkp-bastion']
   become: true
