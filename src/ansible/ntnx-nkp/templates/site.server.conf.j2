@@ -1,0 +1,16 @@
+server {
+    listen 80; 
+    server_name {{ registry_domain }};
+
+    include /etc/nginx/default.d/*.conf;
+}
+
+server {
+    listen 443 ssl; 
+    server_name {{ registry_domain }};
+
+    ssl_certificate {{ nexus_installation_path }}/sonatype-work/nexus3/certs.d/registry-ca.crt; 
+    ssl_certificate_key {{ nexus_installation_path }}/sonatype-work/nexus3/certs.d/registry-ca.key;
+
+    include /etc/nginx/default.d/*.conf;
+}

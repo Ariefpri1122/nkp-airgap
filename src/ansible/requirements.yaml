@@ -15,4 +15,5 @@ roles:
   - dimmaryanto93.kubectl
   - dimMaryanto93.docker_post_install
   - dimmaryanto93.nginx
-  - dimmaryanto93.oracle_java
+  - dimmaryanto93.sonatype_nexus_oss
+  - dimmaryanto93.sonatype_nexus_oss_registry

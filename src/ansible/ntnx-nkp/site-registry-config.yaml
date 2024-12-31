@@ -1,5 +1,75 @@
 ---
 - hosts: ["nkp-registry"]
   become: true
+  vars:
+    nexus_create_new_user: true
+    nexus_new_user: "nkp-user"
+    nexus_new_user_pass: "nutanix/4u"
   roles: 
     - role: dimmaryanto93.sonatype_nexus_oss_registry
+
+- hosts: ["nkp-registry"]
+  become: true
+  vars: 
+    nexus_installation_path: /opt/nexus
+    nexus_default_port: 8081
+    docker_registry_group_port: 8086
+    docker_registry_hosted_port: 8087
+  tasks:
+      - name: Prepare Certificate
+        block:
+        - ansible.builtin.package:
+            name: "{{ item }}"
+          loop:
+            - python3-pip
+        - ansible.builtin.pip:
+            name: cryptography
+            executable: pip3
+        - ansible.builtin.file:
+            path: "{{ item }}"
+            state: directory
+            mode: '7777'
+          loop:
+            - certs
+        - shell: 'openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days 365 -out certs/domain.crt -subj "/C={{ selfsigned_cert.country_id }}/ST=Indonesia/L=Jakarta/O={{ selfsigned_cert.organization_name }}/OU=IT/CN=*.{{ selfsigned_cert.domain_wildcard }}" -addext "subjectAltName = DNS:*.{{ selfsigned_cert.domain_wildcard }}"'
+        - ansible.builtin.file:
+            path: "{{ nexus_installation_path }}/sonatype-work/nexus3/certs.d"
+            state: directory
+            mode: '7777'
+            recurse: yes
+        - ansible.builtin.copy:
+            src: certs/domain.crt
+            dest: "{{ nexus_installation_path }}/sonatype-work/nexus3/certs.d/registry-ca.crt"
+            mode: '7777'
+            remote_src: yes
+        - ansible.builtin.copy:
+            src: certs/domain.key
+            dest: "{{ nexus_installation_path }}/sonatype-work/nexus3/certs.d/registry-ca.key"
+            mode: '7777'
+            remote_src: yes
+      - name: Nginx Configuration
+        block:
+          - file:
+              path: /etc/nginx/nginx.conf
+              state: absent
+          - template:
+              src: nginx.conf.j2
+              dest: /etc/nginx/nginx.conf
+              owner: root
+              group: root
+              mode: '0644'
+          - template:
+              src: site.server.conf.j2
+              dest: /etc/nginx/conf.d/default.conf
+              owner: root
+              group: root
+              mode: '0644'
+          - template:
+              src: site.default.conf.j2
+              dest: /etc/nginx/default.d/default.conf
+              owner: root
+              group: root
+              mode: '0644'
+          - service:
+              name: nginx
+              state: restarted

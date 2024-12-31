@@ -6,5 +6,4 @@
     download_jdk_url: https://download.oracle.com/java/17/archive/jdk-17.0.12_linux-x64_bin.rpm
   roles: 
     - role: dimmaryanto93.nginx
-    - role: dimmaryanto93.oracle_java
     - role: dimmaryanto93.sonatype_nexus_oss
