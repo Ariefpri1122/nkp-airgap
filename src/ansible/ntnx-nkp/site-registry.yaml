@@ -1,0 +1,10 @@
+---
+- hosts: ["nkp-registry"]
+  become: true
+  vars:
+    nexus_download_url: https://download.sonatype.com/nexus/3/nexus-3.72.0-04-unix.tar.gz
+    download_jdk_url: https://download.oracle.com/java/17/archive/jdk-17.0.12_linux-x64_bin.rpm
+  roles: 
+    - role: dimmaryanto93.nginx
+    - role: dimmaryanto93.oracle_java
+    - role: dimmaryanto93.sonatype_nexus_oss

@@ -14,3 +14,5 @@ roles:
   - dimmaryanto93.helm_charts
   - dimmaryanto93.kubectl
   - dimMaryanto93.docker_post_install
+  - dimmaryanto93.nginx
+  - dimmaryanto93.oracle_java

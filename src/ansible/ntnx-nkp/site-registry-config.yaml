@@ -1,0 +1,5 @@
+---
+- hosts: ["nkp-registry"]
+  become: true
+  roles: 
+    - role: dimmaryanto93.sonatype_nexus_oss_registry

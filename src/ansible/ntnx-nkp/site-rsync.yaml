@@ -29,7 +29,7 @@
         mode: '7777'
         recurse: yes
 
-- hosts: "{{ groups['nkp'][1] }}"
+- hosts: ['nkp-bastion']
   become: true
   become_user: "{{ ansible_user }}"
   tasks:
@@ -37,7 +37,7 @@
         dest: "/opt/nkp-airgap/"
         src: "{{ item }}"
         mode: push
-      delegate_to: "{{ groups['nkp'][0] }}"
+      delegate_to: ['nkp-airgap']
       tags: sync-push
       with_items:
         - "{{ hostvars['nkp-airgap'].konvoy_bootstrap_image_loc.stdout }}"
