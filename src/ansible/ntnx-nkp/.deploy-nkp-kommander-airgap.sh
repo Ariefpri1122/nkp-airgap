@@ -1,8 +1,8 @@
 #!/bin/bash
-export NKP_CLUSTER_NAME="nkp-kommander-hpoc"
+export NKP_CLUSTER_NAME="nkp-kommander-hpoc1030"
 export SUBNET="mgnt-ntnx-ipam-local"
-export CONTROLPLANE_VIP="10.10.20.5"
-export METALLB_IP_RANGE="10.10.20.6-10.10.20.9"
+export CONTROLPLANE_VIP="10.10.30.32"
+export METALLB_IP_RANGE="10.10.30.41-10.10.30.45"
 
 nkp create cluster nutanix \
     --cluster-name=${NKP_CLUSTER_NAME} \
