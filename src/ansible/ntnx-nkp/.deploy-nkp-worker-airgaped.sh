@@ -1,6 +1,6 @@
 #!/bin/bash
 export NKP_CLUSTER_NAME="nkp-worker1-hpoc"
-export SUBNET="mgnt.ntnx.ipam.local"
+export SUBNET="mgnt-ntnx-ipam-local"
 export CONTROLPLANE_VIP="10.10.20.100"
 export METALLB_IP_RANGE="10.10.20.101-10.10.20.105"
 
@@ -25,12 +25,13 @@ nkp create cluster nutanix \
     --registry-mirror-cacert=${MIRROR_REGISTRY_CACERT} \
     --kubernetes-service-load-balancer-ip-range=${METALLB_IP_RANGE} \
     --ssh-public-key-file=${SSH_PUBLIC_KEY} \
-    --control-plane-replicas 3 \
-    --control-plane-cores-per-vcpu 1 \
-    --control-plane-vcpus 8 \
-    --control-plane-memory 8 \
-    --worker-replicas 3 \
-    --worker-vcpus 8 \
-    --worker-cores-per-vcpu 1 \
-    --worker-memory 8 \
-    --insecure
+    --control-plane-replicas=1 \
+    --control-plane-cores-per-vcpu=1 \
+    --control-plane-vcpus=4 \
+    --control-plane-memory=8 \
+    --worker-replicas=3 \
+    --worker-vcpus=8 \
+    --worker-cores-per-vcpu=1 \
+    --worker-memory=16 \
+    --insecure=true
+    
