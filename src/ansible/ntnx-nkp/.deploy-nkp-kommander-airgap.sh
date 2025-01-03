@@ -1,6 +1,6 @@
 #!/bin/bash
 export NKP_CLUSTER_NAME="nkp-kommander-hpoc1030"
-export SUBNET="mgnt-ntnx-ipam-local"
+export SUBNET="ntnx-mgnt-ipam-local"
 export CONTROLPLANE_VIP="10.10.30.32"
 export METALLB_IP_RANGE="10.10.30.41-10.10.30.45"
 
