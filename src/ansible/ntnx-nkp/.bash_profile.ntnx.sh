@@ -6,7 +6,7 @@ export NUTANIX_PASSWORD="Nutanix/4u@2024"
 export NUTANIX_ENDPOINT="https://pc.nutanix.local:9440"
 export CLUSTER_NAME="DELL-R730XD-AHV"
 export STORAGE_CONTAINER="NutanixManagementShare"
-export SSH_PUBLIC_KEY="/home/nutanix/.ssh/id_ed25519.pub"
+export SSH_PUBLIC_KEY="/home/$USER/.ssh/id_ed25519.pub"
 # mirror registry
 export MIRROR_REGISTRY_CACERT="/etc/docker/certs.d/airgap.nutanix.local:5000/registry.crt"
 export MIRROR_REGISTRY_URL="https://airgap.nutanix.local:5000"

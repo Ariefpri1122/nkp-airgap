@@ -1,11 +1,14 @@
 #!/bin/bash
-export NKP_CLUSTER_NAME="nkp-kommander-hpoc1030"
+export NKP_CLUSTER_NAME="ntnx-nkp-kommander-hpoc1030"
 export SUBNET="ntnx-mgnt-ipam-local"
 export CONTROLPLANE_VIP="10.10.30.32"
 export METALLB_IP_RANGE="10.10.30.41-10.10.30.45"
+#requied dns server pointing to the first range of loadbalancer (10.10.30.41)
+export INGRESS_FQDN="nkp.nutanix.local"
 
 nkp create cluster nutanix \
     --cluster-name=${NKP_CLUSTER_NAME} \
+    --cluster-hostname=${INGRESS_FQDN} \
     --control-plane-prism-element-cluster=${CLUSTER_NAME} \
     --worker-prism-element-cluster=${CLUSTER_NAME} \
     --control-plane-subnets=${SUBNET} \
