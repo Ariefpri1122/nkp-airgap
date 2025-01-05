@@ -200,3 +200,10 @@ Finaly update the credential for CVM using this command:
 # login to cvm
 sudo passwd nutanix
 ```
+
+### Upgrade password policy
+
+```bash
+sudo chage -M 9999 admin && \
+sudo chage -M 0 admin
+```
