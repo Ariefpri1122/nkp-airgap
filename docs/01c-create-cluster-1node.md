@@ -204,6 +204,6 @@ sudo passwd nutanix
 ### Upgrade password policy
 
 ```bash
-sudo chage -M 9999 admin && \
-sudo chage -M 0 admin
+sudo chage -M 99999 admin && \
+sudo chage -m 0 admin
 ```
