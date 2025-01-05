@@ -205,5 +205,6 @@ sudo passwd nutanix
 
 ```bash
 sudo chage -M 99999 admin && \
-sudo chage -m 0 admin
+sudo chage -m 0 admin && \
+sudo chage -l admin # To view the current password age for the admin user, execute the chage command as follows:
 ```
