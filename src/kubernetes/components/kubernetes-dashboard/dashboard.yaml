@@ -437,7 +437,7 @@ metadata:
     app.kubernetes.io/version: "3.8"
     enable-metrics: "true"
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
   - name: kong-proxy-tls
     port: 443
