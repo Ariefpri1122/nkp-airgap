@@ -5,3 +5,5 @@ resources:
   - ns-dashboard.yaml
   - dashboard.yaml
   - sa-dashboard.yaml
+
+namespace: kubernetes-dashboard
