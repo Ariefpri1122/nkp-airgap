@@ -3,3 +3,4 @@ kind: Kustomization
 
 components:
   - components/kubernetes-dashboard
+  - components/metrics-server

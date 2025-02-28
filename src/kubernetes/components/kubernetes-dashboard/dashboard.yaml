@@ -648,7 +648,6 @@ spec:
         image: kong:3.8
         imagePullPolicy: IfNotPresent
         securityContext:
-        
           allowPrivilegeEscalation: false
           capabilities:
             drop:
@@ -665,9 +664,6 @@ spec:
         - "-vrf"
         - "$KONG_PREFIX/pids"
         env:
-         
-        
-        
         - name: KONG_ADMIN_ACCESS_LOG
           value: "/dev/stdout"
         - name: KONG_ADMIN_ERROR_LOG
@@ -720,7 +716,6 @@ spec:
           value: "0.0.0.0:8100, [::]:8100"
         - name: KONG_STREAM_LISTEN
           value: "off"
-        
         volumeMounts:
         - name: kubernetes-dashboard-kong-prefix-dir
           mountPath: /kong_prefix/
@@ -733,7 +728,6 @@ spec:
         image: kong:3.8
         imagePullPolicy: IfNotPresent
         securityContext:
-        
           allowPrivilegeEscalation: false
           capabilities:
             drop:
@@ -744,9 +738,6 @@ spec:
           seccompProfile:
             type: RuntimeDefault
         env:
-         
-        
-        
         - name: KONG_ADMIN_ACCESS_LOG
           value: "/dev/stdout"
         - name: KONG_ADMIN_ERROR_LOG
