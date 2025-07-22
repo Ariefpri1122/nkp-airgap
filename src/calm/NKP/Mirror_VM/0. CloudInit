@@ -1,0 +1,9 @@
+#cloud-config
+users:
+  - name: nutanix
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+chpasswd:
+  list: |
+    nutanix:@@{nutanix.secret}@@
+  expire: False
+ssh_pwauth:   true
