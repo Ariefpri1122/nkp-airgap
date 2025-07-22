@@ -1,0 +1,8 @@
+wget @@{nexus_location}@@
+tar -zxvf nexus-3.82.0-08-linux-x86_64.tar.gz
+sudo mkdir -p /opt/nexus 
+sudo mv nexus-3.82.0-08 /opt/nexus/
+cd /opt/nexus
+sudo ln -s nexus-3.82.0-08/bin/nexus nexus
+sudo adduser nexus && \
+sudo chown nexus:nexus /opt/nexus

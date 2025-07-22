@@ -1,0 +1,14 @@
+#!/bin/bash
+
+SOURCE_IP="@@{Mirror.address}@@"
+
+echo "$SOURCE_IP"
+
+
+sudo yum install -y sshpass
+sudo mkdir -p /etc/nginx/certs
+sudo sshpass -p "nutanix/4u" scp -o StrictHostKeyChecking=no nutanix@${SOURCE_IP}:certs/domain.crt /etc/nginx/certs/registry-ca.crt
+sudo sshpass -p "nutanix/4u" scp -o StrictHostKeyChecking=no nutanix@${SOURCE_IP}:certs/domain.key /etc/nginx/certs/registry-ca.key
+sudo chmod -R 777 /etc/nginx/certs/*
+
+

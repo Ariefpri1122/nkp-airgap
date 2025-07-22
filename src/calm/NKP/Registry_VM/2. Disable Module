@@ -1,0 +1,1 @@
+sudo ethtool --offload ens3 rx-gro-hw off

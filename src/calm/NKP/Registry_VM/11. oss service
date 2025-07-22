@@ -1,0 +1,34 @@
+#!/bin/bash
+
+SERVICE_FILE="/etc/systemd/system/nexus.service"
+
+sudo bash -c "cat > $SERVICE_FILE" <<EOF
+[Unit]
+Description=nexus service
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/opt/nexus/nexus start
+ExecStop=/opt/nexus/nexus stop
+LimitNOFILE=65536
+User=nexus
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload systemd to pick up new service
+sudo systemctl daemon-reexec
+sudo systemctl daemon-reload
+
+# Enable nexus to start on boot
+sudo systemctl enable nexus.service
+
+# Start the service
+sudo systemctl start nexus.service
+
+# Show status
+sudo systemctl status nexus.service --no-pager
+
