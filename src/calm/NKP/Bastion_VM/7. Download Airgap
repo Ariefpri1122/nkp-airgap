@@ -1,0 +1,10 @@
+wget @@{airgap}@@
+tar -zxvf nkp-air-gapped-bundle* && \
+cd $(ls -1 -d nkp-v2* | tail -1 | sort -r)
+
+# install nkp-cli
+sudo mv cli/nkp /usr/local/bin/ && \
+sudo chmod +x /usr/local/bin/nkp && \
+nkp version
+docker load -i konvoy-bootstrap-image* && \
+docker load -i nkp-image-builder-image*

@@ -1,0 +1,13 @@
+export REGISTRY_URL='https://airgap.@@{domain_name}@@:5000'
+export REGISTRY_USERNAME='admin'
+export REGISTRY_PASSWORD='nutanix/4u'
+export REGISTRY_CACERT='/etc/docker/certs.d/airgap.@@{domain_name}@@:5000/cert.crt'
+
+echo ${REGISTRY_URL}
+echo ${REGISTRY_USERNAME}
+echo ${REGISTRY_PASSWORD}
+echo ${REGISTRY_CACERT}
+
+nkp push bundle --bundle nkp-v*/container-images/konvoy-image-bundle*.tar --to-registry=${REGISTRY_URL} --to-registry-username=${REGISTRY_USERNAME} --to-registry-password=${REGISTRY_PASSWORD} --to-registry-ca-cert-file=${REGISTRY_CACERT}
+nkp push bundle --bundle nkp-v*/container-images/kommander-image-bundle*.tar --to-registry=${REGISTRY_URL} --to-registry-username=${REGISTRY_USERNAME} --to-registry-password=${REGISTRY_PASSWORD} --to-registry-ca-cert-file=${REGISTRY_CACERT}
+nkp push bundle --bundle nkp-v*/container-images/nkp-catalog-applications-image-bundle*.tar --to-registry=${REGISTRY_URL} --to-registry-username=${REGISTRY_USERNAME} --to-registry-password=${REGISTRY_PASSWORD} --to-registry-ca-cert-file=${REGISTRY_CACERT}

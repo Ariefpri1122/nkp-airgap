@@ -1,0 +1,4 @@
+sudo yum install -y sshpass
+sudo mkdir -p /etc/docker/certs.d/airgap.arief.com:5000
+sudo sshpass -p "nutanix/4u" scp -o StrictHostKeyChecking=no nutanix@airgap.@@{domain_name}@@:certs/domain.crt /etc/docker/certs.d/airgap.@@{domain_name}@@:5000/cert.crt
+sudo systemctl restart docker
