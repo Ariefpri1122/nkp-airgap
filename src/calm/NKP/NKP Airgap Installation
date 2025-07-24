@@ -15,7 +15,7 @@ Workshop NKP Builder
     1. Rocky-9-GenericCloud-Base.latest.x86_64.qcow2 —> https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2
     2. nexus-3.82.0-08-linux-x86_64.tar.gz —> https://download.sonatype.com/nexus/3/nexus-3.82.0-08-linux-x86_64.tar.gz
     3. nkp-rocky-9.5-release-1.30.5-20250609192903.qcow2
-    4. nkp-air-gapped-bundle_v2.13.2_linux_amd64.tar.gz —> https://download.nutanix.com/downloads/nkp/v2.15.0/nkp-air-gapped-bundle_v2.15.0_linux_amd64.tar.gz?Expires=1753377219&Key-Pair-Id=APKAJTTNCWPEI42QKMSA&Signature=dyWoz7W-oM8amzasPkYXlePLRIip81SR8Hqf03KTvmjQmyXNtS3YgNAY0GIuMlhP7D6UaiLjQE9DwSdnIu2JmStq3EW9xtsJ~a1LtLBG8k07qmQDHGcD75E2CaVhf-oE7gy4mv0X-P6vottvNN5RzxQDXjr9POO7xOddQhqLLyCRiXP9nUs5lFcHLeRbhWu05-VnlSm-k~InY76W8-hgVBK5OvsdBap2n0NaUCMxdgdwfpmKx5SMNKnmGXNai~N00VKOiMxv3B-do5rClwbEPN-bxEjEFOrFw~BZwcTEmY3bNPaqjV1hMMK3I1piSyKiIsjIi3ngOcocCORo7QTL3g__
+    4. nkp-air-gapped-bundle  —> https://download.nutanix.com/downloads/nkp/v2.15.0/nkp-air-gapped-bundle_v2.15.0_linux_amd64.tar.gz?Expires=1753377219&Key-Pair-Id=APKAJTTNCWPEI42QKMSA&Signature=dyWoz7W-oM8amzasPkYXlePLRIip81SR8Hqf03KTvmjQmyXNtS3YgNAY0GIuMlhP7D6UaiLjQE9DwSdnIu2JmStq3EW9xtsJ~a1LtLBG8k07qmQDHGcD75E2CaVhf-oE7gy4mv0X-P6vottvNN5RzxQDXjr9POO7xOddQhqLLyCRiXP9nUs5lFcHLeRbhWu05-VnlSm-k~InY76W8-hgVBK5OvsdBap2n0NaUCMxdgdwfpmKx5SMNKnmGXNai~N00VKOiMxv3B-do5rClwbEPN-bxEjEFOrFw~BZwcTEmY3bNPaqjV1hMMK3I1piSyKiIsjIi3ngOcocCORo7QTL3g__
 7. Deploy BP Private_Mirror_VM
     1. Upload Rocky-9-GenericCloud-Base.latest.x86_64.qcow2 to Cluster Image Service
     2. Manage project —> make sure VLAN enabled in the project
@@ -34,15 +34,14 @@ Workshop NKP Builder
         2. If exist but not running delete the container —> sudo rm -f [container_id]
         3. Run new container —> sudo docker run -d -p 5000:5000  --restart=always --name DockerRegistry -v /mnt/registry:/var/lib/registry -v `pwd`/auth:/auth -e "REGISTRY_AUTH=htpasswd" -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd -v `pwd`/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2
 9. Deploy BP Bastion_VM
-    1. Upload Rocky-9-GenericCloud-Base.latest.x86_64.qcow2 to Cluster Image Service
-    2. Manage project —> make sure VLAN enabled in the project
-    3. Configure airgap variable
-    4. Configure Cluster
-    5. Configure Image
-    6. Side Disk : 200 GB
-    7. Add Nic and select vlan
-    8. Check log-in upon create and every subsequent
-    9. Add A host record in autoadVM —> bastion with its IP address (map to Bastion VM)
+    1. Manage project —> make sure VLAN enabled in the project
+    2. Configure airgap variable
+    3. Configure Cluster
+    4. Configure Image
+    5. Side Disk : 200 GB
+    6. Add Nic and select vlan
+    7. Check log-in upon create and every subsequent
+    8. Add A host record in autoadVM —> bastion with its IP address (map to Bastion VM)
 10. Configure OSS Nexus by accessing Registry VM IP Address:8081
     1. Create new repository -> docker (proxy)
         1. name [bebas tapi harus di isi]: docker-registry-io
@@ -79,6 +78,16 @@ Workshop NKP Builder
         2. license key —> AEAAQ-AAA6Z-57CF6-C7CUH-AVRDV-TT8LD-P9ES2
 16. Upload Registry /etc/docker/certs.d/airgap.arief.com\:5000/cert.crt to c:\inetpub\wwwroot in autoad vm 
     1. (use winscp to copy it from bastion VM) 
+    2. Modify script below with the correct information
+        1. Image Name
+        2. PC Password
+        3. PC End-Point
+        4. PC Cluster Name
+        5. Storage container name
+        6. Subnet Name
+        7. Control Plane IP Address
+        8. MetallLB IP Range
+    3. ssh to bastion from your laptop and execute command below:
 
 export IMAGE=nkp-rocky-9.5-release-1.32.3-20250605191120.qcow2
 export NUTANIX_USER=admin
