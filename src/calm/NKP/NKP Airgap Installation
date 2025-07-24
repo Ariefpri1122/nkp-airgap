@@ -25,7 +25,15 @@ Workshop NKP Builder
     6. Side Disk : 200 GB
     7. Add Nic and select vlan
     8. Check log-in upon create and every subsequent
-8. Deploy BP Bastion_VM
+8. Configure DNS Setting from autoad VM
+    1. Create Forward Zone [yourname.com] in DNS server
+    2. Add A host record airgap with its IP address (map to Mirror VM)
+    3. Add A host record registry with its IP address (map to Registry VM)
+    4. Check URL https://airgap.arief.com:5000/v2/_catalog 
+        1. If not running check container is exist —> sudo docker ps -l
+        2. If exist but not running delete the container —> sudo rm -f [container_id]
+        3. Run new container —> sudo docker run -d -p 5000:5000  --restart=always --name DockerRegistry -v /mnt/registry:/var/lib/registry -v `pwd`/auth:/auth -e "REGISTRY_AUTH=htpasswd" -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd -v `pwd`/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2
+9. Deploy BP Bastion_VM
     1. Upload Rocky-9-GenericCloud-Base.latest.x86_64.qcow2 to Cluster Image Service
     2. Manage project —> make sure VLAN enabled in the project
     3. Configure airgap variable
@@ -34,11 +42,28 @@ Workshop NKP Builder
     6. Side Disk : 200 GB
     7. Add Nic and select vlan
     8. Check log-in upon create and every subsequent
-9. Configure DNS Setting from autoad VM
-    1. Create Forward Zone [yourname.com] in DNS server
-    2. Add A host record airgap with its IP address (map to Mirror VM)
-    3. Add A host record registry with its IP address (map to Registry VM)
+    9. Add A host record in autoadVM —> bastion with its IP address (map to Bastion VM)
 10. Configure OSS Nexus by accessing Registry VM IP Address:8081
+    1. Create new repository -> docker (proxy)
+        1. name [bebas tapi harus di isi]: docker-registry-io
+        2. online: di checklist
+        3. remote storage [boleh pake registry lainnya]: https://registry-1.docker.io
+        4. Docker Index [pilih]: Use Docker Hub
+        5. Blob store [pilih bebas]: default
+    2. Create new repository -> docker (hosted)
+        1. name [bebas tpi harus di isi]: docker-repository
+        2. online: di checklist
+        3. HTTP [di checklist dan di isi port contohnya]: 8087
+        4. Allow anonnymuous docker pull [di checklist klo mau yang bisa ngepull tanpa login]: uncheked
+        5. Enable Docker V1 API [docker engine version]: unchecked
+        6. Deployment policy [Tergantung kebutuhan, klo saya pilih Allow redeploy supaya tanpa ganti tags]: Allow redeploy
+    3. Create new repository -> docker (group)
+        1. Name [bebas, tapi harus diisi]: docker-repository-public
+        2. Online: checked
+        3. HTTP: 8086
+        4. Allow anonnymuous docker pull [di checklist klo mau yang bisa ngepull tanpa login]: uncheked
+        5. Blob store: default
+        6. Member repositories: pilih semua repository yang kita telah buat 
 11. Check https access to https://registry.[yourname.com] (nginx reverse proxy to oss nexus port 8081)
 12. Deploy BP Bastion
 13. Upload nkp-rocky-9.5-release-1.30.5-20250609192903.qcow2 image to prism central images
@@ -52,13 +77,14 @@ Workshop NKP Builder
     4. Example:
         1. nkp cluster name —> airgapped-hm-nkp-demo-2
         2. license key —> AEAAQ-AAA6Z-57CF6-C7CUH-AVRDV-TT8LD-P9ES2
-16. Upload Registry Cert.crt to c:\inetpub\wwwroot in autoad vm (use winscp to copy it from bastion VM)
+16. Upload Registry /etc/docker/certs.d/airgap.arief.com\:5000/cert.crt to c:\inetpub\wwwroot in autoad vm 
+    1. (use winscp to copy it from bastion VM) 
 
 export IMAGE=nkp-rocky-9.5-release-1.32.3-20250605191120.qcow2
 export NUTANIX_USER=admin
-export NUTANIX_PASSWORD=nx2Tech164!
-export NUTANIX_ENDPOINT=https://10.54.93.7:9440/
-export CLUSTER_NAME=dm3-poc142
+export NUTANIX_PASSWORD=nx2Tech806!
+export NUTANIX_ENDPOINT=https://10.38.16.74:9440/
+export CLUSTER_NAME=PHX-SPOC016-2
 export STORAGE_CONTAINER=default
 export SSH_PUBLIC_KEY=.ssh/id_ed25519.pub
 export AIRGAP_REGISTRY_CACERT=/etc/docker/certs.d/airgap.arief.com\:5000/cert.crt
@@ -66,9 +92,9 @@ export AIRGAP_REGISTRY_URL=https://airgap.arief.com:5000
 export AIRGAP_REGISTRY_USERNAME=admin
 export AIRGAP_REGISTRY_PASSWORD=nutanix/4u
 export NKP_CLUSTER_NAME=airgapped-hm-nkp-demo-2
-export SUBNET=primary
-export CONTROLPLANE_VIP=10.54.93.24
-export METALLB_IP_RANGE=10.54.93.111-10.54.93.116
+export SUBNET=primary-PHX-SPOC016-2
+export CONTROLPLANE_VIP=10.38.16.65
+export METALLB_IP_RANGE=10.38.16.66-10.38.16.70
 
 nkp create cluster nutanix \
     --cluster-name=${NKP_CLUSTER_NAME} \
@@ -91,7 +117,7 @@ nkp create cluster nutanix \
     --control-plane-cores-per-vcpu 1 \
     --control-plane-vcpus 8 \
     --control-plane-memory 16 \
-    --worker-replicas 1 \
+    --worker-replicas 2 \
     --worker-vcpus 8 \
     --worker-cores-per-vcpu 1 \
     --worker-memory 16 \
@@ -107,5 +133,4 @@ nkp create cluster nutanix \
     2. export KUBECONFIG=./nkp-kommander.conf 
     3. NKP Cluster Name —> kubectl get cluster -o jsonpath='{.items[0].metadata.name}'
     4. NKP Cluster UUID —> kubectl get namespace kube-system --output jsonpath={.metadata.uid}
-
 
