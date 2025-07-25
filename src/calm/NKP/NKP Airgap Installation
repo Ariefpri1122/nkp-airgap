@@ -4,84 +4,109 @@ Workshop NKP Builder
     1. PC = pc.2024.3.1.4
     2. AOS = 6.10
     3. NKP = 2.13.2
-2. increase and update autoad VM memory to 16GB (VM must be shutdown to change and power on after)
-3. Configure windows IIS with folder browsing allowed
-4. Note on these HPOC File Shares:
+2. Shutdown autoad Vm —> increase and update autoad VM Core to 2 and increase memory to 16GB 
+3. add new vdisk in autoad VM with 200 GB Size and format it to become D:\ Drive and create folder called “Software”. Moved the Download folder into this new folder —> POwer on the VM
+4. In autoAD VM, add and Configure windows IIS with folder browsing allowed, and delete iis.* file on autoad VM —> test with internet explorer http://localhost
+5. Take a not on your AutoAD VM IP Address —> 10.38.16.73
+6. Note on these HPOC File Shares:
     * PHX: http://phx-dfs01 or http://10.42.194.11
     * DM3: http://rtp-dfs01 or http://10.55.251.38
     * BLR: http://blr-dfs01 or http://10.136.239.13
-5. From AutoAD VM, Install Chrome and make it default —> http://10.42.194.11/misc/Google/Chrome/ChromeSetup.exe
-6. From AutoAD VM, Download these files:
+7. From AutoAD VM, Iusing internet explorer, nstall Chrome and make it default —> http://10.42.194.11/misc/Google/Chrome/ChromeSetup.exe
+8. From AutoAD VM, using chrome browser, Download these files:
     1. Download Rocky-9-GenericCloud-Base.latest.x86_64.qcow2 —> https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2
     2. Download WInSCP —> https://downloads.sourceforge.net/project/winscp/WinSCP/6.5.3/WinSCP-6.5.3-Setup.exe?ts=gAAAAABogjh_EJ08-T1H0IwKZdQWkhtoRwhoDEtsLaylXsYNL7W6j22plQzbOAZFFR1FOF3Z3dFUmk6f9FHyOn6Exi6Vk3UPNw%3D%3D&r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fwinscp%2Ffiles%2FWinSCP%2F6.5.3%2FWinSCP-6.5.3-Setup.exe%2Fdownload
     3. Install WinSCP
-    4. Download Putty —> https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+    4. Download Putty —> https://the.earth.li/~sgtatham/putty/latest/w64/putty-64bit-0.83-installer.msi
     5. Instal Putty 
-7. From AutoAD VM, Download all these files and put all in c:\inetpub\wwwroot and delete iis.* file on autoad VM
+9. From AutoAD VM, Download all these files and put all in c:\inetpub\wwwroot 
     1. nexus-3.82.0-08-linux-x86_64.tar.gz —> https://download.sonatype.com/nexus/3/nexus-3.82.0-08-linux-x86_64.tar.gz
-    2. nkp-rocky-9.5-release-1.30.5-20250609192903.qcow2
-    3. nkp-air-gapped-bundle  —> https://download.nutanix.com/downloads/nkp/v2.15.0/nkp-air-gapped-bundle_v2.15.0_linux_amd64.tar.gz?Expires=1753377219&Key-Pair-Id=APKAJTTNCWPEI42QKMSA&Signature=dyWoz7W-oM8amzasPkYXlePLRIip81SR8Hqf03KTvmjQmyXNtS3YgNAY0GIuMlhP7D6UaiLjQE9DwSdnIu2JmStq3EW9xtsJ~a1LtLBG8k07qmQDHGcD75E2CaVhf-oE7gy4mv0X-P6vottvNN5RzxQDXjr9POO7xOddQhqLLyCRiXP9nUs5lFcHLeRbhWu05-VnlSm-k~InY76W8-hgVBK5OvsdBap2n0NaUCMxdgdwfpmKx5SMNKnmGXNai~N00VKOiMxv3B-do5rClwbEPN-bxEjEFOrFw~BZwcTEmY3bNPaqjV1hMMK3I1piSyKiIsjIi3ngOcocCORo7QTL3g__
-8. Deploy BP Private_Mirror_VM
-    1. Upload Rocky-9-GenericCloud-Base.latest.x86_64.qcow2 to Cluster Image Service
-    2. Manage project —> make sure VLAN enabled in the project
-    3. Configure nexus_location variable
-    4. Configure Cluster
-    5. Configure Image
-    6. Side Disk : 200 GB
-    7. Add Nic and select vlan
-    8. Check log-in upon create and every subsequent
-9. Configure DNS Setting from autoad VM
+    2. Download NKP files from https://portal.nutanix.com/page/downloads?product=nkp
+        1. nkp-rocky-9.5-release-1.30.5-20250609192903.qcow2 (NKP Version 2.14.1)
+        2. nkp-air-gapped-bundle  (NKP Version 2.14.1
+10. Deploy BP Private_Mirror_VM
+    1. From Auto AD VM, Open PC GUI and Upload Rocky-9-GenericCloud-Base.latest.x86_64.qcow2 to Cluster Image Service
+    2. Manage project —> make sure VLAN enabled in the project (in infrastructure tab)
+    3. Download BP Private_Mirror Jason —> https://github.com/Ariefpri1122/nkp-airgap/blob/main/src/calm/Nutanix%20Self%20Service%20v4.1.0%20Version%20pc.2024.3.1.1/APR_Private_Mirror.json
+    4. Upload BP Private_Mirror Jason  to Self-service
+    5. Configure nexus_location variable —> http://autoad VM IP your nexus OSS location
+    6. Configure Mirror_VM:
+        1. Configure Cluster
+        2. in VM Name : add your initial in front of the vm name --> ‘apr-‘
+        3. Configure Image —> Rocky-9-GenericCloud-Base.latest.x86
+        4. Size Disk : 200 GB
+        5. Add Nic and select vlan —> make sure use DYNAMIC IP
+        6. Check log-in upon create and every subsequent
+        7. Save
+    7. Configure Registry_VM:
+        1. Configure Cluster
+        2. in VM Name : add your initial in front of the vm name --> ‘apr-‘
+        3. Configure Image —> Rocky-9-GenericCloud-Base.latest.x86
+        4. Size Disk : 200 GB
+        5. Add Nic and select vlan
+        6. Check log-in upon create and every subsequent
+        7. Save
+    8. Launch Blueprint —> Name: “Your_init”_Registry
+11. Configure DNS Setting from autoad VM
     1. Create Forward Zone [yourname.com] in DNS server
     2. Add A host record airgap with its IP address (map to Mirror VM)
     3. Add A host record registry with its IP address (map to Registry VM)
-    4. Check URL https://airgap.arief.com:5000/v2/_catalog 
+    4. using INCOGNITO Chrome tab —> Check URL https://airgap.arief.com:5000/v2/_catalog 
         1. If not running check container is exist —> sudo docker ps -l
         2. If exist but not running delete the container —> sudo rm -f [container_id]
         3. Run new container —> sudo docker run -d -p 5000:5000  --restart=always --name DockerRegistry -v /mnt/registry:/var/lib/registry -v `pwd`/auth:/auth -e "REGISTRY_AUTH=htpasswd" -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd -v `pwd`/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2
-10. Deploy BP Bastion_VM
-    1. Manage project —> make sure VLAN enabled in the project
-    2. Configure airgap variable
+12. Deploy BP Bastion_VM
+    1. Download BP Bastion Jason —> https://github.com/Ariefpri1122/nkp-airgap/blob/main/src/calm/Nutanix%20Self%20Service%20v4.1.0%20Version%20pc.2024.3.1.1/APR_Bastion.json
+    2. Configure airgap variable —> http://autoad VM IP/ your airgap_bundle location
     3. Configure Cluster
-    4. Configure Image
-    5. Side Disk : 200 GB
-    6. Add Nic and select vlan
-    7. Check log-in upon create and every subsequent
-    8. Add A host record in autoadVM —> bastion with its IP address (map to Bastion VM)
-11. Configure OSS Nexus by accessing Registry VM IP Address:8081
-    1. Create new repository -> docker (proxy)
+    4. In VM Name : add your initial in front of the vm name --> ‘apr-‘
+    5. Configure Image —> Rocky-9-GenericCloud-Base.latest.x86
+    6. Side Disk : 200 GB
+    7. Add Nic and select vlan —> make sure use DYNAMIC IP
+    8. Check log-in upon create and every subsequent
+    9. Launch Blueprint —> Name: “Your_init”_Bastion
+    10. Add A host record in autoadVM —> bastion with its IP address (map to Bastion VM)
+13. Configure OSS Nexus by accessing Registry VM IP https://registry.arief.com:8081 (You can do this while waiting for bastion BP running)
+    1. Login to OSS with username:admin and the password located in /opt/nexus/sonatype-work/nexus3/admin.password (you need to ssh to registry VM)
+        1. ssh nutanix@registry.arief.com
+        2. cat /opt/nexus/sonatype-work/nexus3/admin.password
+        3. create new password to “nutanix/4u”
+        4. Disable anonymous access
+        5. Finish
+        6. Click Settings - Repositories - Create Repository
+    2. Create new repository -> docker (proxy)
         1. name [bebas tapi harus di isi]: docker-registry-io
         2. online: di checklist
         3. remote storage [boleh pake registry lainnya]: https://registry-1.docker.io
         4. Docker Index [pilih]: Use Docker Hub
         5. Blob store [pilih bebas]: default
-    2. Create new repository -> docker (hosted)
+    3. Create new repository -> docker (hosted)
         1. name [bebas tpi harus di isi]: docker-repository
         2. online: di checklist
         3. HTTP [di checklist dan di isi port contohnya]: 8087
         4. Allow anonnymuous docker pull [di checklist klo mau yang bisa ngepull tanpa login]: uncheked
         5. Enable Docker V1 API [docker engine version]: unchecked
         6. Deployment policy [Tergantung kebutuhan, klo saya pilih Allow redeploy supaya tanpa ganti tags]: Allow redeploy
-    3. Create new repository -> docker (group)
+    4. Create new repository -> docker (group)
         1. Name [bebas, tapi harus diisi]: docker-repository-public
         2. Online: checked
         3. HTTP: 8086
         4. Allow anonnymuous docker pull [di checklist klo mau yang bisa ngepull tanpa login]: uncheked
         5. Blob store: default
         6. Member repositories: pilih semua repository yang kita telah buat 
-12. Check https access to https://registry.[yourname.com] (nginx reverse proxy to oss nexus port 8081)
-13. Deploy BP Bastion
-14. Upload nkp-rocky-9.5-release-1.30.5-20250609192903.qcow2 image to prism central images
-15. From bastion VM modify the NKP configuration file and execute
+14. Check https access to https://registry.[yourname.com] (nginx reverse proxy to oss nexus port 8081) using chrome incognito tab
+15. Upload nkp-rocky-9.5-release-1.30.5-20250609192903.qcow2 (NKP Version 2.14.1) image to prism central images
+16. From bastion VM modify the NKP configuration file and execute
     1. Note that IP Address range in HPOC Primary VLAN is —> x.x.x.1 - x.x.x.126
     2. Note that IP Address range in HPOC Secondary VLAN is —> x.x.x.190 - x.x.x.254
-16. Check avail NKP Ultimate license and its expired Date
+17. Check avail NKP Ultimate license and its expired Date
     1. https://portal.nutanix.com/page/licensing (See License with Key)
     2. search by “nkp” find NKP Ultimate license and its expiry date
     3. Note the “cluster name” —> put the same name in “export NKP_CLUSTER_NAME” below
     4. Example:
         1. nkp cluster name —> airgapped-hm-nkp-demo-2
         2. license key —> AEAAQ-AAA6Z-57CF6-C7CUH-AVRDV-TT8LD-P9ES2
-17. Upload Registry /etc/docker/certs.d/airgap.arief.com\:5000/cert.crt to c:\inetpub\wwwroot in autoad vm 
+18. Upload Registry /etc/docker/certs.d/airgap.arief.com\:5000/cert.crt to c:\inetpub\wwwroot in autoad vm 
     1. (use winscp to copy it from bastion VM) 
     2. Modify script below with the correct information
         1. Image Name
@@ -92,23 +117,44 @@ Workshop NKP Builder
         6. Subnet Name
         7. Control Plane IP Address
         8. MetallLB IP Range
-    3. ssh to bastion from your laptop and execute command below:
+    3. ssh to bastion from your laptop (or from AUTOAD VM) and execute command below:
 
-export IMAGE=nkp-rocky-9.5-release-1.32.3-20250605191120.qcow2
-export NUTANIX_USER=admin
-export NUTANIX_PASSWORD=nx2Tech806!
-export NUTANIX_ENDPOINT=https://10.38.16.74:9440/
-export CLUSTER_NAME=PHX-SPOC016-2
-export STORAGE_CONTAINER=default
-export SSH_PUBLIC_KEY=.ssh/id_ed25519.pub
-export AIRGAP_REGISTRY_CACERT=/etc/docker/certs.d/airgap.arief.com\:5000/cert.crt
-export AIRGAP_REGISTRY_URL=https://airgap.arief.com:5000
-export AIRGAP_REGISTRY_USERNAME=admin
-export AIRGAP_REGISTRY_PASSWORD=nutanix/4u
-export NKP_CLUSTER_NAME=airgapped-hm-nkp-demo-2
-export SUBNET=primary-PHX-SPOC016-2
-export CONTROLPLANE_VIP=10.38.16.65
-export METALLB_IP_RANGE=10.38.16.66-10.38.16.70
+export IMAGE="nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2"
+export NUTANIX_USER="admin"
+export NUTANIX_PASSWORD="nx2Tech806!"
+export NUTANIX_ENDPOINT="https://10.38.16.74:9440/"
+export CLUSTER_NAME="PHX-SPOC016-2"
+export STORAGE_CONTAINER="default"
+export SSH_PUBLIC_KEY=".ssh/id_ed25519.pub" # ex: /home/user/.ssh/id_ed25519.pub
+export AIRGAP_REGISTRY_CACERT="/etc/docker/certs.d/airgap.arief.com:5000/cert.crt"
+export AIRGAP_REGISTRY_URL="https://airgap.arief.com:5000"
+export AIRGAP_REGISTRY_USERNAME="admin"
+export AIRGAP_REGISTRY_PASSWORD="nutanix/4u"
+export NKP_CLUSTER_NAME="airgapped-hm-nkp-demo-2" # ex: nkp-kommander-hpoc1020
+export SUBNET="primary-PHX-SPOC016-2" # ex: mgnt.ntnx.ipam.local
+export CONTROLPLANE_VIP="10.38.16.65" # ex: 10.10.20.5
+export METALLB_IP_RANGE="10.38.16.66-10.38.16.70" # ex: 10.10.20.6-10.10.20.9
+
+
+    4. ssh to bastion from your laptop (or from AUTOAD VM) and execute command below:
+
+echo IMAGE:$IMAGE
+echo NUTANIX_USER:$NUTANIX_USER
+echo NUTANIX_PASSWORD:$NUTANIX_PASSWORD
+echo NUTANIX_ENDPOINT:$NUTANIX_ENDPOINT
+echo CLUSTER_NAME:$CLUSTER_NAME
+echo STORAGE_CONTAINER:$STORAGE_CONTAINER
+echo SSH_PUBLIC_KEY:$SSH_PUBLIC_KEY
+echo AIRGAP_REGISTRY_CACERT:$AIRGAP_REGISTRY_CACERT
+echo AIRGAP_REGISTRY_URL:$AIRGAP_REGISTRY_URL
+echo AIRGAP_REGISTRY_USERNAME:$AIRGAP_REGISTRY_USERNAME
+echo AIRGAP_REGISTRY_PASSWORD:$AIRGAP_REGISTRY_PASSWORD
+echo NKP_CLUSTER_NAME:$NKP_CLUSTER_NAME
+echo SUBNET:$SUBNET
+echo CONTROLPLANE_VIP:$CONTROLPLANE_VIP
+echo METALLB_IP_RANGE:$METALLB_IP_RANGE
+
+    5. If all variables printed well (make sure no space after “:” —> execute below command:
 
 nkp create cluster nutanix \
     --cluster-name=${NKP_CLUSTER_NAME} \
@@ -131,7 +177,7 @@ nkp create cluster nutanix \
     --control-plane-cores-per-vcpu 1 \
     --control-plane-vcpus 8 \
     --control-plane-memory 16 \
-    --worker-replicas 2 \
+    --worker-replicas 3 \
     --worker-vcpus 8 \
     --worker-cores-per-vcpu 1 \
     --worker-memory 16 \
@@ -147,4 +193,3 @@ nkp create cluster nutanix \
     2. export KUBECONFIG=./nkp-kommander.conf 
     3. NKP Cluster Name —> kubectl get cluster -o jsonpath='{.items[0].metadata.name}'
     4. NKP Cluster UUID —> kubectl get namespace kube-system --output jsonpath={.metadata.uid}
-
