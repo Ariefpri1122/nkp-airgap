@@ -122,7 +122,7 @@ Workshop NKP Builder
 export IMAGE="nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2"
 export NUTANIX_USER="admin"
 export NUTANIX_PASSWORD="nx2Tech806!"
-export NUTANIX_ENDPOINT="https://10.38.16.74:9440/"
+export NUTANIX_ENDPOINT="https://10.38.16.74:9440" # make sure no “/“ at the end of the command
 export CLUSTER_NAME="PHX-SPOC016-2"
 export STORAGE_CONTAINER="default"
 export SSH_PUBLIC_KEY=".ssh/id_ed25519.pub" # ex: /home/user/.ssh/id_ed25519.pub
@@ -173,16 +173,17 @@ nkp create cluster nutanix \
     --registry-mirror-cacert=${AIRGAP_REGISTRY_CACERT} \
     --kubernetes-service-load-balancer-ip-range=${METALLB_IP_RANGE} \
     --ssh-public-key-file=${SSH_PUBLIC_KEY} \
-    --control-plane-replicas 1 \
-    --control-plane-cores-per-vcpu 1 \
+    --control-plane-replicas 2 \
+    --control-plane-cores-per-vcpu 2 \
     --control-plane-vcpus 8 \
     --control-plane-memory 16 \
-    --worker-replicas 3 \
+    --worker-replicas 4 \
     --worker-vcpus 8 \
-    --worker-cores-per-vcpu 1 \
+    --worker-cores-per-vcpu 2 \
     --worker-memory 16 \
     --insecure \
-    --self-managed
+    --self-managed \
+    --airgapped
 
 12. nkp get dashboard --kubeconfig="/home/nutanix/nkp-kommander.conf"
     1. Username: cool_carver
@@ -193,3 +194,4 @@ nkp create cluster nutanix \
     2. export KUBECONFIG=./nkp-kommander.conf 
     3. NKP Cluster Name —> kubectl get cluster -o jsonpath='{.items[0].metadata.name}'
     4. NKP Cluster UUID —> kubectl get namespace kube-system --output jsonpath={.metadata.uid}
+
