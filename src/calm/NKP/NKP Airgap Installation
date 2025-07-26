@@ -99,6 +99,9 @@ Workshop NKP Builder
 16. From bastion VM modify the NKP configuration file and execute
     1. Note that IP Address range in HPOC Primary VLAN is —> x.x.x.1 - x.x.x.126
     2. Note that IP Address range in HPOC Secondary VLAN is —> x.x.x.190 - x.x.x.254
+    3. Execute this command —> curl -fsSL http://10.42.194.11/workshop_staging/tradeshows/experimental/nkp-bootcamp/install-tools.sh | bash
+    4. from your laptop/autoad using chrome https://bastion.arief.com (from autoadvm) or http://[your_bastion_ip]
+    5. Next is to open a terminal. Click the menu icon followed by Terminal and New Terminal
 17. Check avail NKP Ultimate license and its expired Date
     1. https://portal.nutanix.com/page/licensing (See License with Key)
     2. search by “nkp” find NKP Ultimate license and its expiry date
