@@ -122,7 +122,7 @@ Workshop NKP Builder
 export IMAGE="nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2"
 export NUTANIX_USER="admin"
 export NUTANIX_PASSWORD="nx2Tech806!"
-export NUTANIX_ENDPOINT="https://10.38.13.138:9440" # make sure no “/“ at the end of the command
+export NUTANIX_ENDPOINT="https://10.38.13.138:9440" # make sure no “/“ at the end of the command and its PrismCentral IP (Not Prism Element)
 export CLUSTER_NAME="PHX-SPOC013-3"
 export STORAGE_CONTAINER="default"
 export SSH_PUBLIC_KEY=".ssh/id_ed25519.pub" # ex: /home/user/.ssh/id_ed25519.pub
@@ -132,8 +132,17 @@ export AIRGAP_REGISTRY_USERNAME="admin"
 export AIRGAP_REGISTRY_PASSWORD="nutanix/4u"
 export NKP_CLUSTER_NAME="airgapped-hm-nkp-demo-2" # ex: nkp-kommander-hpoc1020
 export SUBNET="primary-PHX-SPOC013-3" # ex: mgnt.ntnx.ipam.local
-export CONTROLPLANE_VIP="10.38.13.146" # ex: 10.10.20.5
-export METALLB_IP_RANGE="110.38.13.147-10.38.13.160" # ex: 10.10.20.6-10.10.20.9
+export CONTROLPLANE_VIP="10.38.13.130" # ex: make sure the IP is the (after) 1st IP of the HPOC Range 
+export METALLB_IP_RANGE="10.38.13.140-10.38.13.160" 
+
+# make sure the IP RANGE is +10 (so PC and autoAD IP not in the range) of VIP IP and before 1st IP of IPAM range and consist at least 20 IPs - modify/shorten IPAM IP Pool if necessary
+Example:
+
+Address Range	: 	10.38.13.129-10.38.13.190
+IPAM			:	10.38.13.146-10.38.13.189 (Modified) to 10.38.13.161-10.38.13.189
+
+Endpoint			: 	10.38.13.130
+LB Range		:	10.38.13.140-10.38.13.160
 
 
     4. ssh to bastion from your laptop (or from AUTOAD VM) and execute command below:
@@ -173,21 +182,33 @@ nkp create cluster nutanix \
     --registry-mirror-cacert=${AIRGAP_REGISTRY_CACERT} \
     --kubernetes-service-load-balancer-ip-range=${METALLB_IP_RANGE} \
     --ssh-public-key-file=${SSH_PUBLIC_KEY} \
-    --control-plane-replicas 3 \
-    --control-plane-vcpus 4 \
-    --control-plane-memory 16 \
-    --worker-replicas 4 \
-    --worker-vcpus 8 \
-    --worker-memory 32 \
+    --control-plane-replicas 1 \
+    --control-plane-vcpus 8 \
+    --control-plane-cores-per-vcpu 2 \
+    --control-plane-memory 48 \
+    --worker-replicas 2 \
+    --worker-vcpus 12 \
+    --worker-cores-per-vcpu 2 \
+    --worker-memory 64 \
     --insecure \
     --self-managed \
     --airgapped
 
-12. nkp get dashboard --kubeconfig="/home/nutanix/nkp-kommander.conf"
-    1. Username: cool_carver
-    2. Password: 3Hvl7iiSqD3TdyaidIJWPZBkzPji9ZDjbrrGSQZAa35uwJKcs6zY1ehCiaYw85ye
-    3. URL: https://10.38.190.41/dkp/kommander/dashboard
-13. Get trial license 
+19. If Failed:
+    1. in PC go to Infrastructure - Storage - Volume Groups
+    2. Click pvc that created by nkp (named with pvc**) - Manage Connection - DELETE selected virtual machine - save
+    3. Click delete button - check Acknowledgement - Delete
+    4. Repeat until all pvc deleted
+    5. Go to Infrastructure - Compute - VMs - Select all NKP VM - Action - delete - delete
+    6. Retry NKP Create Command Installation but execute this first —>  nkp delete bootstrap
+20. After installation
+    1. nkp get dashboard --kubeconfig="/home/nutanix/nkp-kommander.conf"
+        1. Username: cool_carver
+        2. Password: 3Hvl7iiSqD3TdyaidIJWPZBkzPji9ZDjbrrGSQZAa35uwJKcs6zY1ehCiaYw85ye
+        3. URL: https://10.38.190.41/dkp/kommander/dashboard
+    2. from dashboard login (top right corner) —> Generate token (Follow all the instruction until kubectl works well)
+    3. make sure all application installed (condition met) —> kubectl -n kommander wait --for condition=Ready helmreleases --all --timeout 15m
+21. Get trial license 
     1. https://portal.nutanix.com/page/licensing
     2. export KUBECONFIG=./nkp-kommander.conf 
     3. NKP Cluster Name —> kubectl get cluster -o jsonpath='{.items[0].metadata.name}'
