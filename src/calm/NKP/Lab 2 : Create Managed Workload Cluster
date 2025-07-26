@@ -1,0 +1,33 @@
+Create Workspace and New Cluster
+	1.	Create Workspace
+	⁃	Name		: arief-workspace
+	⁃	Create
+	2.	Continue to workspace
+	⁃	Action - Add Cluster
+	⁃	Standard Cluster Creation
+	⁃	cluster name		:	arief-nkp
+	⁃	SSH Public Key	:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEWT+eSeTQYYX7mIhQGghmSm418n9ANHLX9nZ//eGISr arief.pribadi@nutanix.com
+	⁃	Nutanix Prism Project:	lab
+	⁃	Nutanix AOS Cluster	:	PHX-SPOC013-3
+	⁃	Subnet			:	primary-PHX-SPOC013-3
+	⁃	OS Image		:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
+	⁃	CP End Point IP	:	+1 IP from management cluster end point IP
+	⁃	CP Node Count	:	1
+	⁃	CPU Per Node (vCPU):	2
+	⁃	Memory Per Node	:	16
+	⁃	Disk Size Per Node	:	80
+	⁃	Worker Node Count	:	1 (rest is default)
+	⁃	Storage Container	:	default
+	⁃	Load Balancing	:	Start +1 IP from management cluster LB end IP
+	⁃	Load Balancing	:	End +9 IP from above
+	⁃	Image Registry Mirror
+	⁃	URL		:	https://airgap.arief.com:5000
+	⁃	username	:	admin
+	⁃	password	:	nutanix/4u
+	⁃	CA		:	download ca.cert from http://[your autoad vm] and upload in here
+	⁃	Private Registry	
+	⁃	URL		:	https://registry.arief.com
+	⁃	username	:	admin
+	⁃	password	:	nutanix/4u
+	⁃	CA		:	download ca.cert from http://[your autoad vm] and upload in here
+	⁃	Create
