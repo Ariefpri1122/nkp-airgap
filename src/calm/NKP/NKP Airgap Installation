@@ -65,7 +65,7 @@ Workshop NKP Builder
     7. Add Nic and select vlan —> make sure use DYNAMIC IP
     8. Check log-in upon create and every subsequent
     9. Launch Blueprint —> Name: “Your_init”_Bastion
-    10. Add A host record in autoadVM —> bastion with its IP address (map to Bastion VM)
+    10. Add A host record in autoad VM —> bastion with its IP address (map to Bastion VM)
 13. Configure OSS Nexus by accessing Registry VM IP http://registry.arief.com:8081 (You can do this while waiting for bastion BP running)
     1. Login to OSS with username:admin and the password located in /opt/nexus/sonatype-work/nexus3/admin.password (you need to ssh to registry VM)
         1. ssh nutanix@registry.arief.com
@@ -138,14 +138,14 @@ export SUBNET="primary-PHX-SPOC013-3" # ex: mgnt.ntnx.ipam.local
 export CONTROLPLANE_VIP="10.38.13.130" # ex: make sure the IP is the (after) 1st IP of the HPOC Range 
 export METALLB_IP_RANGE="10.38.13.140-10.38.13.160" 
 
-# make sure the IP RANGE is +10 (so PC and autoAD IP not in the range) of VIP IP and before 1st IP of IPAM range and consist at least 20 IPs - modify/shorten IPAM IP Pool if necessary
+# make sure the IP RANGE is +10 (so PC and autoAD IP not in the range) of VIP IP and before 1st IP of IPAM range and consist at least 10 IPs - modify/shorten IPAM IP Pool if necessary
 Example:
 
 Address Range	: 	10.38.13.129-10.38.13.190
 IPAM			:	10.38.13.146-10.38.13.189 (Modified) to 10.38.13.161-10.38.13.189
 
 Endpoint			: 	10.38.13.130
-LB Range		:	10.38.13.140-10.38.13.160
+LB Range		:	10.38.13.140-10.38.13.150
 
 
     4. ssh to bastion from your laptop (or from AUTOAD VM) and execute command below:
@@ -189,7 +189,7 @@ nkp create cluster nutanix \
     --control-plane-vcpus 8 \
     --control-plane-cores-per-vcpu 2 \
     --control-plane-memory 48 \
-    --worker-replicas 2 \
+    --worker-replicas 1 \
     --worker-vcpus 12 \
     --worker-cores-per-vcpu 2 \
     --worker-memory 64 \
@@ -206,12 +206,15 @@ nkp create cluster nutanix \
     6. Retry NKP Create Command Installation but execute this first —>  nkp delete bootstrap
 20. After installation
     1. nkp get dashboard --kubeconfig="/home/nutanix/nkp-kommander.conf"
-        1. Username: cool_carver
-        2. Password: 3Hvl7iiSqD3TdyaidIJWPZBkzPji9ZDjbrrGSQZAa35uwJKcs6zY1ehCiaYw85ye
-        3. URL: https://10.38.190.41/dkp/kommander/dashboard
+        1. Username: condescending_dewdney
+        2. Password: AJthEFOoqFAqBvanFbqsHGS53Ezp46T9tl5qBM49RqiBLIFLIntkNEGuiX7gvT1Z
+        3. URL: https://10.38.13.140/dkp/kommander/dashboard
     2. from dashboard login (top right corner) —> Generate token (Follow all the instruction until kubectl works well)
     3. make sure all application installed (condition met) —> kubectl -n kommander wait --for condition=Ready helmreleases --all --timeout 15m
-21. Get trial license 
+21. Apply Ultimate License (if HPOC Deployment)
+    1. From NKP Dashboard Global - Licensing - remove License
+    2. Activate license key from no 17 above —> AEAAQ-AAA6Z-57CF6-C7CUH-AVRDV-TT8LD-P9ES2
+22. Get trial license (if Real Customer POC)
     1. https://portal.nutanix.com/page/licensing
     2. export KUBECONFIG=./nkp-kommander.conf 
     3. NKP Cluster Name —> kubectl get cluster -o jsonpath='{.items[0].metadata.name}'
