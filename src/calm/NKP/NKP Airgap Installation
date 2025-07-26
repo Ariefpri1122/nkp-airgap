@@ -66,7 +66,7 @@ Workshop NKP Builder
     8. Check log-in upon create and every subsequent
     9. Launch Blueprint —> Name: “Your_init”_Bastion
     10. Add A host record in autoadVM —> bastion with its IP address (map to Bastion VM)
-13. Configure OSS Nexus by accessing Registry VM IP https://registry.arief.com:8081 (You can do this while waiting for bastion BP running)
+13. Configure OSS Nexus by accessing Registry VM IP http://registry.arief.com:8081 (You can do this while waiting for bastion BP running)
     1. Login to OSS with username:admin and the password located in /opt/nexus/sonatype-work/nexus3/admin.password (you need to ssh to registry VM)
         1. ssh nutanix@registry.arief.com
         2. cat /opt/nexus/sonatype-work/nexus3/admin.password
