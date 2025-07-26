@@ -1,0 +1,38 @@
+	1.	Create service account for NKP to query AD in Active Directory User Administrator
+	2.	Copy User Account Administrator and create new user account based on your name
+	3.	Create “NKP Admins” Group for NKP to query Group in Active Directory User Administrator and add your new account into it.
+	4.	From NKP Dashboard - Global - Identity Providers - Identity Provider
+	⁃	Name					              : ntnxlab.local
+	⁃	Host					              : 10.38.13.137:389
+	⁃	Bind DN				              : CN=nkpsvc,CN=Users,DC=ntnxlab,DC=local
+	⁃	Bind Password			          : nutanix/4u
+	⁃	Root CA				              : Check Insecure No SSL and Check Insecure Skip TLS Verify
+	⁃	User Search Base DN			    : CN=Users,DC=ntnxlab,DC=local
+	⁃	User Search Username		    : sAMAccountName
+	⁃	User Search ID Attribute		: DN
+	⁃	User Search E-Mail			    : userPrincipalName
+	⁃	Name					              : name
+	⁃	Checked —> group search queries for groups
+	⁃	Group Search Base DN		    : CN=Users,DC=ntnxlab,DC=local
+	⁃	Group Search Filter			    : (objectClass=group)
+	⁃	Group Search Name Attribute	: cn
+	⁃	Add —> User Matchers
+	⁃	Group Search Group Attribute	: member
+	⁃	Group Search User Attribute		; DN
+	⁃	Save
+	5.	From NKP Dashboard - Global - Identity Providers - Groups
+	⁃	Create Group
+	⁃	Name					              : NKP Admins
+	⁃	Click Add Group
+	⁃	Groups				              : NKP Admins
+	⁃	Save
+	6.	From NKP Dashboard - Global - Access Control  - Cluster Role Bindings
+	⁃	NKP Admins - Add Roles —> Cluster Admin Role and DKP Commander Admin
+	⁃	Save
+	7.	Test Single Sign-On using AD to NKP Dashboard
+	⁃	Add Administrator user into NKP Admins Group in Active Directory User Administrator
+	⁃	Using incognito window open NKP Dashboard —> https://10.38.13.140/dkp/kommander/dashboard
+	⁃	Login with your AD Domain
+	⁃	username: administrator and its-password
+
+
