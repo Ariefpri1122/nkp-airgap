@@ -1,33 +1,40 @@
 Create Workspace and New Cluster
-	1.	Create Workspace
-	⁃	Name		: arief-workspace
+	1.	Global - Workspace - Create Workspace
+	⁃	Name			: arief-workspace
 	⁃	Create
 	2.	Continue to workspace
 	⁃	Action - Add Cluster
 	⁃	Standard Cluster Creation
 	⁃	cluster name		:	arief-nkp
-	⁃	SSH Public Key	:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEWT+eSeTQYYX7mIhQGghmSm418n9ANHLX9nZ//eGISr arief.pribadi@nutanix.com
-	⁃	Nutanix Prism Project:	lab
+	-	SSH Username		:	nutanix
+	⁃	SSH Public Key		:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEWT+eSeTQYYX7mIhQGghmSm418n9ANHLX9nZ//eGISr arief.pribadi@nutanix.com
+	⁃	Nutanix Prism Project	:	lab
 	⁃	Nutanix AOS Cluster	:	PHX-SPOC013-3
 	⁃	Subnet			:	primary-PHX-SPOC013-3
 	⁃	OS Image		:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
-	⁃	CP End Point IP	:	+1 IP from management cluster end point IP
-	⁃	CP Node Count	:	1
-	⁃	CPU Per Node (vCPU):	2
-	⁃	Memory Per Node	:	16
+	⁃	CP End Point IP		:	+1 IP from management cluster end point IP (10.38.13.151)
+	⁃	CP Node Count		:	1
+	⁃	CPU Per Node (vCPU)	:	16
+	⁃	Memory Per Node		:	16
 	⁃	Disk Size Per Node	:	80
-	⁃	Worker Node Count	:	1 (rest is default)
+	⁃	Nutanix Prism Project	:	lab
+	⁃	Nutanix AOS Cluster	:	PHX-SPOC013-3
+	⁃	Subnet			:	primary-PHX-SPOC013-3
+	⁃	OS Image		:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
+	⁃	Worker Node Count	:	1
+	-	CPU Per Node (vCPU)	:	16
+	⁃	Memory Per Node		:	32
+	⁃	Disk Size Per Node	:	80
 	⁃	Storage Container	:	default
-	⁃	Load Balancing	:	Start +1 IP from management cluster LB end IP
-	⁃	Load Balancing	:	End +9 IP from above
+	⁃	Load Balancing Start	:	Start +1 IP from management cluster LB end IP (10.38.13.152)
+	⁃	Load Balancing End	:	End +9 IP from above (10.38.13.160)
 	⁃	Image Registry Mirror
-	⁃	URL		:	https://airgap.arief.com:5000
-	⁃	username	:	admin
-	⁃	password	:	nutanix/4u
-	⁃	CA		:	download ca.cert from http://[your autoad vm] and upload in here
+	⁃	URL			:	https://airgap.arief.com:5000	
+	⁃	username		:	admin
+	⁃	password		:	nutanix/4u
+	⁃	CA			:	download ca.cert from http://[your autoad vm] and upload in here
 	⁃	Private Registry	
-	⁃	URL		:	https://registry.arief.com
-	⁃	username	:	admin
-	⁃	password	:	nutanix/4u
-	⁃	CA		:	download ca.cert from http://[your autoad vm] and upload in here
-	⁃	Create
+	⁃	URL			:	https://registry.arief.com/repository/docker-registry-io
+	⁃	username		:	admin
+	⁃	password		:	nutanix/4u
+	⁃	CA			:	download ca.cert from http://[your autoad vm] and upload in here
