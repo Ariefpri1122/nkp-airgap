@@ -21,7 +21,7 @@ Create Workspace and New Cluster
 	⁃	Nutanix AOS Cluster	:	PHX-SPOC013-3
 	⁃	Subnet			:	primary-PHX-SPOC013-3
 	⁃	OS Image		:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
-	⁃	Worker Node Count	:	2
+	⁃	Worker Node Count	:	1
 	-	CPU Per Node (vCPU)	:	16
 	⁃	Memory Per Node		:	32
 	⁃	Disk Size Per Node	:	80
@@ -34,7 +34,7 @@ Create Workspace and New Cluster
 	⁃	password		:	nutanix/4u
 	⁃	CA			:	download ca.cert from http://[your autoad vm] and upload in here
 	⁃	Private Registry	
-	⁃	URL			:	https://registry.arief.com/repository/docker-registry-io
+	⁃	URL			:	https://registry.arief.com/repository/docker-repository
 	⁃	username		:	admin
 	⁃	password		:	nutanix/4u
 	⁃	CA			:	download ca.cert from http://[your autoad vm] and upload in here
