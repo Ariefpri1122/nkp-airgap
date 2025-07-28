@@ -188,11 +188,11 @@ nkp create cluster nutanix \
     --control-plane-replicas 1 \
     --control-plane-vcpus 4 \
     --control-plane-cores-per-vcpu 2 \
-    --control-plane-memory 6 \
-    --worker-replicas 2 \
-    --worker-vcpus 2 \
+    --control-plane-memory 16 \
+    --worker-replicas 4 \
+    --worker-vcpus 4 \
     --worker-cores-per-vcpu 2 \
-    --worker-memory 6 \
+    --worker-memory 32 \
     --insecure \
     --self-managed \
     --airgapped
