@@ -186,13 +186,13 @@ nkp create cluster nutanix \
     --kubernetes-service-load-balancer-ip-range=${METALLB_IP_RANGE} \
     --ssh-public-key-file=${SSH_PUBLIC_KEY} \
     --control-plane-replicas 1 \
-    --control-plane-vcpus 8 \
+    --control-plane-vcpus 4 \
     --control-plane-cores-per-vcpu 2 \
-    --control-plane-memory 48 \
-    --worker-replicas 1 \
-    --worker-vcpus 12 \
+    --control-plane-memory 6 \
+    --worker-replicas 2 \
+    --worker-vcpus 2 \
     --worker-cores-per-vcpu 2 \
-    --worker-memory 64 \
+    --worker-memory 6 \
     --insecure \
     --self-managed \
     --airgapped
