@@ -66,35 +66,6 @@ Workshop NKP Builder
     8. Check log-in upon create and every subsequent
     9. Launch Blueprint —> Name: “Your_init”_Bastion
     10. Add A host record in autoad VM —> bastion with its IP address (map to Bastion VM)
-13. Configure OSS Nexus by accessing Registry VM IP http://registry.arief.com:8081 (You can do this while waiting for bastion BP running)
-    1. Login to OSS with username:admin and the password located in /opt/nexus/sonatype-work/nexus3/admin.password (you need to ssh to registry VM)
-        1. ssh nutanix@registry.arief.com
-        2. cat /opt/nexus/sonatype-work/nexus3/admin.password
-        3. create new password to “nutanix/4u”
-        4. Disable anonymous access
-        5. Finish
-        6. Click Settings - Repositories - Create Repository
-    2. Create new repository -> docker (proxy)
-        1. name [bebas tapi harus di isi]: docker-registry-io
-        2. online: di checklist
-        3. remote storage [boleh pake registry lainnya]: https://registry-1.docker.io
-        4. Docker Index [pilih]: Use Docker Hub
-        5. Blob store [pilih bebas]: default
-    3. Create new repository -> docker (hosted)
-        1. name [bebas tpi harus di isi]: docker-repository
-        2. online: di checklist
-        3. HTTP [di checklist dan di isi port contohnya]: 8087
-        4. Allow anonnymuous docker pull [di checklist klo mau yang bisa ngepull tanpa login]: uncheked
-        5. Enable Docker V1 API [docker engine version]: unchecked
-        6. Deployment policy [Tergantung kebutuhan, klo saya pilih Allow redeploy supaya tanpa ganti tags]: Allow redeploy
-    4. Create new repository -> docker (group)
-        1. Name [bebas, tapi harus diisi]: docker-repository-public
-        2. Online: checked
-        3. HTTP: 8086
-        4. Allow anonnymuous docker pull [di checklist klo mau yang bisa ngepull tanpa login]: uncheked
-        5. Blob store: default
-        6. Member repositories: pilih semua repository yang kita telah buat 
-14. Check https access to https://registry.[yourname.com] (nginx reverse proxy to oss nexus port 8081) using chrome incognito tab
 15. Upload nkp-rocky-9.5-release-1.30.5-20250609192903.qcow2 (NKP Version 2.14.1) image to prism central images
 16. From bastion VM modify the NKP configuration file and execute
     1. Note that IP Address range in HPOC Primary VLAN is —> x.x.x.1 - x.x.x.126
