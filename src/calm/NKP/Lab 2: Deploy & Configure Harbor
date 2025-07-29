@@ -5,10 +5,10 @@ Harbor Installation
 	4.	Using k8s dashboard see the deployment finished and success
 	5.	Confirmed in Management Cluster - Applications - CloudNativePG is “Deployed” —> not “Enabled”
 	6.	Enable Harbor - Choose “Rook Chef” as S3 Object Store
-	7.	Using k8s dashboard see the deployment finished and success
+	7.	Using k8s dashboard see the deployment finished and success --> if no harbor deployment shown in k8s dashboard, try to disable and enable again harbor application from NKP Dashboard
 	8.	Confirmed in Management Cluster - Applications -  Harbor is “Deployed” —> not “Enabled”
 	9.	From Bastion —> kubectl get secrets -n ncr-system harbor-admin-password -o jsonpath='{.data.HARBOR_ADMIN_PASSWORD}' | base64 -d
-	⁃	H6djLg=on1xchNfP2xZg
+	⁃	91fRIMGQYRtGsNfP0j5m
 	10.	From Management Cluster - Application Dashboard - Harbor —> Click Dashboard
 	11.	Login to harbor —> username: admin & password: (as mentioned above)
 	12.	Select Administration - Users —> Click New User
@@ -41,6 +41,7 @@ Harbor Installation
 	⁃	echo $HARBOR_ADDRESS 
 	⁃	mkdir /etc/docker/certs.d/$HARBOR_ADDRESS:5000
 	⁃	cd /etc/docker/certs.d/$HARBOR_ADDRESS:5000
+	-	kubectl get kommandercluster -n kommander host-cluster -o jsonpath='{.status.ingress.caBundle}' | base64 -d > ca.crt
 	⁃	cat ca.crt
 	⁃	sudo systemctl restart docker
 	⁃	docker login -u nutanix -p nx2Tech806! https://10.38.13.140:5000/ —> must be “Login Succeeded”
