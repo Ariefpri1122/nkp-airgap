@@ -22,8 +22,8 @@ Create Workspace and New Cluster by opening NKP dashboard from AUTOAD VM or your
 	⁃	OS Image		:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
 	⁃	CP End Point IP		:	+1 IP from management cluster end point IP (10.38.13.151)
 	⁃	CP Node Count		:	1
-	⁃	CPU Per Node (vCPU)	:	16
-	⁃	Memory Per Node		:	16
+	⁃	CPU Per Node (vCPU)	:	4
+	⁃	Memory Per Node		:	12
 	⁃	Disk Size Per Node	:	80
 	⁃	Nutanix Prism Project	:	lab
 	⁃	Nutanix AOS Cluster	:	PHX-SPOC013-3
@@ -31,7 +31,7 @@ Create Workspace and New Cluster by opening NKP dashboard from AUTOAD VM or your
 	⁃	OS Image		:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
 	⁃	Worker Node Count	:	4
 	-	CPU Per Node (vCPU)	:	8
-	⁃	Memory Per Node		:	32
+	⁃	Memory Per Node		:	12
 	⁃	Disk Size Per Node	:	80
 	⁃	Storage Container	:	default
 	⁃	Load Balancing Start	:	Start +1 IP from management cluster LB end IP (10.38.13.152)
