@@ -1,0 +1,56 @@
+Harbor Installation
+	1.	From NKP Dashboard - Management Cluster Workspace - Applications
+	2.	In Application - change all categories to general
+	3.	Enable CloudNativePG
+	4.	Using k8s dashboard see the deployment finished and success
+	5.	Confirmed in Management Cluster - Applications - CloudNativePG is “Deployed” —> not “Enabled”
+	6.	Enable Harbor - Choose “Rook Chef” as S3 Object Store
+	7.	Using k8s dashboard see the deployment finished and success
+	8.	Confirmed in Management Cluster - Applications -  Harbor is “Deployed” —> not “Enabled”
+	9.	From Bastion —> kubectl get secrets -n ncr-system harbor-admin-password -o jsonpath='{.data.HARBOR_ADMIN_PASSWORD}' | base64 -d
+	⁃	H6djLg=on1xchNfP2xZg
+	10.	From Management Cluster - Application Dashboard - Harbor —> Click Dashboard
+	11.	Login to harbor —> username: admin & password: (as mentioned above)
+	12.	Select Administration - Users —> Click New User
+	13.	Enter information:
+	⁃	username	: nutanix
+	⁃	email		: nutanix@nutanix.com
+	⁃	Firstname	: nutanix
+	⁃	password	: [your nutanix cluster password]
+	⁃	confirm		: [your nutanix cluster password]
+	⁃	Save
+	14.	Click your new username and mark it as ADMIN
+	15.	Logout  and login again as new user 
+	16.	Configure and Create Docker Proxy Cache Registry 
+	⁃	From Harbor Dashboard - Administration - Registries - New Endpoint
+	⁃	Provider	: Docker Hub
+	⁃	Name		: Docker Hub
+	⁃	Access ID	: [your docker username]
+	⁃	Secret	: [your docker password]
+	⁃	Verify Cert	: Checked
+	⁃	Click Test Connection —> “Connection tested sucessfully”
+	⁃	Click OK
+	⁃	From Harbor Dashboard - Project - New Project
+	⁃	Project Name	: proxy_cache
+	⁃	Access Level	: Unchecked Public
+	⁃	Click the Proxy Cache slider and then select your registry endpoint —>  Docker Hub-https://hub.docker.com
+	⁃	Click OK
+	17.	Check docker login and docker push from BASTION VM
+	⁃	Get harbor address
+	⁃	export HARBOR_ADDRESS="$(kubectl -n kommander get kommandercluster host-cluster -o jsonpath='{.status.ingress.address}')"
+	⁃	echo $HARBOR_ADDRESS 
+	⁃	mkdir /etc/docker/certs.d/$HARBOR_ADDRESS:5000
+	⁃	cd /etc/docker/certs.d/$HARBOR_ADDRESS:5000
+	⁃	cat ca.crt
+	⁃	sudo systemctl restart docker
+	⁃	docker login -u nutanix -p nx2Tech806! https://10.38.13.140:5000/ —> must be “Login Succeeded”
+	⁃	docker pull 10.38.13.140:5000/proxy_cache/goharbor/harbor-core:dev
+	⁃	docker pull 10.38.13.140:5000/proxy_cache/hello-world:latest
+	⁃	docker image ls 
+	⁃	docker tag 10.38.13.140:5000/proxy_cache/hello-world 10.38.13.140:5000/library/hello-world
+	⁃	docker image ls
+	⁃	docker push 10.38.13.140:5000/library/hello-world
+	⁃	from harbor dashboard examine
+	⁃	Projects - proxy_cache - repositories
+	⁃	Projects - library - repositories
+
