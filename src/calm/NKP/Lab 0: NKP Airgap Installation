@@ -118,7 +118,6 @@ IPAM			:	10.38.13.146-10.38.13.189 (Modified) to 10.38.13.161-10.38.13.189
 Endpoint		: 	10.38.13.130
 LB Range		:	10.38.13.140-10.38.13.150
 
-
     4. ssh to bastion from your laptop (or from AUTOAD VM) and execute command below:
 
 echo IMAGE:$IMAGE
@@ -139,6 +138,10 @@ echo METALLB_IP_RANGE:$METALLB_IP_RANGE
 
     5. If all variables printed well (make sure no space after “:” —> execute below command:
 
+Take a note on minimum requirement of Commander Cluster:
+- Control Plane  --> 3x VM with 4 vCPU + 16 GB Memory + 80 GB Disk
+- Worker Node    --> 4x VM with 8 vCPU + 32 GB Memory + 95 GB Disk    
+
 nkp create cluster nutanix \
     --cluster-name=${NKP_CLUSTER_NAME} \
     --control-plane-prism-element-cluster=${CLUSTER_NAME} \
@@ -157,13 +160,13 @@ nkp create cluster nutanix \
     --kubernetes-service-load-balancer-ip-range=${METALLB_IP_RANGE} \
     --ssh-public-key-file=${SSH_PUBLIC_KEY} \
     --control-plane-replicas 1 \
-    --control-plane-vcpus 4 \
+    --control-plane-vcpus 6 \
     --control-plane-cores-per-vcpu 2 \
-    --control-plane-memory 16 \
+    --control-plane-memory 8 \
     --worker-replicas 4 \
     --worker-vcpus 4 \
     --worker-cores-per-vcpu 2 \
-    --worker-memory 32 \
+    --worker-memory 16 \
     --insecure \
     --self-managed \
     --airgapped
