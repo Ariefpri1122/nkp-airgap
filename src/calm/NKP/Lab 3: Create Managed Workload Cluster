@@ -32,12 +32,12 @@ Create Workspace and New Cluster by opening NKP dashboard from AUTOAD VM or your
 	⁃	Load Balancing Start	:	Start +1 IP from management cluster LB end IP (10.38.13.152)
 	⁃	Load Balancing End	:	End +9 IP from above (10.38.13.160)
 	⁃	Image Mirror	
-	⁃	URL			:	https://airgap.arief.com:5000
-	⁃	username		:	admin
-	⁃	password		:	nutanix/4u
+	⁃	URL			:	https://10.38.13.140:5000/proxy_Cache
+	⁃	username		:	nutanix
+	⁃	password		:	nx2Tech806!
 	⁃	CA			:	download ca.cert from http://[your autoad vm] and upload in here
 	⁃	Private Registry	
-	⁃	URL			:	https://10.38.13.140:5000
+	⁃	URL			:	https://10.38.13.140:5000/library
 	⁃	username		:	nutanix
 	⁃	password		:	nx2Tech806!
 	⁃	CA			:	download ca.cert from http://[your autoad vm] and upload in here
