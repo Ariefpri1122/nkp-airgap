@@ -73,6 +73,11 @@ Workshop NKP Builder
     3. Execute this command —> curl -fsSL http://10.42.194.11/workshop_staging/tradeshows/experimental/nkp-bootcamp/install-tools.sh | bash
     4. from your laptop/autoad using chrome https://bastion.arief.com (from autoadvm) or http://[your_bastion_ip]
     5. Next is to open a terminal. Click the menu icon followed by Terminal and New Terminal
+    6. Install fzf tools:
+        - git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+        - ~/.fzf/install --> Follow the instruction with YES answer
+        - source ~/.bashrc
+        - fzf --version
 17. Check avail NKP Ultimate license and its expired Date
     1. https://portal.nutanix.com/page/licensing (See License with Key)
     2. search by “nkp” find NKP Ultimate license and its expiry date
