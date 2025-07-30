@@ -58,4 +58,22 @@ Exploring Kiali:
 From your managed-cluster nkp dashboard - clusters - click 3 dots menu - kiali
 Choose your project namespace - show graph
 
+Deploying NKP Insights:
+
+From NKP Dashboard - Your Workspace - Applications
+In Application - choose all categories
+Enable Rook Ceph
+Using k8s dashboard see the deployment finished and success
+Confirmed in Management Cluster - Applications - Rook Ceph is “Deployed” —> not “Enabled”
+
+Enable Rook Ceph Cluster
+Using k8s dashboard see the deployment finished and success
+Confirmed in Management Cluster - Applications - Rook Ceph Cluster is “Deployed” —> not “Enabled”
+
+Enable NKP Insights
+Using k8s dashboard see the deployment finished and success
+Confirmed in Management Cluster - Applications - NKP Insights is “Deployed” —> not “Enabled”
+
+Go to Dashboard to see insights (below of the screen)
+Go to Side Menu - Insights for detail insight information and searching --> find some insights and click Dashboard and click also details
 
