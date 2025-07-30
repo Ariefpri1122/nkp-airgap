@@ -1,1 +1,38 @@
+Enable Centralize Logging
+-------------------------
+
+From NKP Dashboard - Your Workspace - Applications
+In Application - change all categories to Logging
+Enable Grafana Loki
+Using k8s dashboard see the deployment finished and success
+Confirmed in Management Cluster - Applications - Grafana Loki is “Deployed” —> not “Enabled”
+
+Grafana Logging
+Using k8s dashboard see the deployment finished and success
+Confirmed in Management Cluster - Applications - Grafana Logging is “Deployed” —> not “Enabled”
+
+Enable Fluent Bit
+Using k8s dashboard see the deployment finished and success
+Confirmed in Management Cluster - Applications - Fluent Bit is “Deployed” —> not “Enabled”
+
+While waiting --> Currious on Rook Ceph Cluster?
+
+Go to Projects - your project - Clusters - managed-cluster - Rook Ceph Cluster - Dashboard
+
+username  : admin
+password  : --> get it from this command from bastion VM: kubectl get secret -n ${NAMESPACE} rook-ceph-dashboard-password -ogo-template='{{ .data.password | base64decode | printf "%s\n" }}'
+
+Explore --> CLuster Hosts
+        --> (Object Storage Daemon) OSD
+        --> Object - Bucket
+        --> Observability
+
+After make sure Fluent Bit, Grafana Loki and Grafana Logging are deployed, got to Projects - your-project - Clusters - managed-cluster - Grafana Loggind - Dashboard
+
+Click Dashboard - Kubernetes Audit  --> Explore Namespace - view
+                                    --> Explore Audit Log - View - back to dashboard - Audit Log - Explore
+
+[wait 30 mins until logs process by the logging system]
+
+Click Dashboard - Logging Dashboard via Loki --> Explore
 
