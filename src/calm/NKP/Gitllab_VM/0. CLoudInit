@@ -1,0 +1,9 @@
+#cloud-config
+users:
+  - name: rocky
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+chpasswd:
+  list: |
+    rocky:@@{rocky.secret}@@
+  expire: False
+ssh_pwauth: true
