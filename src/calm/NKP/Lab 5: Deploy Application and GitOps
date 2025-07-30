@@ -76,6 +76,10 @@ From Kubernetes Dashboard  -->  Check Deployment, make sure deployment success (
 
 If redis-cart error (this is happened because the image still in docker hub, while other deployment's image use gcp artifact with no auth and limit -- while docker hub has maximum limit):
 
+docker pull 10.38.13.140:5000/proxy_cache/redis:alpine
+docker tag 10.38.13.140:5000/proxy_cache/redis:alpine 10.38.13.140:5000/library/redis:alpine
+docker push 10.38.13.140:5000/library/redis:alpine
+
 copy harbor-registry-credentials manifest in arief-ngix namespace using kubernetes dashboard:
 
 apiVersion: v1
@@ -128,6 +132,7 @@ type: Opaque
 
 Modify RedisCart Deployment:
 
+change the image location (line 155) to --> 10.38.13.140:5000/library/redis:alpine
 add below config in line 95 (After dnspolicy):
       imagePullSecrets:
         - name: harbor-registry-credentials
