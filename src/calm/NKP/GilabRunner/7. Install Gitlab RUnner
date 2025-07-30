@@ -8,5 +8,5 @@ sudo gitlab-runner register \
   --url http://gitlab.@@{domain_name}@@ \
   --registration-token $RUNNER_TOKEN \
   --executor shell \
-  --description “vm-runner” \
-  --tag-list “vm”
+  --description vm-runner \
+  --tag-list vm-runner
