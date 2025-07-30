@@ -32,7 +32,7 @@ Harbor Installation
 	⁃	Click OK
 	⁃	From Harbor Dashboard - Project - New Project
 	⁃	Project Name	: proxy_cache
-	⁃	Access Level	: Unchecked Public
+	⁃	Access Level	: checked Public
 	⁃	Click the Proxy Cache slider and then select your registry endpoint —>  Docker Hub-https://hub.docker.com
 	⁃	Click OK
 	17.	Check docker login and docker push from BASTION VM
