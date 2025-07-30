@@ -1,0 +1,12 @@
+curl -L "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.rpm.sh" | sudo bash
+
+sudo dnf install gitlab-runner -y
+
+export RUNNER_TOKEN=@@{runner_token}@@
+sudo gitlab-runner register \
+  --non-interactive \
+  --url http://gitlab.@@{domain_name}@@ \
+  --registration-token $RUNNER_TOKEN \
+  --executor shell \
+  --description “vm-runner” \
+  --tag-list “vm”
