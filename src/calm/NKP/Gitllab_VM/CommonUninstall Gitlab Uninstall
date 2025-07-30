@@ -1,0 +1,12 @@
+#!/bin/bash
+set -ex
+
+##############################################
+# Name        : Gitlab_uninstallation.sh
+# Author      : Calm Devops
+# Version     : 1.0
+# Description : Script to remove gitlab 
+# Compatibility : Rocky 8
+##############################################
+
+sudo dnf remove -y gitlab*
