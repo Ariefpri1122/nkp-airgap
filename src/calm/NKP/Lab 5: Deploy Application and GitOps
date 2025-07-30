@@ -1,1 +1,144 @@
+From bastion VM create a simple nginx container application:
+
+mkdir workshop
+cd workshop
+mkdir arief
+cd arief
+
+vi Dockerfile
+from 10.38.13.140:5000/library/nginx
+copy index.html /usr/share/nginx/html
+
+vi index.html
+<HTML>
+<BODY>
+<H1>
+<CENTER>
+LANDING PAGE ..... Arief Pribadi
+</CENTER>
+</H1>
+</BODY>
+</HTML>
+
+docker login -u nutanix -p nx2Tech806! https://10.38.13.140:5000/ 
+docker build -f Dockerfile -t arief-nginx -->  If Failed, check endpoint healthy in harbor dashboard  
+docker image ls 
+docker tag arief-nginx:latest 10.38.13.140:5000/library/arief-nginx:latest
+docker image ls
+docker push 10.38.13.140:5000/library/arief-nginx
+from harbor dashboard examine Projects - library - repositories
+
+
+Create credential for harbor access:
+kubectx --> make sure you use managed-cluster cluster context
+REGISTRY_USERNAME="nutanix"
+REGISTRY_PASSWORD="nx2Tech806!"
+NAMESPACE="arief-nkp-lmq7d-62fgk"
+kubectl create secret generic -n $NAMESPACE harbor-registry-credentials \
+--from-literal username=$REGISTRY_USERNAME \
+--from-literal password=$REGISTRY_PASSWORD \
+--from-file=ca.crt=/etc/docker/certs.d/10.38.13.140:5000/ca.crt 
+
+
+From Managed Cluster Kubernetes Dashboard:
+
+Choose yourname namespace
+Create new resource - Create from Form
+
+Name              :  arief-nginx
+container image   :  10.38.13.140:5000/library/arief-nginx
+number of pods    :  1
+service           :  external
+port              :  80
+target port       :  80
+Show advanced option
+image pull secret :  harbor-registry-credentials
+
+Check deployment running
+Check Services created - click external endpoint --> the web application shown
+
+Deploy Application using GitOps Deployment
+
+From NKP Manage-Cluster Dasboard - Projects - Create Project
+Name              :  arief-project
+Select Managed-Cluster
+Create - Continue to project
+Go to Continues Deployment (CD) Tab - Add GitOps Source
+Name              :  online-boutique
+Repository URL    :  https://github.com/nutanixdev/nkp-microservices-demo.git
+Git Ref Type      :  Branch
+Branch Name       :  main
+Path              :  ./release/without-istio
+Git Secret        :  none
+Save
+
+From Kubernetes Dashboard  -->  Check Deployment, make sure deployment success (Please be aware that creating new project will create new namespace)
+
+If redis-cart error (this is happened because the image still in docker hub, while other deployment's image use gcp artifact with no auth and limit -- while docker hub has maximum limit):
+
+copy harbor-registry-credentials manifest in arief-ngix namespace using kubernetes dashboard:
+
+apiVersion: v1
+data:
+  ca.crt: >-
+    LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJiakNDQVJXZ0F3SUJBZ0lSQU1KaTN0QnRTbjRPZFNOY3dVbkdad013Q2dZSUtvWkl6ajBFQXdJd0Z6RVYKTUJNR0ExVUVBeE1NYTI5dGJXRnVaR1Z5TFdOaE1CNFhEVEkxTURjeU9USXlNVE14T0ZvWERUTTFNRGN5TnpJeQpNVE14T0Zvd0Z6RVZNQk1HQTFVRUF4TU1hMjl0YldGdVpHVnlMV05oTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJCnpqMERBUWNEUWdBRUpZUklyc3JQQWVtZWZhQWI3WkNMMDJqNFArRm12MXFWa0gyVTU1TW5FKzFyNm5qTXFyZHkKeGdIOGV2Q1MybXJzNzVFTzB3TVdVWDdHMlMwMTJKQmFHYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4RwpBMVVkRXdFQi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZQbm5RaHBLZ0RoZ0lIeCtTYjJPdkVXY1V4eHBNQW9HCkNDcUdTTTQ5QkFNQ0EwY0FNRVFDSUF1SXc0anVJRHMySkdjalh2K3c1V3ZUZEQyT002ZnZiVTN1enhXQisrdUkKQWlCZDNzUlZ4OUwzakxvaG9IUjM0THFRMTFEcW5CWjFQTlhnbkhYRTk1UmxMUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+  password: bngyVGVjaDgwNiE=
+  username: bnV0YW5peA==
+kind: Secret
+metadata:
+  creationTimestamp: '2025-07-30T00:22:06Z'
+  managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:data:
+          .: {}
+          f:ca.crt: {}
+          f:password: {}
+          f:username: {}
+        f:type: {}
+      manager: kubectl-create
+      operation: Update
+      time: '2025-07-30T00:22:06Z'
+  name: harbor-registry-credentials
+  namespace: arief-nkp-lmq7d-62fgk
+  resourceVersion: '37363'
+  uid: df8554bc-dec7-44eb-b3b6-164639471b89
+type: Opaque
+
+--> Delete Line 89-102
+--> Change namespace name to your project namespace (line 104)
+--> Delete Line 105-106
+
+It should be like this:
+
+apiVersion: v1
+data:
+  ca.crt: >-
+    LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJiakNDQVJXZ0F3SUJBZ0lSQU1KaTN0QnRTbjRPZFNOY3dVbkdad013Q2dZSUtvWkl6ajBFQXdJd0Z6RVYKTUJNR0ExVUVBeE1NYTI5dGJXRnVaR1Z5TFdOaE1CNFhEVEkxTURjeU9USXlNVE14T0ZvWERUTTFNRGN5TnpJeQpNVE14T0Zvd0Z6RVZNQk1HQTFVRUF4TU1hMjl0YldGdVpHVnlMV05oTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJCnpqMERBUWNEUWdBRUpZUklyc3JQQWVtZWZhQWI3WkNMMDJqNFArRm12MXFWa0gyVTU1TW5FKzFyNm5qTXFyZHkKeGdIOGV2Q1MybXJzNzVFTzB3TVdVWDdHMlMwMTJKQmFHYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4RwpBMVVkRXdFQi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZQbm5RaHBLZ0RoZ0lIeCtTYjJPdkVXY1V4eHBNQW9HCkNDcUdTTTQ5QkFNQ0EwY0FNRVFDSUF1SXc0anVJRHMySkdjalh2K3c1V3ZUZEQyT002ZnZiVTN1enhXQisrdUkKQWlCZDNzUlZ4OUwzakxvaG9IUjM0THFRMTFEcW5CWjFQTlhnbkhYRTk1UmxMUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+  password: bngyVGVjaDgwNiE=
+  username: bnV0YW5peA==
+kind: Secret
+metadata:
+  name: harbor-registry-credentials
+  namespace: arief-project-p284h
+type: Opaque
+
+--> copy modified manifest above and create new resource from kubernetes dashboard --> Create from input and paste the manifest above then click UPLOAD
+
+Modify RedisCart Deployment:
+
+add below config in line 95 (After dnspolicy):
+      imagePullSecrets:
+        - name: harbor-registry-credentials
+Change 
+
+Go to Services - frontend-external --> click the external end points IP Address (make sure application shown)
+
+
+
+
+
+
+
 
