@@ -1,4 +1,5 @@
 Exploring Grafana:
+------------------
 From your managed-cluster nkp dashboard - clusters - click 3 dots menu - grafana
 Click dashboard - Kubernetes / Networking / Namespace (Workload)
 Choose you project name space
@@ -6,7 +7,8 @@ Choose you project name space
 Click dashboard - Kubernetes / Compute Resources / Namespace (Pods)
 Click dashboard - Traefik Official Kubernetes Dashboard
 
-Deploying Istio Service Mesh:
+Deploying Istio Service Mesh and Kiali Observation
+--------------------------------------------------
 From NKP Dashboard - Your Workspace - Applications
 In Application - change all categories to Service Mesh
 Enable Istio Service Mesh
@@ -59,7 +61,7 @@ From your managed-cluster nkp dashboard - clusters - click 3 dots menu - kiali
 Choose your project namespace - show graph
 
 Deploying NKP Insights:
-
+-----------------------
 From NKP Dashboard - Your Workspace - Applications
 In Application - choose all categories
 Enable Rook Ceph
@@ -76,4 +78,12 @@ Confirmed in Management Cluster - Applications - NKP Insights is “Deployed” 
 
 Go to Dashboard to see insights (below of the screen)
 Go to Side Menu - Insights for detail insight information and searching --> find some insights and click Dashboard and click also details
+
+Observing Cost Management
+--------------------------
+From NKP Dashboard - Your Workspace - Projects - CLick Up Arrow button under "Cost: Totals"
+Click add-license-key-here --> Kubecost dashboard shown
+Click Start Free Trial Button
+Click Overview Menu from the left menu and Explore
+Click Monitor Menu from the left menu and Explore
 
