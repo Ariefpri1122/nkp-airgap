@@ -1,0 +1,15 @@
+#!/bin/bash
+
+CONFIG_FILE="/etc/selinux/config"
+
+# Check if file exists
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "SELinux config file not found: $CONFIG_FILE"
+    exit 1
+fi
+
+# Use sed to update the SELINUX line
+sed -i 's/^SELINUX=.*/SELINUX=permissive/' "$CONFIG_FILE"
+
+# Show result
+grep "^SELINUX=" "$CONFIG_FILE"
