@@ -1,0 +1,62 @@
+#!/bin/bash
+set -ex
+
+##############################################
+# Name        : Generic_disk_setup_to_opt.sh
+# Author      : Calm Devops
+# Version     : 1.0
+# Description : Script is used to group all possible disk to single group and create one logical volume of that
+# Compatibility : Rocky 8
+##############################################
+
+
+# Update the system
+sudo yum install dnf -y
+sudo rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+sudo dnf install -qy https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
+sudo dnf -qy install epel-release
+sudo dnf update -qy
+sudo sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/sysconfig/selinux
+sudo sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
+sudo systemctl stop firewalld || :
+sudo systemctl disable firewalld || :
+sudo setenforce 0
+sudo dnf install chrony
+sudo systemctl start chronyd
+sudo systemctl enable chronyd
+sudo yum install -y lvm2 --quiet 
+sudo dnf update -y --quiet
+
+# Install required packages
+sudo dnf install -y --quiet lvm2 libudev-devel
+
+# Initialize an empty list to store unused/unclaimed disks
+pv_list=""
+
+# Iterate through drive letters from 'a' to 'z'
+for x in {a..z}; do
+    if [ -e /dev/sd$x ]; then
+        # For non-AWS providers
+        data_flag=$(sudo file -sL /dev/sd$x | cut -d ':' -f2 | tr -d ' ')
+        if [ "$data_flag" == "data" ]; then
+            sudo pvcreate /dev/sd$x
+            pv_list+="/dev/sd$x "
+        fi
+    elif [ -e /dev/xvd$x ]; then
+        # For AWS disks
+        data_flag=$(sudo file -sL /dev/xvd$x | cut -d ':' -f2 | tr -d ' ')
+        if [ "$data_flag" == "data" ]; then
+            sudo pvcreate /dev/xvd$x
+            pv_list+="/dev/xvd$x "
+        fi
+    fi
+done
+
+# If there are unclaimed disks, create a volume group (vg01)
+if [[ ! -z $pv_list ]]; then
+    eval sudo vgcreate vg01 $pv_list                   # vg01 is created with all unclaimed / unused disks
+    sudo lvcreate -l 100%VG -n lv01 vg01               # lv01 is created from vg01 
+    sudo mkfs.xfs /dev/vg01/lv01
+    echo -e "/dev/vg01/lv01 \t /opt \t xfs \t defaults \t 0 0" | sudo tee -a /etc/fstab
+    sudo mount -a
+fi
