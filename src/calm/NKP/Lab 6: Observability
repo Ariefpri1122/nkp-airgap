@@ -1,1 +1,61 @@
+Exploring Grafana:
+From your managed-cluster nkp dashboard - clusters - click 3 dots menu - grafana
+Click dashboard - Kubernetes / Networking / Namespace (Workload)
+Choose you project name space
+
+Click dashboard - Kubernetes / Compute Resources / Namespace (Pods)
+Click dashboard - Traefik Official Kubernetes Dashboard
+
+Deploying Istio Service Mesh:
+From NKP Dashboard - Your Workspace - Applications
+In Application - change all categories to Service Mesh
+Enable Istio Service Mesh
+Using k8s dashboard see the deployment finished and success
+Confirmed in Management Cluster - Applications - Istio Service Mesh is “Deployed” —> not “Enabled”
+
+Enable Jaeger
+Using k8s dashboard see the deployment finished and success
+Confirmed in Management Cluster - Applications - Jaeger is “Deployed” —> not “Enabled”
+
+Enable Kiali
+Using k8s dashboard see the deployment finished and success
+Confirmed in Management Cluster - Applications - Kiali is “Deployed” —> not “Enabled”
+
+Istio Injection to your name space:
+From bastion VM - change your context to workload-cluster - change your namespace to your project namespace
+kubectl get pods --> notice that all pods are in single container
+
+From your managed-cluster nkp dashboard - Projects - click 3 dots menu your project - edit:
+- Add namespace label:
+  * key  :  istio-injection
+  * value:  enabled
+save
+
+kubectl get namespaces --show-labels
+
+kubectl rollout restart deployment adservice
+kubectl rollout restart deployment cartservice
+kubectl rollout restart deployment checkoutservice
+kubectl rollout restart deployment currencyservice
+kubectl rollout restart deployment emailservice
+kubectl rollout restart deployment frontend
+kubectl rollout restart deployment loadgenerator
+kubectl rollout restart deployment paymentservice
+kubectl rollout restart deployment productcatalogservice
+kubectl rollout restart deployment recommendationservice
+kubectl rollout restart deployment shippingservice
+
+From Kubernetes Dashboard:
+Modify RedisCart Deployment
+change the image location (line 155) to --> 10.38.13.140:5000/library/redis:alpine --> Click Restart (from 3 dots menu)
+
+kubectl get pods --> you can see now the pods contain 2 containers
+From Kubernetes Dashboard - Your Project name space - Pods --> you will see 2 containers:
+1. Application container Name
+2. istio-proxy --> this is the sidecar container
+
+Exploring Kiali:
+From your managed-cluster nkp dashboard - clusters - click 3 dots menu - kiali
+Choose your project namespace - show graph
+
 
