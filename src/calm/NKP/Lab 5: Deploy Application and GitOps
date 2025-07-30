@@ -1,5 +1,5 @@
 From bastion VM create a simple nginx container application:
-
+------------------------------------------------------------
 mkdir workshop
 cd workshop
 mkdir arief
@@ -27,7 +27,6 @@ docker tag arief-nginx:latest 10.38.13.140:5000/library/arief-nginx:latest
 docker image ls
 docker push 10.38.13.140:5000/library/arief-nginx
 from harbor dashboard examine Projects - library - repositories
-
 
 Create credential for harbor access:
 kubectx --> make sure you use managed-cluster cluster context
@@ -57,8 +56,209 @@ image pull secret :  harbor-registry-credentials
 Check deployment running
 Check Services created - click external endpoint --> the web application shown
 
-Deploy Application using GitOps Deployment
+Create more complex application with persistent volue:
+------------------------------------------------------
+From managed-cluster kubernetes dashboard --> examine installed storage classes: nutanix-volume
 
+Choose your project namespace from kubernetes dashboard
+
+Apply below manifest using Create New Resources - Create from input in kubernetes dashboard
+
+mySQL Application:
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-pass
+  type: Opaque
+stringData:
+  password: nutanix/4u
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-mysql
+  labels:
+    app: wordpress
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: wordpress
+    tier: mysql
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  labels:
+    app: wordpress
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress-mysql
+  labels:
+    app: wordpress
+spec:
+  selector:
+    matchLabels:
+      app: wordpress
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: mysql
+    spec:
+      containers:
+        - image: 10.38.13.140:5000/proxy_cache/mysql:8.0
+          name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: password
+            - name: MYSQL_DATABASE
+              value: wordpress
+            - name: MYSQL_USER
+              value: wordpress
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: password
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-pv-claim
+      imagePullSecrets:
+        - name: harbor-registry-credentials
+
+Click the Persistent Volume Claims option on the sidebar menu to see the persistent volume created for MySQL --> status bound
+
+Wordpress Application:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: wordpress
+    tier: frontend
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wp-pv-claim
+  labels:
+    app: wordpress
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: frontend
+    spec:
+      containers:
+      - image: 10.38.13.140:5000/proxy_cache/wordpress:apache
+        name: wordpress
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: wordpress-mysql
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        - name: WORDPRESS_DB_USER
+          value: wordpress
+        ports:
+        - containerPort: 80
+          name: wordpress
+        volumeMounts:
+        - name: wordpress-persistent-storage
+          mountPath: /var/www/html
+      volumes:
+      - name: wordpress-persistent-storage
+        persistentVolumeClaim:
+          claimName: wp-pv-claim
+      imagePullSecrets:
+        - name: harbor-registry-credentials
+
+Create Ingress to access wordpress:
+
+From kubernetes dashboard - find "kommander-traefik" --> identify kommander-traefik services External End Point (Ex: 10.38.13.152)
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wordpress
+spec:
+  ingressClassName: kommander-traefik
+  rules:
+    - host: wordpress.arief.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wordpress
+                port:
+                  number: 80
+
+
+--> From AUTOAD VM Add DNS A Host record of "wordpress" to kommander-traefik services External End Point (Ex: 10.38.13.152) in arief.com zone 
+--> or add wordpress and its kommander-traefik services External End Point (Ex: 10.38.13.152) into your laptop host file
+
+** Check wordpress application https://wordpress.arief.com
+
+
+Deploy Application using GitOps Deployment
+------------------------------------------
 From NKP Manage-Cluster Dasboard - Projects - Create Project
 Name              :  arief-project
 Select Managed-Cluster
