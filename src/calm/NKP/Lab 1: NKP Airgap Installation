@@ -1,36 +1,77 @@
-Workshop NKP Builder
+Deploy NKP Cluster Commander AirGap Method
+------------------------------------------ 
 
 1. Reserved HPOC
     1. PC = pc.2024.3.1.4
     2. AOS = 6.10
     3. NKP = 2.13.2
-2. Shutdown autoad Vm —> increase and update autoad VM Core to 2 and increase memory to 16GB 
-3. add new vdisk in autoad VM with 200 GB Size and format it to become D:\ Drive and create folder called “Software”. Moved the Download folder into this new folder —> POwer on the VM
-4. In autoAD VM, add and Configure windows IIS with folder browsing allowed, and delete iis.* file on autoad VM —> test with internet explorer http://localhost
-5. Take a not on your AutoAD VM IP Address —> 10.38.16.73
-6. Note on these HPOC File Shares:
+2. Shutdown autoad Vm —> Configure the VM:
+- increase and update autoad VM Core to 2 and increase memory to 16GB 
+- Power on the VM
+- Configure AUTOAD VM Disk Layout
+    * Right click windows logo (top down corner) - Disk Manager - right click disk1 - Online 
+    * Right click disk1 - Initiatialize Disk - OK 
+    * Right click unalocated 200GB volume - New Simple volume - next - next - next
+    * Volume Label = Data
+    * Next - Finish
+    * Right click Data Volume - Open - New Folder named “Software” 
+    * Right click Download folder (from the left pane menu) - properties - location 
+    * Moved folder into this new "software" folder - OK - Yes
+    
+- In autoAD VM, add and Configure windows IIS with folder browsing allowed:
+    * From server manager - manager - add roles and feature
+    * Next - Next - Next - Checked Web Server (IIS) - Add Features
+    * Next - Next - Next - Next - Install - (wait for a while) - Close
+    * From Administrative Tools - Internet Information Service (IIS)
+    * open sites - default web site - Directory Browsing - Open Feature - Enable
+    * click default web site - expolre (top right corner) - windows explorer will open 
+        - delete iisstart.* file on autoad VM
+    * test IIS with internet explorer http://localhost
+
+- Take a note on your AutoAD VM IP Address (using CMD ipconfig) —> 10.38.20.137 (this is example)
+
+3. Note on these HPOC File Shares:
     * PHX: http://phx-dfs01 or http://10.42.194.11
     * DM3: http://rtp-dfs01 or http://10.55.251.38
     * BLR: http://blr-dfs01 or http://10.136.239.13
-7. From AutoAD VM, Iusing internet explorer, nstall Chrome and make it default —> http://10.42.194.11/misc/Google/Chrome/ChromeSetup.exe
-8. From AutoAD VM, using chrome browser, Download these files:
+4. From AutoAD VM, using internet explorer, install Chrome and make it default —> http://10.42.194.11/misc/Google/Chrome/ChromeSetup.exe
+5. From AutoAD VM, using chrome browser, Download these files:
     1. Download Rocky-9-GenericCloud-Base.latest.x86_64.qcow2 —> https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-GenericCloud-Base.latest.x86_64.qcow2
     2. Download WInSCP —> https://downloads.sourceforge.net/project/winscp/WinSCP/6.5.3/WinSCP-6.5.3-Setup.exe?ts=gAAAAABogjh_EJ08-T1H0IwKZdQWkhtoRwhoDEtsLaylXsYNL7W6j22plQzbOAZFFR1FOF3Z3dFUmk6f9FHyOn6Exi6Vk3UPNw%3D%3D&r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fwinscp%2Ffiles%2FWinSCP%2F6.5.3%2FWinSCP-6.5.3-Setup.exe%2Fdownload
-    3. Install WinSCP
-    4. Download Putty —> https://the.earth.li/~sgtatham/putty/latest/w64/putty-64bit-0.83-installer.msi
+
+    (wait 5 seconds)
+
+    3. Download Putty —> https://the.earth.li/~sgtatham/putty/latest/w64/putty-64bit-0.83-installer.msi
+    4. Install WinSCP
     5. Instal Putty 
-9. From AutoAD VM, Download all these files and put all in c:\inetpub\wwwroot 
+6. From AutoAD VM, Download all these files and put all in c:\inetpub\wwwroot 
     1. nexus-3.82.0-08-linux-x86_64.tar.gz —> https://download.sonatype.com/nexus/3/nexus-3.82.0-08-linux-x86_64.tar.gz
     2. Download NKP files from https://portal.nutanix.com/page/downloads?product=nkp
-        1. nkp-rocky-9.5-release-1.30.5-20250609192903.qcow2 (NKP Version 2.14.1)
-        2. nkp-air-gapped-bundle  (NKP Version 2.14.1
-10. Deploy BP Private_Mirror_VM
-    1. From Auto AD VM, Open PC GUI and Upload Rocky-9-GenericCloud-Base.latest.x86_64.qcow2 to Cluster Image Service
-    2. Manage project —> make sure VLAN enabled in the project (in infrastructure tab)
-    3. Download BP Private_Mirror Jason —> https://github.com/Ariefpri1122/nkp-airgap/blob/main/src/calm/Nutanix%20Self%20Service%20v4.1.0%20Version%20pc.2024.3.1.1/APR_Private_Mirror.json
-    4. Upload BP Private_Mirror Jason  to Self-service
-    5. Configure nexus_location variable —> http://autoad VM IP your nexus OSS location
-    6. Configure Mirror_VM:
+        1. Rocky Linux 9.5-release-1.32.3-20250605191120 for AHV (NKP Version 2.15)
+        2. nkp-air-gapped-bundle  (NKP Version 2.15)
+    3. Put these 3 files in c:\inetpub\wwwroot 
+
+Blueprint Deployment
+--------------------
+
+Take a note of:
+- PC IP Address --> (ex:https://10.38.20.138:9440/)
+- PE IP Address --> (ex:https://10.38.20.135:9440/) 
+- HPOC admin password --> (ex:nx2Tech974!)
+
+Deploy BP Private_Mirror_VM
+    1. From Auto AD VM, Open PC GUI - compute - Images - Add Image - Add File -  Upload Rocky-9-GenericCloud-Base.latest.x86_64.qcow2 from download folder - Next - Save
+    2. Click - Platform Service - Admin Center
+        - Click project - lab - Infrastructure tab -—> make sure VLAN registered in the project
+    3. Click - Cloud Infrastructure - Self-service - Blueprints
+        - From autoad VM - chrome browser Download: 
+            * BP Private_Mirror Jason —> https://github.com/Ariefpri1122/nkp-airgap/blob/main/src/calm/Nutanix%20Self%20Service%20v4.1.0%20Version%20pc.2024.3.1.1/APR_Private_Mirror.json
+            * Click 3 dot menu (right side) - Download
+    4. Upload BP Private_Mirror Jason  to Self-service (password:nutanix/4u)
+        - Configure nexus_location variable —> http://autoad VM IP for your nexus OSS location
+        - Configure Domain_name variable --> your_name.com (ex:arief.com)
+        - Save
+    6. Click - Configure Mirror_VM:
         1. Configure Cluster
         2. in VM Name : add your initial in front of the vm name --> ‘apr-‘
         3. Configure Image —> Rocky-9-GenericCloud-Base.latest.x86
@@ -38,7 +79,7 @@ Workshop NKP Builder
         5. Add Nic and select vlan —> make sure use DYNAMIC IP
         6. Check log-in upon create and every subsequent
         7. Save
-    7. Configure Registry_VM:
+    7. Click - Configure Registry_VM:
         1. Configure Cluster
         2. in VM Name : add your initial in front of the vm name --> ‘apr-‘
         3. Configure Image —> Rocky-9-GenericCloud-Base.latest.x86
@@ -46,82 +87,141 @@ Workshop NKP Builder
         5. Add Nic and select vlan
         6. Check log-in upon create and every subsequent
         7. Save
-    8. Launch Blueprint —> Name: “Your_init”_Registry
-11. Configure DNS Setting from autoad VM
-    1. Create Forward Zone [yourname.com] in DNS server
+    8. Launch Blueprint —> Name: “Your_initial_name”_Registry (ex:APR_Registry) - Deploy
+        * make sure bp application "RUNNING"
+        * take note on registry_VM IP Address (ex:10.38.20.153)
+        * take note on mirror_VM IP Address (ex:10.38.20.189)
+
+Configure DNS Setting from autoad VM
+    1. Open DNS Manager from Start - Windows Administrative Tools
+        - Right CLick Forward Lookup Zone
+        - New Zone - Next - Primary Zone - Unchecked Store the zone in active directory - next
+        - Zone name = [yourname.com] (ex:arief.com) - Next - Next - Check Allow both nonsecure and secure dynamic updates - next
+        - Finish
     2. Add A host record airgap with its IP address (map to Mirror VM)
-    3. Add A host record registry with its IP address (map to Registry VM)
+        - Double click and then right click [yourname.com] (ex:arief.com) - New host
+        - Name          :   airgap
+        - IP Address    :   mirror_VM IP Address (ex:10.38.20.189)
+        - Add Host
+    3. Add A host record registry with its IP address (map to registry VM)
+        - Double click and then right click [yourname.com] (ex:arief.com) - New host
+        - Name          :   registry
+        - IP Address    :   registry_VM IP Address (ex:10.38.20.153)
+        - Add Host        
+    DONE
+
     4. using INCOGNITO Chrome tab —> Check URL https://airgap.arief.com:5000/v2/_catalog 
+        - username  :   admin
+        - password  :   nutanix/4u
+
         1. If not running check container is exist —> sudo docker ps -l
         2. If exist but not running delete the container —> sudo rm -f [container_id]
         3. Run new container —> sudo docker run -d -p 5000:5000  --restart=always --name DockerRegistry -v /mnt/registry:/var/lib/registry -v `pwd`/auth:/auth -e "REGISTRY_AUTH=htpasswd" -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd -v `pwd`/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2
-12. Deploy BP Bastion_VM
-    1. Download BP Bastion Jason —> https://github.com/Ariefpri1122/nkp-airgap/blob/main/src/calm/Nutanix%20Self%20Service%20v4.1.0%20Version%20pc.2024.3.1.1/APR_Bastion.json
-    2. Configure airgap variable —> http://autoad VM IP/ your airgap_bundle location
-    3. Configure Cluster
-    4. In VM Name : add your initial in front of the vm name --> ‘apr-‘
-    5. Configure Image —> Rocky-9-GenericCloud-Base.latest.x86
-    6. Side Disk : 200 GB
-    7. Add Nic and select vlan —> make sure use DYNAMIC IP
-    8. Check log-in upon create and every subsequent
-    9. Launch Blueprint —> Name: “Your_init”_Bastion
-    10. Add A host record in autoad VM —> bastion with its IP address (map to Bastion VM)
-15. Upload nkp-rocky-9.5-release-1.30.5-20250609192903.qcow2 (NKP Version 2.14.1) image to prism central images
-16. From bastion VM modify the NKP configuration file and execute
-    1. Note that IP Address range in HPOC Primary VLAN is —> x.x.x.1 - x.x.x.126
-    2. Note that IP Address range in HPOC Secondary VLAN is —> x.x.x.190 - x.x.x.254
-    3. Execute this command —> curl -fsSL http://10.42.194.11/workshop_staging/tradeshows/experimental/nkp-bootcamp/install-tools.sh | bash
-    4. from your laptop/autoad using chrome https://bastion.arief.com (from autoadvm) or http://[your_bastion_ip]
-    5. Next is to open a terminal. Click the menu icon followed by Terminal and New Terminal
-    6. Install fzf tools:
+
+Deploy BP Bastion_VM
+    1. From autoad VM - chrome browser Download: 
+        *   Download BP Bastion Jason —> https://github.com/Ariefpri1122/nkp-airgap/blob/main/src/calm/Nutanix%20Self%20Service%20v4.1.0%20Version%20pc.2024.3.1.1/APR_Bastion.json
+        * Click 3 dot menu (right side) - Download
+        
+    2. Upload BP Bastion_VM Jason to Self-service (password:nutanix/4u)
+        - Configure airgap variable —> http://autoad VM IP/ your airgap_bundle location
+        - Configure Domain_name variable --> your_name.com (ex:arief.com)
+        - Save
+        
+    3. Click - Configure Bastion_VM: 
+        1. Configure Cluster
+        2. In VM Name : add your initial in front of the vm name --> ‘apr-‘
+        3. Configure Image —> Rocky-9-GenericCloud-Base.latest.x86
+        4. Side Disk : 200 GB
+        5. Add Nic and select vlan —> make sure use DYNAMIC IP
+        6. Check log-in upon create and every subsequent
+        Save
+
+    4. Launch Blueprint —> Name: “Your_init”_Bastion (ex:APR_Bastion) - Deploy
+        * make sure bp application "RUNNING"
+        * take note on Bastion_VM IP Address (ex:10.38.20.153)
+
+    5. Add A host record bastion with its IP address (map to Bastion VM)
+        - Double click and then right click [yourname.com] (ex:arief.com) - New host
+        - Name          :   bastion
+        - IP Address    :   mirror_VM IP Address (ex:10.38.20.154)
+        - Add Host
+
+    6. Check URL https://airgap.arief.com:5000/v2/_catalog --> filled with airgap images
+    7. From Auto AD VM, Open PC GUI - compute - Images - Add Image - Add File - nkp-rocky-9.5-release-1.32.3-20250605191120.qcow2 from c:\inetpub\wwwroot folder - Next - Save
+
+Remote SSH to nutanix@bastion VM IP Address from your laptop or autoad VM
+- Execute this command —> curl -fsSL http://10.42.194.11/workshop_staging/tradeshows/experimental/nkp-bootcamp/install-tools.sh | bash
+- From your laptop/autoad using chrome https://[your_bastion_ip]
+- Next is to open a terminal. Click the menu icon followed by Terminal and New Terminal
+- Install fzf tools from this terminal:
         - git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
         - ~/.fzf/install --> Follow the instruction with YES answer
         - source ~/.bashrc
         - fzf --version
-17. Check avail NKP Ultimate license and its expired Date
-    1. https://portal.nutanix.com/page/licensing (See License with Key)
-    2. search by “nkp” find NKP Ultimate license and its expiry date
-    3. Note the “cluster name” —> put the same name in “export NKP_CLUSTER_NAME” below
+
+From your laptop -- Check avail NKP Ultimate license and its expired Date
+    1. https://portal.nutanix.com/page/licensing - In left pane menu - click - clusters - Licensed with Key 
+    2. search by “nkp” find NKP Ultimate license and with long expiry date
+    3. Note the “cluster name” —> Take a note of its "cluster name" and "license key"
     4. Example:
         1. nkp cluster name —> airgapped-hm-nkp-demo-2
         2. license key —> AEAAQ-AAA6Z-57CF6-C7CUH-AVRDV-TT8LD-P9ES2
-18. Upload Registry /etc/docker/certs.d/airgap.arief.com\:5000/cert.crt to c:\inetpub\wwwroot in autoad vm 
-    1. (use winscp to copy it from bastion VM) 
-    2. Modify script below with the correct information
-        1. Image Name
-        2. PC Password
-        3. PC End-Point
-        4. PC Cluster Name
-        5. Storage container name
-        6. Subnet Name
-        7. Control Plane IP Address
-        8. MetallLB IP Range
-    3. ssh to bastion from your laptop (or from AUTOAD VM) and execute command below:
 
-export IMAGE="nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2"
+
+From autoAD VM --> Copy Registry /etc/docker/certs.d/airgap.arief.com\:5000/cert.crt to c:\inetpub\wwwroot 
+    * use winscp to copy it from bastion VM
+
+
+IP Address Management
+----------------------
+Multi-Cluster HPOC:
+* Note that IP Address range in HPOC Primary VLAN is —> x.x.x.1 - x.x.x.126
+* Note that IP Address range in HPOC Secondary VLAN is —> x.x.x.190 - x.x.x.254
+
+SingleNode-Cluster HPOC:
+* Note that IP Address range in HPOC Primary VLAN is —> x.x.x.129 - x.x.x.190
+* IPAM range    :   x.x.x.146-x.x.x.189 --> Need be modified to x.x.x.161-x.x.x.189 (please configure ip pool in default vlan in prism element)
+
+
+# End Point IP and MetalLB IP Range --> cannot be part of IPAM range and cannot be in the range which PC/PE/CVM/AHV in it.
+# MetallB IP Range --> need at least consist of 10 IPs
+
+Example SingleNode Cluster:
+Endpoint		: 	x.x.x.130
+LB Range		:	x.x.x.140-x.x.x.150
+
+Example Multi-Node Cluster (Recommended using Secondary VLAN)
+Endpoint		: 	x.x.x.190
+LB Range		:	x.x.x.200-x.x.x.210
+
+Modify script below with the correct information
+1. PC Password
+2. PC End-Point
+3. PC Cluster Name
+4. Airgap Registry URL
+5. NKP Cluster Name --> need to be the same name with the cluster of NKP Ultimate and license key in https://portal.nutanix.com/page/licensing above
+4. Subnet Name
+5. Control Plane IP Address
+6. MetallLB IP Range
+
+** ssh to bastion from your laptop (or from AUTOAD VM) or using web code-server terminal to execute the commands
+
+export IMAGE="nkp-rocky-9.5-release-1.32.3-20250605191120.qcow2"
 export NUTANIX_USER="admin"
-export NUTANIX_PASSWORD="nx2Tech806!"
-export NUTANIX_ENDPOINT="https://10.38.13.138:9440" # make sure no “/“ at the end of the command and its PrismCentral IP (Not Prism Element)
-export CLUSTER_NAME="PHX-SPOC013-3"
+export NUTANIX_PASSWORD="nx2Tech974!"
+export NUTANIX_ENDPOINT="https://10.38.20.138:9440" # make sure no “/“ at the end of the command and its PrismCentral IP (Not Prism Element)
+export CLUSTER_NAME="PHX-SPOC020-3"
 export STORAGE_CONTAINER="default"
 export SSH_PUBLIC_KEY=".ssh/id_ed25519.pub" # ex: /home/user/.ssh/id_ed25519.pub
 export AIRGAP_REGISTRY_CACERT="/etc/docker/certs.d/airgap.arief.com:5000/cert.crt"
 export AIRGAP_REGISTRY_URL="https://airgap.arief.com:5000"
 export AIRGAP_REGISTRY_USERNAME="admin"
 export AIRGAP_REGISTRY_PASSWORD="nutanix/4u"
-export NKP_CLUSTER_NAME="airgapped-hm-nkp-demo-2" # ex: nkp-kommander-hpoc1020
-export SUBNET="primary-PHX-SPOC013-3" # ex: mgnt.ntnx.ipam.local
-export CONTROLPLANE_VIP="10.38.13.130" # ex: make sure the IP is the (after) 1st IP of the HPOC Range 
-export METALLB_IP_RANGE="10.38.13.140-10.38.13.160" 
-
-# make sure the IP RANGE is +10 (so PC and autoAD IP not in the range) of VIP IP and before 1st IP of IPAM range and consist at least 10 IPs - modify/shorten IPAM IP Pool if necessary
-Example:
-
-Address Range	: 	10.38.13.129-10.38.13.190
-IPAM			:	10.38.13.146-10.38.13.189 (Modified) to 10.38.13.161-10.38.13.189
-
-Endpoint		: 	10.38.13.130
-LB Range		:	10.38.13.140-10.38.13.150
+export NKP_CLUSTER_NAME="airgapped-hm-nkp-demo-2" # Important: same name with the cluster of NKP Ultimate and license key
+export SUBNET="primary-PHX-SPOC020-3"
+export CONTROLPLANE_VIP="10.38.20.130" # Follow IP Address Management Above
+export METALLB_IP_RANGE="10.38.20.140-10.38.20.160" 
 
     4. ssh to bastion from your laptop (or from AUTOAD VM) and execute command below:
 
@@ -144,8 +244,8 @@ echo METALLB_IP_RANGE:$METALLB_IP_RANGE
     5. If all variables printed well (make sure no space after “:” —> execute below command:
 
 Take a note on minimum requirement of Commander Cluster:
-- Control Plane  --> 3x VM with 4 vCPU + 16 GB Memory + 80 GB Disk
-- Worker Node    --> 4x VM with 8 vCPU + 32 GB Memory + 95 GB Disk    
+- Control Plane  --> 3x VM with 4 vCPU + 16 GB Memory + 80 GB Disk (Can be only one for POC)
+- Worker Node    --> 4x VM with 8 vCPU + 32 GB Memory + 95 GB Disk (Must be & Mandatory to be 4 nodes but memory can be 16 for POC)
 
 nkp create cluster nutanix \
     --cluster-name=${NKP_CLUSTER_NAME} \
@@ -167,7 +267,7 @@ nkp create cluster nutanix \
     --control-plane-replicas 1 \
     --control-plane-vcpus 6 \
     --control-plane-cores-per-vcpu 2 \
-    --control-plane-memory 8 \
+    --control-plane-memory 16 \
     --worker-replicas 4 \
     --worker-vcpus 4 \
     --worker-cores-per-vcpu 2 \
@@ -176,26 +276,27 @@ nkp create cluster nutanix \
     --self-managed \
     --airgapped
 
-19. If Failed:
+If Failed:
     1. in PC go to Infrastructure - Storage - Volume Groups
     2. Click pvc that created by nkp (named with pvc**) - Manage Connection - DELETE selected virtual machine - save
     3. Click delete button - check Acknowledgement - Delete
     4. Repeat until all pvc deleted
     5. Go to Infrastructure - Compute - VMs - Select all NKP VM - Action - delete - delete
     6. Retry NKP Create Command Installation but execute this first —>  nkp delete bootstrap
-20. After installation
+
+After installation
     1. nkp get dashboard --kubeconfig="/home/nutanix/nkp-kommander.conf"
         1. Username: condescending_dewdney
         2. Password: AJthEFOoqFAqBvanFbqsHGS53Ezp46T9tl5qBM49RqiBLIFLIntkNEGuiX7gvT1Z
         3. URL: https://10.38.13.140/dkp/kommander/dashboard
     2. from dashboard login (top right corner) —> Generate token (Follow all the instruction until kubectl works well)
     3. make sure all application installed (condition met) —> kubectl -n kommander wait --for condition=Ready helmreleases --all --timeout 15m
-21. Apply Ultimate License (if HPOC Deployment)
+Apply Ultimate License (if HPOC Deployment)
     1. From NKP Dashboard Global - Licensing - remove License
     2. Activate license key from no 17 above —> AEAAQ-AAA6Z-57CF6-C7CUH-AVRDV-TT8LD-P9ES2
-22. Get trial license (if Real Customer POC)
+
+Get trial license (if Real Customer POC)
     1. https://portal.nutanix.com/page/licensing
     2. export KUBECONFIG=./nkp-kommander.conf 
     3. NKP Cluster Name —> kubectl get cluster -o jsonpath='{.items[0].metadata.name}'
     4. NKP Cluster UUID —> kubectl get namespace kube-system --output jsonpath={.metadata.uid}
-
