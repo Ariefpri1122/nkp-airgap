@@ -190,12 +190,13 @@ SingleNode-Cluster HPOC:
 * IPAM range    :   x.x.x.146-x.x.x.189 --> Need be modified to x.x.x.161-x.x.x.189 (please configure ip pool in default vlan in prism element)
                                             ***************************************
 
-# End Point IP and MetalLB IP Range --> cannot be part of IPAM range and cannot be in the range which PC/PE/CVM/AHV/AD in it.
+# End Point IP and MetalLB IP Range --> cannot be part of IPAM range and cannot be in the range which PC/PE/CVM/AHV/AD in it
+# End Point IP --> Must be checked (using ping) before use
 # MetallB IP Range --> need at least consist of 10 IPs
 
 Example SingleNode Cluster:
-Endpoint		: 	x.x.x.130
-LB Range		:	x.x.x.140-x.x.x.150
+Endpoint		: 	x.x.x.139 --> Confirmed Check PING before use
+LB Range		:	x.x.x.140-x.x.x.150 --> Confirmed Check PING before use
 
 Example Multi-Node Cluster (Recommended using Secondary VLAN)
 Endpoint		: 	x.x.x.190
@@ -226,7 +227,7 @@ export AIRGAP_REGISTRY_USERNAME="admin"
 export AIRGAP_REGISTRY_PASSWORD="nutanix/4u"
 export NKP_CLUSTER_NAME="airgapped-hm-nkp-demo-2" # Important: same name with the cluster of NKP Ultimate and license key
 export SUBNET="primary-PHX-SPOC020-3"
-export CONTROLPLANE_VIP="10.38.20.130" # Follow IP Address Management Above
+export CONTROLPLANE_VIP="10.38.20.139" # Confirmed Check PING before use
 export METALLB_IP_RANGE="10.38.20.140-10.38.20.160" 
 
     4. ssh to bastion from your laptop (or from AUTOAD VM) and execute command below:
@@ -250,8 +251,8 @@ echo METALLB_IP_RANGE:$METALLB_IP_RANGE
     5. If all variables printed well (make sure no space after “:” —> execute below command:
 
 Take a note on minimum requirement of Commander Cluster:
-- Control Plane  --> 3x VM with 4 vCPU + 16 GB Memory + 80 GB Disk (Can be 1 node for POC)
-- Worker Node    --> 4x VM with 8 vCPU + 32 GB Memory + 95 GB Disk 
+- Control Plane  --> 3x VM with 4 vCPU + 16 GB Memory + 80 GB Disk (Can be 1 node for POC but 12 vCPU and 32 GB Memory)
+- Worker Node    --> 4x VM with 8 vCPU + 32 GB Memory + 95 GB Disk (Mandatory cannot be changed)
 
 nkp create cluster nutanix \
     --cluster-name=${NKP_CLUSTER_NAME} \
