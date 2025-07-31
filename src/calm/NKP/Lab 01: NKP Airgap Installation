@@ -6,10 +6,21 @@ Deploy NKP Cluster Commander AirGap Method
     2. AOS = 6.10
     3. NKP = 2.13.2
 
+Multi-Cluster HPOC:
+* Note that IP Address range in HPOC Primary VLAN is —> x.x.x.1 - x.x.x.126
+* IPAM range    :   x.x.x.39-x.x.x.125  --> Need to be modified to x.x.x.60-x.x.x.125 (please configure ip pool in default vlan in prism element/central)
+                                            *****************************************
+
+* Note that IP Address range in HPOC Secondary VLAN is —> x.x.x.132 - x.x.x.254
+* IPAM range    :   x.x.x.134-x.x.x.253 --> Need to be modified to x.x.x.161-x.x.x.253 (please configure ip pool in default vlan in prism element/central)
+                                            ******************************************
+
 SingleNode-Cluster HPOC:
 * Note that IP Address range in HPOC Primary VLAN is —> x.x.x.129 - x.x.x.190
 * IPAM range    :   x.x.x.146-x.x.x.189 --> Need be modified to x.x.x.161-x.x.x.189 (please configure ip pool in default vlan in prism element)
                                             ***************************************
+
+From PC --> Makesure after change IP Pool, click the checked button and click SAVE
 
 2. Shutdown autoad Vm —> Configure the VM:
 - increase and update autoad VM Core to 2 and increase memory to 16GB 
@@ -27,14 +38,14 @@ SingleNode-Cluster HPOC:
 - In autoAD VM, add and Configure windows IIS with folder browsing allowed:
     * From server manager - manager - add roles and feature
     * Next - Next - Next - Checked Web Server (IIS) - Add Features
-    * Next - Next - Next - Next - Install - (wait for a while) - Close
+    * Next - Next - Next - Next - Install - (wait for a while until feature installation finished) - Close
     * From Administrative Tools - Internet Information Service (IIS)
     * open sites - default web site - Directory Browsing - Open Feature - Enable
     * click default web site - expolre (top right corner) - windows explorer will open 
         - delete iisstart.* file on autoad VM
     * test IIS with internet explorer http://localhost
 
-- Take a note on your AutoAD VM IP Address (using CMD ipconfig) —> 10.38.20.137 (this is example)
+- Take a note on your AutoAD VM IP Address (using CMD ipconfig) —> 10.38.106.6 (this is example)
 
 3. Note on these HPOC File Shares:
     * PHX: http://phx-dfs01 or http://10.42.194.11
@@ -48,8 +59,12 @@ SingleNode-Cluster HPOC:
     (wait 5 seconds)
 
     3. Download Putty —> https://the.earth.li/~sgtatham/putty/latest/w64/putty-64bit-0.83-installer.msi
-    4. Install WinSCP
-    5. Instal Putty 
+    4. Download Angry IP Scanner --> https://github.com/angryip/ipscan/releases/download/3.9.1/ipscan-3.9.1-setup.exe
+
+    5. Install WinSCP
+    6. Instal Putty 
+    7. Install Angry IP Scanner
+
 6. From AutoAD VM, Download all these files and put all in c:\inetpub\wwwroot 
     1. nexus-3.82.0-08-linux-x86_64.tar.gz —> https://download.sonatype.com/nexus/3/nexus-3.82.0-08-linux-x86_64.tar.gz
     2. Download NKP files from https://portal.nutanix.com/page/downloads?product=nkp
@@ -61,8 +76,8 @@ Blueprint Deployment
 --------------------
 
 Take a note of:
-- PC IP Address --> (ex:https://10.38.20.138:9440/)
-- PE IP Address --> (ex:https://10.38.20.135:9440/) 
+- PC IP Address --> (ex:https://10.38.106.7:9440)
+- PE IP Address --> (ex:https://10.38.106.37:9440) 
 - HPOC admin password --> (ex:nx2Tech974!)
 
 Deploy BP Private_Mirror_VM
@@ -95,8 +110,8 @@ Deploy BP Private_Mirror_VM
         7. Save
     8. Launch Blueprint —> Name: “Your_initial_name”_Registry (ex:APR_Registry) - Deploy
         * make sure bp application "RUNNING"
-        * take note on registry_VM IP Address (ex:10.38.20.153)
-        * take note on mirror_VM IP Address (ex:10.38.20.189)
+        * take note on registry_VM IP Address (ex:10.38.106.87)
+        * take note on mirror_VM IP Address (ex:10.38.106.61)
 
 Configure DNS Setting from autoad VM
     1. Open DNS Manager from Start - Windows Administrative Tools
@@ -124,6 +139,14 @@ Configure DNS Setting from autoad VM
         2. If exist but not running delete the container —> sudo rm -f [container_id]
         3. Run new container —> sudo docker run -d -p 5000:5000  --restart=always --name DockerRegistry -v /mnt/registry:/var/lib/registry -v `pwd`/auth:/auth -e "REGISTRY_AUTH=htpasswd" -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd -v `pwd`/certs:/certs -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key registry:2
 
+Before continuing, letg get back to make sure:
+
+1. From AutoAD VM, Download all these files and put all in c:\inetpub\wwwroot 
+    * nkp-air-gapped-bundle  (NKP Version 2.15) has been downloaded --> from https://portal.nutanix.com/page/downloads?product=nkp
+        - nkp-air-gapped-bundle (NKP Version 2.15) --> nkp-air-gapped-bundle_v2.15.0_linux_amd64.tar.gz
+        - Put this file in c:\inetpub\wwwroot 
+        - Take note in the URL from browser (ex: http://10.38.106.6/nkp-air-gapped-bundle_v2.15.0_linux_amd64.tar.gz)
+
 Deploy BP Bastion_VM
     1. From autoad VM - chrome browser Download: 
         *   Download BP Bastion Jason —> https://github.com/Ariefpri1122/nkp-airgap/blob/main/src/calm/Nutanix%20Self%20Service%20v4.1.0%20Version%20pc.2024.3.1.1/APR_Bastion.json
@@ -147,14 +170,19 @@ Deploy BP Bastion_VM
         * make sure bp application "RUNNING"
         * take note on Bastion_VM IP Address (ex:10.38.20.153)
 
+While waiting:
+    * From Auto AD VM, Open PC GUI - compute - Images - Add Image - Add File - nkp-rocky-9.5-release-1.32.3-20250605191120.qcow2 from c:\inetpub\wwwroot folder - Next - Save
+
+    (wait until disk size shown in the dashboard)
+
     5. Add A host record bastion with its IP address (map to Bastion VM)
-        - Double click and then right click [yourname.com] (ex:arief.com) - New host
+        - From autoad vm - DNS Manager Console - Double click and then right click [yourname.com] (ex:arief.com) - New host
         - Name          :   bastion
-        - IP Address    :   mirror_VM IP Address (ex:10.38.20.154)
+        - IP Address    :   Bastion_VM IP Address (ex:10.38.106.114)
         - Add Host
 
-    6. Check URL https://airgap.arief.com:5000/v2/_catalog --> filled with airgap images
-    7. From Auto AD VM, Open PC GUI - compute - Images - Add Image - Add File - nkp-rocky-9.5-release-1.32.3-20250605191120.qcow2 from c:\inetpub\wwwroot folder - Next - Save
+    6. Check --> filled with airgap images
+
 
 Remote SSH to nutanix@bastion VM IP Address from your laptop or autoad VM
 - Execute this command —> curl -fsSL http://10.42.194.11/workshop_staging/tradeshows/experimental/nkp-bootcamp/install-tools.sh | bash
@@ -183,24 +211,30 @@ IP Address Management
 ----------------------
 Multi-Cluster HPOC:
 * Note that IP Address range in HPOC Primary VLAN is —> x.x.x.1 - x.x.x.126
-* Note that IP Address range in HPOC Secondary VLAN is —> x.x.x.190 - x.x.x.254
+* IPAM range    :   changed to x.x.x.60-x.x.x.125
+
+* Note that IP Address range in HPOC Secondary VLAN is —> x.x.x.132 - x.x.x.254
+* IPAM range    :   changed to x.x.x.161-x.x.x.253 
+
+# End Point IP and MetalLB IP Range --> cannot be part of IPAM range and cannot be in the range which PC/PE/CVM/AHV/AD in it
+# End Point IP --> Must be checked (using ping and IP Scanner) before use
+# MetallB IP Range --> need at least consist of 10 IPs
+
+Example Multi-Node Cluster:
+Endpoint		: 	x.x.x.40 --> Confirmed Check PING and IP Scanner before use (ex: 10.38.106.40)
+LB Range		:	x.x.x.41-x.x.x.51 --> Confirmed Check PING and IP Scanner before use (ex: 10.38.106.41-10.38.106.51)
 
 SingleNode-Cluster HPOC:
 * Note that IP Address range in HPOC Primary VLAN is —> x.x.x.129 - x.x.x.190
-* IPAM range    :   x.x.x.146-x.x.x.189 --> Need be modified to x.x.x.161-x.x.x.189 (please configure ip pool in default vlan in prism element)
-                                            ***************************************
+* IPAM range    :   changed to x.x.x.161-x.x.x.189 
 
 # End Point IP and MetalLB IP Range --> cannot be part of IPAM range and cannot be in the range which PC/PE/CVM/AHV/AD in it
-# End Point IP --> Must be checked (using ping) before use
+# End Point IP --> Must be checked (using ping and IP scanner) before use
 # MetallB IP Range --> need at least consist of 10 IPs
 
 Example SingleNode Cluster:
-Endpoint		: 	x.x.x.160 --> Confirmed Check PING before use
-LB Range		:	x.x.x.140-x.x.x.150 --> Confirmed Check PING before use
-
-Example Multi-Node Cluster (Recommended using Secondary VLAN)
-Endpoint		: 	x.x.x.190
-LB Range		:	x.x.x.200-x.x.x.210
+Endpoint		: 	x.x.x.160 --> Confirmed Check PING and IP Scanner before use
+LB Range		:	x.x.x.140-x.x.x.150 --> Confirmed Check PING and IP Scanner before use
 
 Modify script below with the correct information
 1. PC Password
@@ -217,8 +251,8 @@ Modify script below with the correct information
 export IMAGE="nkp-rocky-9.5-release-1.32.3-20250605191120.qcow2"
 export NUTANIX_USER="admin"
 export NUTANIX_PASSWORD="nx2Tech974!"
-export NUTANIX_ENDPOINT="https://10.38.20.138:9440" # make sure no “/“ at the end of the command and its PrismCentral IP (Not Prism Element)
-export CLUSTER_NAME="PHX-SPOC020-3"
+export NUTANIX_ENDPOINT="https://10.38.106.7:9440" # make sure no “/“ at the end of the command and its PrismCentral IP (Not Prism Element)
+export CLUSTER_NAME="PHX-POC334"
 export STORAGE_CONTAINER="default"
 export SSH_PUBLIC_KEY=".ssh/id_ed25519.pub" # ex: /home/user/.ssh/id_ed25519.pub
 export AIRGAP_REGISTRY_CACERT="/etc/docker/certs.d/airgap.arief.com:5000/cert.crt"
@@ -226,9 +260,9 @@ export AIRGAP_REGISTRY_URL="https://airgap.arief.com:5000"
 export AIRGAP_REGISTRY_USERNAME="admin"
 export AIRGAP_REGISTRY_PASSWORD="nutanix/4u"
 export NKP_CLUSTER_NAME="airgapped-hm-nkp-demo-2" # Important: same name with the cluster of NKP Ultimate and license key
-export SUBNET="primary-PHX-SPOC020-3"
-export CONTROLPLANE_VIP="10.38.20.160" # Confirmed Check PING before use
-export METALLB_IP_RANGE="10.38.20.140-10.38.20.159" 
+export SUBNET="primary-PHX-POC334"
+export CONTROLPLANE_VIP="10.38.106.40" # Confirmed Check PING before use
+export METALLB_IP_RANGE="10.38.106.41-10.38.106.51" 
 
     4. ssh to bastion from your laptop (or from AUTOAD VM) and execute command below:
 
@@ -253,6 +287,8 @@ echo METALLB_IP_RANGE:$METALLB_IP_RANGE
 Take a note on minimum requirement of Commander Cluster:
 - Control Plane  --> 3x VM with 4 vCPU + 16 GB Memory + 80 GB Disk (Can be 1 node for POC but 12 vCPU and 32 GB Memory)
 - Worker Node    --> 4x VM with 8 vCPU + 32 GB Memory + 95 GB Disk (Mandatory cannot be changed)
+- If you are using Multi-node cluster --> Use Production minimum requirements
+- If you are using Single-node cluster --> Use POC requirements
 
 nkp create cluster nutanix \
     --cluster-name=${NKP_CLUSTER_NAME} \
@@ -271,10 +307,10 @@ nkp create cluster nutanix \
     --registry-mirror-cacert=${AIRGAP_REGISTRY_CACERT} \
     --kubernetes-service-load-balancer-ip-range=${METALLB_IP_RANGE} \
     --ssh-public-key-file=${SSH_PUBLIC_KEY} \
-    --control-plane-replicas 1 \
+    --control-plane-replicas 3 \
     --control-plane-vcpus 2 \
-    --control-plane-cores-per-vcpu 6 \
-    --control-plane-memory 32 \
+    --control-plane-cores-per-vcpu 2 \
+    --control-plane-memory 16 \
     --worker-replicas 4 \
     --worker-vcpus 2 \
     --worker-cores-per-vcpu 4 \
