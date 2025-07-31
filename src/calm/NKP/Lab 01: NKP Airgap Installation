@@ -6,6 +6,11 @@ Deploy NKP Cluster Commander AirGap Method
     2. AOS = 6.10
     3. NKP = 2.13.2
 
+SingleNode-Cluster HPOC:
+* Note that IP Address range in HPOC Primary VLAN is —> x.x.x.129 - x.x.x.190
+* IPAM range    :   x.x.x.146-x.x.x.189 --> Need be modified to x.x.x.161-x.x.x.189 (please configure ip pool in default vlan in prism element)
+                                            ***************************************
+
 2. Shutdown autoad Vm —> Configure the VM:
 - increase and update autoad VM Core to 2 and increase memory to 16GB 
 - Power on the VM
