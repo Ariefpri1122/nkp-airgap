@@ -195,7 +195,7 @@ SingleNode-Cluster HPOC:
 # MetallB IP Range --> need at least consist of 10 IPs
 
 Example SingleNode Cluster:
-Endpoint		: 	x.x.x.139 --> Confirmed Check PING before use
+Endpoint		: 	x.x.x.160 --> Confirmed Check PING before use
 LB Range		:	x.x.x.140-x.x.x.150 --> Confirmed Check PING before use
 
 Example Multi-Node Cluster (Recommended using Secondary VLAN)
@@ -227,8 +227,8 @@ export AIRGAP_REGISTRY_USERNAME="admin"
 export AIRGAP_REGISTRY_PASSWORD="nutanix/4u"
 export NKP_CLUSTER_NAME="airgapped-hm-nkp-demo-2" # Important: same name with the cluster of NKP Ultimate and license key
 export SUBNET="primary-PHX-SPOC020-3"
-export CONTROLPLANE_VIP="10.38.20.139" # Confirmed Check PING before use
-export METALLB_IP_RANGE="10.38.20.140-10.38.20.160" 
+export CONTROLPLANE_VIP="10.38.20.160" # Confirmed Check PING before use
+export METALLB_IP_RANGE="10.38.20.140-10.38.20.159" 
 
     4. ssh to bastion from your laptop (or from AUTOAD VM) and execute command below:
 
