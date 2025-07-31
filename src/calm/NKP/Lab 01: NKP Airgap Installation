@@ -5,6 +5,7 @@ Deploy NKP Cluster Commander AirGap Method
     1. PC = pc.2024.3.1.4
     2. AOS = 6.10
     3. NKP = 2.13.2
+
 2. Shutdown autoad Vm —> Configure the VM:
 - increase and update autoad VM Core to 2 and increase memory to 16GB 
 - Power on the VM
@@ -182,9 +183,9 @@ Multi-Cluster HPOC:
 SingleNode-Cluster HPOC:
 * Note that IP Address range in HPOC Primary VLAN is —> x.x.x.129 - x.x.x.190
 * IPAM range    :   x.x.x.146-x.x.x.189 --> Need be modified to x.x.x.161-x.x.x.189 (please configure ip pool in default vlan in prism element)
+                                            ***************************************
 
-
-# End Point IP and MetalLB IP Range --> cannot be part of IPAM range and cannot be in the range which PC/PE/CVM/AHV in it.
+# End Point IP and MetalLB IP Range --> cannot be part of IPAM range and cannot be in the range which PC/PE/CVM/AHV/AD in it.
 # MetallB IP Range --> need at least consist of 10 IPs
 
 Example SingleNode Cluster:
@@ -244,8 +245,8 @@ echo METALLB_IP_RANGE:$METALLB_IP_RANGE
     5. If all variables printed well (make sure no space after “:” —> execute below command:
 
 Take a note on minimum requirement of Commander Cluster:
-- Control Plane  --> 3x VM with 4 vCPU + 16 GB Memory + 80 GB Disk (Can be only one for POC)
-- Worker Node    --> 4x VM with 8 vCPU + 32 GB Memory + 95 GB Disk (Must be & Mandatory to be 4 nodes but memory can be 16 for POC)
+- Control Plane  --> 3x VM with 4 vCPU + 16 GB Memory + 80 GB Disk (Must be 3 node for POC)
+- Worker Node    --> 4x VM with 8 vCPU + 32 GB Memory + 95 GB Disk (Must be & Mandatory to be 4 nodes but memory can be 24 for POC)
 
 nkp create cluster nutanix \
     --cluster-name=${NKP_CLUSTER_NAME} \
@@ -264,14 +265,14 @@ nkp create cluster nutanix \
     --registry-mirror-cacert=${AIRGAP_REGISTRY_CACERT} \
     --kubernetes-service-load-balancer-ip-range=${METALLB_IP_RANGE} \
     --ssh-public-key-file=${SSH_PUBLIC_KEY} \
-    --control-plane-replicas 1 \
-    --control-plane-vcpus 6 \
+    --control-plane-replicas 3 \
+    --control-plane-vcpus 2 \
     --control-plane-cores-per-vcpu 2 \
     --control-plane-memory 16 \
     --worker-replicas 4 \
     --worker-vcpus 4 \
     --worker-cores-per-vcpu 2 \
-    --worker-memory 16 \
+    --worker-memory 24 \
     --insecure \
     --self-managed \
     --airgapped
