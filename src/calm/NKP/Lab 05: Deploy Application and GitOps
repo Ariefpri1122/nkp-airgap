@@ -1,12 +1,12 @@
-From bastion VM create a simple nginx container application:
-------------------------------------------------------------
+From code-server (bastion VM) create a simple nginx container application:
+--------------------------------------------------------------------------
 mkdir workshop
 cd workshop
 mkdir arief
 cd arief
 
-vi Dockerfile
-from 10.38.13.140:5000/library/nginx
+vi Dockerfile #change ip address to your harbor registry ip address
+from 10.38.106.41:5000/proxy_cache/nginx 
 copy index.html /usr/share/nginx/html
 
 vi index.html
@@ -20,24 +20,37 @@ LANDING PAGE ..... Arief Pribadi
 </BODY>
 </HTML>
 
-docker login -u nutanix -p nx2Tech806! https://10.38.13.140:5000/ 
-docker build -f Dockerfile -t arief-nginx -->  If Failed, check endpoint healthy in harbor dashboard  
+export HARBOR_ADDRESS="$(kubectl -n kommander get kommandercluster host-cluster -o jsonpath='{.status.ingress.address}')"
+echo $HARBOR_ADDRESS 
+
+docker login -u nutanix -p nx2Tech974! https://$HARBOR_ADDRESS:5000/ #change ip address to your harbor registry ip address
+docker build -f Dockerfile -t arief-nginx . # -->  If Failed, check endpoint healthy in harbor dashboard  
 docker image ls 
-docker tag arief-nginx:latest 10.38.13.140:5000/library/arief-nginx:latest
+docker tag arief-nginx:latest $HARBOR_ADDRESS:5000/library/arief-nginx:latest
 docker image ls
-docker push 10.38.13.140:5000/library/arief-nginx
+docker push $HARBOR_ADDRESS:5000/library/arief-nginx
 from harbor dashboard examine Projects - library - repositories
 
-Create credential for harbor access:
+Create new Namespace and Create credential for harbor access:
+cd /home/nutanix
+
+kubectx --> make sure you use commander-cluster cluster context
+export HARBOR_ADDRESS="$(kubectl -n kommander get kommandercluster host-cluster -o jsonpath='{.status.ingress.address}')"
+echo $HARBOR_ADDRESS 
+
 kubectx --> make sure you use managed-cluster cluster context
+kubectl get ns
+kubectl create ns arief-nginx #use your name 
+
+kubens --> make sure you choose yourname-nginx namespace
+
 REGISTRY_USERNAME="nutanix"
-REGISTRY_PASSWORD="nx2Tech806!"
-NAMESPACE="arief-nkp-lmq7d-62fgk"
-kubectl create secret generic -n $NAMESPACE harbor-registry-credentials \
+REGISTRY_PASSWORD="nx2Tech974!" #change password to your cluster password
+
+kubectl create secret generic harbor-registry-credentials \
 --from-literal username=$REGISTRY_USERNAME \
 --from-literal password=$REGISTRY_PASSWORD \
---from-file=ca.crt=/etc/docker/certs.d/10.38.13.140:5000/ca.crt 
-
+--from-file=/etc/docker/certs.d/10.38.106.41:5000/ca.crt
 
 From Managed Cluster Kubernetes Dashboard:
 
@@ -45,7 +58,7 @@ Choose yourname namespace
 Create new resource - Create from Form
 
 Name              :  arief-nginx
-container image   :  10.38.13.140:5000/library/arief-nginx
+container image   :  10.38.106.41:5000/library/arief-nginx # change to your harbor registry ip address
 number of pods    :  1
 service           :  external
 port              :  80
@@ -338,11 +351,3 @@ add below config in line 95 (After dnspolicy):
         - name: harbor-registry-credentials
 
 Go to Services - frontend-external --> click the external end points IP Address (make sure application shown)
-
-
-
-
-
-
-
-
