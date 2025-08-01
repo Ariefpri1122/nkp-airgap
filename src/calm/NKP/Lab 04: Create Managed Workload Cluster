@@ -15,7 +15,7 @@ Take a note on minimum requirement of managed Cluster:
 From NKP Dashboard - Global - Workspaces:
 
 	1.	Global - Workspace - Create Workspace
-		⁃	Name			: arief-workspace
+		⁃	Name				: arief-workspace
 		⁃	Create
 	2.	Continue to workspace
 	⁃	Action - Add Cluster
@@ -24,8 +24,8 @@ From NKP Dashboard - Global - Workspaces:
 		⁃	SSH Public Key			:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEWT+eSeTQYYX7mIhQGghmSm418n9ANHLX9nZ//eGISr arief.pribadi@nutanix.com
 		⁃	Nutanix Prism Project		:	lab
 		⁃	Nutanix AOS Cluster		:	PHX-POC334
-		⁃	Subnet				:	primary-PHX-POC334
-		⁃	OS Image			:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
+		⁃	Subnet					:	primary-PHX-POC334
+		⁃	OS Image				:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
 		⁃	CP End Point IP			:	+1 IP from LAST COMMANDER LB RANGE --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.52)
 		⁃	CP Node Count			:	1
 		⁃	CPU Per Node (vCPU)		:	4
@@ -55,4 +55,8 @@ From NKP Dashboard - Global - Workspaces:
 	-	Create
 
 From NKP Dashboard - Your Workspace - CLusters - view details your cluster:
-	- Examine the Application tab --> Examine the deployments of applications its all enabled apps are deployed
+	- Generate Token (by clicking your username from the right top corner)
+	- Login using above username and password
+      		* Put the CA Certificate into your .kube directory --> Copy and Paste in code-server terminal (bastion)
+    		* These commands will update ~/.kube/config --> Copy and Paste in code-server terminal (bastion) 4x times
+        	* from code-server terminal --> kubectl get nodes
