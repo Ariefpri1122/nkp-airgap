@@ -1,3 +1,4 @@
+
 Deploy NKP Managed Cluster
 -------------------------- 
 
@@ -10,7 +11,7 @@ From BASTION vm execute this command --> echo "https://$(kubectl -n kommander ge
 
 Take a note on minimum requirement of managed Cluster:
 - Control Plane  --> 1x VM with 4 vCPU + 12 GB Memory + 80 GB Disk (development)
-- Worker Node    --> 4x VM with 8 vCPU + 12 GB Memory + 95 GB Disk    
+- Worker Node    --> 4x VM with 8 vCPU + 12 GB Memory + 95 GB Disk 
 
 From NKP Dashboard - Global - Workspaces:
 
@@ -56,6 +57,10 @@ From NKP Dashboard - Global - Workspaces:
 From NKP Dashboard - Your Workspace - CLusters - view details your cluster:
 	- Generate Token (by clicking your username from the right top corner)
 	- Login using above username and password
-      		* Put the CA Certificate into your .kube directory --> Copy and Paste in code-server terminal (bastion)
-    		* These commands will update ~/.kube/config --> Copy and Paste in code-server terminal (bastion) 4x times
-        	* from code-server terminal --> kubectl get nodes
+		* Put the CA Certificate into your .kube directory --> Copy and Paste in code-server terminal (bastion)
+		* These commands will update ~/.kube/config --> Copy and Paste in code-server terminal (bastion) 4x times
+		* from code-server terminal --> kubectl get nodes
+	- Modify your .kube\config 'context name' with more friendly name
+		* ex: name: objective_chaplygin-10.38.106.53 (Managed Cluster) --> for managed cluster
+		* ex: name: objective_chaplygin-10.38.106.41 (Kommander) --> for commander cluster
+	- use kubectx to switch between cluster-context
