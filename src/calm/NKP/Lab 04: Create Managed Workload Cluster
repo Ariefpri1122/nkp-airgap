@@ -20,7 +20,6 @@ From NKP Dashboard - Global - Workspaces:
 	2.	Continue to workspace
 	⁃	Action - Add Cluster
 		⁃	cluster name			:	arief-nkp
-		-	SSH Username			:	nutanix
 		⁃	SSH Public Key			:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEWT+eSeTQYYX7mIhQGghmSm418n9ANHLX9nZ//eGISr arief.pribadi@nutanix.com
 		⁃	Nutanix Prism Project		:	lab
 		⁃	Nutanix AOS Cluster		:	PHX-POC334
