@@ -43,22 +43,22 @@ Harbor Installation
 			* Click the Proxy Cache slider and then select your registry endpoint —>  Docker Hub-https://hub.docker.com
 			* Click OK
 
-	8.	Check docker login and docker push from BASTION VM
-		⁃	Get harbor address
-		⁃	export HARBOR_ADDRESS="$(kubectl -n kommander get kommandercluster host-cluster -o jsonpath='{.status.ingress.address}')"
-		⁃	echo $HARBOR_ADDRESS 
-		⁃	mkdir /etc/docker/certs.d/$HARBOR_ADDRESS:5000
-		⁃	cd /etc/docker/certs.d/$HARBOR_ADDRESS:5000
+	8.	Check docker login and docker push from Code-Server (BASTION VM)
+		⁃	Get harbor address (ex: 10.38.106.41:5000) :
+		        * export HARBOR_ADDRESS="$(kubectl -n kommander get kommandercluster host-cluster -o jsonpath='{.status.ingress.address}')"
+		        * echo $HARBOR_ADDRESS 
+        ⁃	sudo mkdir /etc/docker/certs.d/$HARBOR_ADDRESS:5000
 		-	kubectl get kommandercluster -n kommander host-cluster -o jsonpath='{.status.ingress.caBundle}' | base64 -d > ca.crt
 		⁃	cat ca.crt
+        -   sudo cp ca.crt /etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt
 		⁃	sudo systemctl restart docker
-		⁃	docker login -u nutanix -p nx2Tech806! https://10.38.13.140:5000/ —> must be “Login Succeeded”
-		⁃	docker pull 10.38.13.140:5000/proxy_cache/goharbor/harbor-core:dev
-		⁃	docker pull 10.38.13.140:5000/proxy_cache/hello-world:latest
-		⁃	docker image ls 
-		⁃	docker tag 10.38.13.140:5000/proxy_cache/hello-world 10.38.13.140:5000/library/hello-world
+        -   Please be aware to change the password with your cluster password !!!
+		⁃	docker login -u nutanix -p nx2Tech974! https://$HARBOR_ADDRESS:5000/ —> must be “Login Succeeded”
+		⁃	docker pull $HARBOR_ADDRESS:5000/proxy_cache/goharbor/harbor-core:dev
+		⁃	docker pull $HARBOR_ADDRESS:5000/proxy_cache/hello-world:latest
+		⁃	docker tag $HARBOR_ADDRESS:5000/proxy_cache/hello-world $HARBOR_ADDRESS:5000/library/hello-world
 		⁃	docker image ls
-		⁃	docker push 10.38.13.140:5000/library/hello-world
-        ⁃	from harbor dashboard examine
-        ⁃	Projects - proxy_cache - repositories
-        ⁃	Projects - library - repositories
+		⁃	docker push $HARBOR_ADDRESS:5000/library/hello-world
+        ⁃	from harbor dashboard examine:
+            * Projects - proxy_cache - repositories
+            * Projects - library - repositories
