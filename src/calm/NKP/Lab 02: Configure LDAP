@@ -60,6 +60,6 @@ From autoad VM - Administrative Tools - Active Directory User and Computers:
 			Save
 
 	7.	Test Single Sign-On using AD to NKP Dashboard
-	⁃	Logout existing NKP Dashboard 
+	⁃	Open new incognito windows - Access your NKP Dashboard (ex: https://10.38.106.41/dkp/kommander/dashboard) 
 	⁃	Login with your AD Domain
 	⁃	username: [yourname] and its-password
