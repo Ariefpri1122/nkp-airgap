@@ -52,6 +52,11 @@ Harbor Installation
 		⁃	cat ca.crt
         -   sudo cp ca.crt /etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt
 		⁃	sudo systemctl restart docker
+		-	sudo mkdir -p /etc/buildkit/certs.d/$HARBOR_ADDRESS:5000
+		-	sudo cp /etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt /etc/buildkit/certs.d/$HARBOR_ADDRESS:5000/ca.crt
+		- 	sudo systemctl restart buildkit
+
+		Test Login to Harbor:
         -   Please be aware to change the password with your cluster password !!!
 		⁃	docker login -u nutanix -p nx2Tech974! https://$HARBOR_ADDRESS:5000/ —> must be “Login Succeeded”
 		⁃	docker pull $HARBOR_ADDRESS:5000/proxy_cache/goharbor/harbor-core:dev
