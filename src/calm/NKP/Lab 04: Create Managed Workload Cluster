@@ -25,8 +25,8 @@ From NKP Dashboard - Global - Workspaces:
 		⁃	SSH Public Key			:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEWT+eSeTQYYX7mIhQGghmSm418n9ANHLX9nZ//eGISr arief.pribadi@nutanix.com
 		⁃	Nutanix Prism Project		:	lab
 		⁃	Nutanix AOS Cluster		:	PHX-POC334
-		⁃	Subnet					:	primary-PHX-POC334
-		⁃	OS Image				:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
+		⁃	Subnet				:	primary-PHX-POC334
+		⁃	OS Image			:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
 		⁃	CP End Point IP			:	+1 IP from LAST COMMANDER LB RANGE --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.52)
 		⁃	CP Node Count			:	1
 		⁃	CPU Per Node (vCPU)		:	4
