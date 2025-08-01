@@ -59,6 +59,6 @@ Harbor Installation
 		⁃	docker tag 10.38.13.140:5000/proxy_cache/hello-world 10.38.13.140:5000/library/hello-world
 		⁃	docker image ls
 		⁃	docker push 10.38.13.140:5000/library/hello-world
-	⁃	from harbor dashboard examine
-	⁃	Projects - proxy_cache - repositories
-	⁃	Projects - library - repositories
+        ⁃	from harbor dashboard examine
+        ⁃	Projects - proxy_cache - repositories
+        ⁃	Projects - library - repositories
