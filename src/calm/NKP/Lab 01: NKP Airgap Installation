@@ -345,6 +345,8 @@ Apply Ultimate License (if HPOC Deployment)
     1. From NKP Dashboard Global - Licensing - remove License
     2. Activate license key from no 17 above —> AEAAQ-AAA6Z-57CF6-C7CUH-AVRDV-TT8LD-P9ES2
 
+From NKP Dashboard - Management Cluster - Application tab --> Examine the deployments of applications
+
 Get trial license (if Real Customer POC)
     1. https://portal.nutanix.com/page/licensing
     2. export KUBECONFIG=./nkp-kommander.conf 
