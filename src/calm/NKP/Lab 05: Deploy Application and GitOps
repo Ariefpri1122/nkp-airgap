@@ -172,11 +172,15 @@ spec:
 
 Check mySQL Deployment:
   - Click the Persistent Volume Claims option on the sidebar menu to see the persistent volume created for MySQL --> status bound
+    * Copy the volume name (ex: pvc-85eef0b5-8f84-4231-8401-20eabe87d6c1)
   - Secret --> mysql-pass exist
   - Services --> wordpress-mysql exist
   - Deployment --> Status running
   - Using kubernetes dashboard - Pods - wordpress-mysql-xxx --> Click 3 button menu and click Exec
     * you are inside the mysql container --> ls /var/lib/mysql --> this is where the files stored in Nutanix CSI Storage
+  - From Prism Central - Infrastructure - Storage - Volume Groups
+    * search your volume name (ex: pvc-85eef0b5-8f84-4231-8401-20eabe87d6c1)
+    * this is your new create volume group mapped to your new PVC
 
 Wordpress Application:
 ----------------------
@@ -382,3 +386,83 @@ From NKP Dashboard - your workspace - Projects - your project - Continues Deploy
   - Click Resume --> This is necessary if you already fixed the problem in the source code
 
   but for our case (its deliberetly to be broken), we will make the status SUSPENDED
+
+
+OPTIONAL LAB (ONLY CAN BE DONE IF YOU HAVE NUTANIX FILES CONFIGURED IN YOUR CLUSTER)
+====================================================================================
+
+Create an NFS File Share
+------------------------
+- From your Prism Central (PC) dasbboard - Unified Storage - Files
+- Click your File Server (ex: labFS) - Share & Exports - Click New Share or Export
+  * Name                    : wordpress
+  * Size                    : 10 GB
+  * Primary Protocol Access : NFS
+  * General Settings        : Default (no change)
+  * Next
+  * NFS Protocol Access     : Default (no change)
+  * Next
+  * Create
+- Click your new wordpress share
+  * Copy the Mount Path (ex: labFS.ntnxlab.local:/wordpress)
+
+- From Code Proxy (bastion)
+  * sudo mkdir /mnt/nfs_wordpress
+  * sudo mount -t nfs labFS.ntnxlab.local:/wordpress /mnt/nfs_wordpress
+  * cd /mnt/nfs_wordpress
+
+Modify Wordpress Pods into 2 replicas with single PVC Claim
+-----------------------------------------------------------
+- From kubernetes dashboard - Your Name-nginx name space - Config and Storage 
+  * From - Storage Classes --> You will see only 1 named nutanix-volume
+  * From - Persistent Volume Claim --> You will see 2 PVC with ReadWriteOnce in nutanix-volume storage class
+  * Create new resource - create from input:
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nutanix-files
+provisioner: csi.nutanix.com
+parameters:
+  nfsServerName: labFS
+  nfsServer: labFS.ntnxlab.local
+  nfsPath: wordpress
+  storageType: NutanixFiles
+  squashType: root-squash
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wp-pv-claim-nfs
+  labels:
+    app: wordpress
+spec:
+  storageClassName: nutanix-files
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+
+- From kubernetes dashboard - Your Name-nginx name space
+  * From Config and Storage - Storage Classes --> You will see nutanix-files
+  * From Persistent Volume Claim --> wp-pv-claim-nfs with Read-Write-Many to nutanix files storage class
+  * From Cluster - Persistent Volume --> the PV-xxxxxx-xxxxxx (with storage class nutanix-files) has BOND status
+
+- From kubernetes dashboard - Your Name-nginx name space
+  * Modify wordpress deployment:
+    - Go to Volumes:
+        - name: wordpress-persistent-storage
+          persistentVolumeClaim:
+            claimName: wp-pv-claim --> replace 'wp-pv-claim' to 'wp-pv-claim-nfs'
+    - Go to spec:
+        - replicas: 1 --> change it into replicas: 2
+  * Go to Pods:
+    - you will see 2 new created PODS 
+      - Click 3 dot menu pod no #1 - click exec --> you are now in /var/www/html folder (this is the folder that using NFS CSI share), examine the files
+      - Click 3 dot menu pod no #2 - click exec --> you will see same files (use ls)
+  * Go to code-server (bastion)
+    - ls /mnt/nfs_wordpress --> you will see pvc folder created by CSI driver
+    - ls /mnt/nfs_wordpress/pvc-xxxxx --> you will see the same files as pod no #1 and no #2
