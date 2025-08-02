@@ -52,6 +52,9 @@ kubectl create secret generic harbor-registry-credentials \
 --from-literal password=$REGISTRY_PASSWORD \
 --from-file=/etc/docker/certs.d/10.38.106.41:5000/ca.crt
 
+*** DONT FORGET TO REPLACE YOUR HARBOR IP ADDRESS ABOVE BEFORE COPY PASTE ***
+
+
 From Managed Cluster Kubernetes Dashboard:
 
 Choose yourname namespace
@@ -66,6 +69,7 @@ target port       :  80
 Show advanced option
 image pull secret :  harbor-registry-credentials
 
+While waiting you can check from harbor dashboard Projects - Library - arief-nginx - Artifacts --> Check it last pull time and date
 Check deployment running
 Check Services created - click external endpoint --> the web application shown
 
@@ -77,8 +81,10 @@ Choose your project namespace from kubernetes dashboard
 
 Apply below manifest using Create New Resources - Create from input in kubernetes dashboard
 
-mySQL Application:
+*** MAKE SURE YOU CHANGE THE IMAGE URL IN DEPLOYMENT MANIFEST INTO YOUR HARBOR PROXY_CACHE URL ***
 
+mySQL Application:
+------------------
 apiVersion: v1
 kind: Secret
 metadata:
@@ -134,7 +140,7 @@ spec:
         tier: mysql
     spec:
       containers:
-        - image: 10.38.13.140:5000/proxy_cache/mysql:8.0
+        - image: 10.38.106.41:5000/proxy_cache/mysql:8.0    # Change the IP into your harbor proxy_cache URL
           name: mysql
           env:
             - name: MYSQL_ROOT_PASSWORD
@@ -164,10 +170,16 @@ spec:
       imagePullSecrets:
         - name: harbor-registry-credentials
 
-Click the Persistent Volume Claims option on the sidebar menu to see the persistent volume created for MySQL --> status bound
+Check mySQL Deployment:
+  - Click the Persistent Volume Claims option on the sidebar menu to see the persistent volume created for MySQL --> status bound
+  - Secret --> mysql-pass exist
+  - Services --> wordpress-mysql exist
+  - Deployment --> Status running
+  - Using kubernetes dashboard - Pods - wordpress-mysql-xxx --> Click 3 button menu and click Exec
+    * you are inside the mysql container --> ls /var/lib/mysql --> this is where the files stored in Nutanix CSI Storage
 
 Wordpress Application:
-
+----------------------
 apiVersion: v1
 kind: Service
 metadata:
@@ -216,7 +228,7 @@ spec:
         tier: frontend
     spec:
       containers:
-      - image: 10.38.13.140:5000/proxy_cache/wordpress:apache
+      - image: 10.38.106.41:5000/proxy_cache/wordpress:apache   # Change the IP into your harbor proxy_cache URL
         name: wordpress
         env:
         - name: WORDPRESS_DB_HOST
@@ -241,10 +253,37 @@ spec:
       imagePullSecrets:
         - name: harbor-registry-credentials
 
+
+Check WordPress Deployment:
+  - Click the Persistent Volume Claims option on the sidebar menu to see the persistent volume created for WordPress --> status bound
+  - Services --> wordpress-mysql exist
+  - Deployment --> Status running
+  - Using kubernetes dashboard - Pods - wordpress-mysql-xxx --> Click 3 button menu and click Exec
+    * you are inside the mysql container --> ls /var/lib/mysql --> you will find wordress database directory there
+    * ls /var/lib/mysql/wordpress/ --> to explore more the wordpress database files
+    * mysql -u wordpress -p 
+        - password: nutanix/4u
+    * show databases;
+    * use wordpress;
+    * show tables;
+
 Create Ingress to access wordpress:
+-----------------------------------
 
-From kubernetes dashboard - find "kommander-traefik" --> identify kommander-traefik services External End Point (Ex: 10.38.13.152)
+*** Take a note that mysql and wordpress services above is "Headless" means clusterIP: None (Cant be expose by NodePort or LoadBalancer) ***
 
+From kubernetes dashboard:
+  - Click service - ingress classes from left pane menu --> there is a traefik ingress available in the cluster
+  - Click service - ingresses --> you will see no ingresses in this namespace (yet)
+  - Switch to All-Namespace to find trafik end point IP:
+    * find "kommander-traefik" --> identify kommander-traefik services External End Point (Ex: 10.38.106.53)
+  - Switch back to yourname-namespace (ex: Arief-nginx)
+  - Click New Resources - Create from input and input below manifest
+
+*** MAKE SURE YOU SWITCH YOU NAMESPACE INTO YOURNAME NAMESPACE (EX: ARIEF-NGINX) ***
+
+Traefik Ingress Manifest
+------------------------
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -252,7 +291,7 @@ metadata:
 spec:
   ingressClassName: kommander-traefik
   rules:
-    - host: wordpress.arief.com
+    - host: wordpress.arief.com       # Change to yourname domain
       http:
         paths:
           - path: /
@@ -263,9 +302,10 @@ spec:
                 port:
                   number: 80
 
+Click service - ingresses --> make sure there is a wordpress ingress
 
---> From AUTOAD VM Add DNS A Host record of "wordpress" to kommander-traefik services External End Point (Ex: 10.38.13.152) in arief.com zone 
---> or add wordpress and its kommander-traefik services External End Point (Ex: 10.38.13.152) into your laptop host file
+--> From AUTOAD VM Add DNS A Host record of "wordpress" to kommander-traefik services External End Point (Ex: 10.38.106.53) in arief.com zone 
+--> or add wordpress and its kommander-traefik services External End Point (Ex: 10.38.106.53) into your laptop host file
 
 ** Check wordpress application https://wordpress.arief.com
 
@@ -274,7 +314,7 @@ Deploy Application using GitOps Deployment
 ------------------------------------------
 From NKP Manage-Cluster Dasboard - Projects - Create Project
 Name              :  arief-project
-Select Managed-Cluster
+Select Your Managed-Cluster
 Create - Continue to project
 Go to Continues Deployment (CD) Tab - Add GitOps Source
 Name              :  online-boutique
@@ -285,69 +325,60 @@ Path              :  ./release/without-istio
 Git Secret        :  none
 Save
 
-From Kubernetes Dashboard  -->  Check Deployment, make sure deployment success (Please be aware that creating new project will create new namespace)
+From Kubernetes Dashboard  -->  Check Deployment, make sure deployment success (Please be aware that creating new project will create new namespace based on your project name)
 
-If redis-cart error (this is happened because the image still in docker hub, while other deployment's image use gcp artifact with no auth and limit -- while docker hub has maximum limit):
+Troubleshooting redis card pod:
+-------------------------------
 
-docker pull 10.38.13.140:5000/proxy_cache/redis:alpine
-docker tag 10.38.13.140:5000/proxy_cache/redis:alpine 10.38.13.140:5000/library/redis:alpine
-docker push 10.38.13.140:5000/library/redis:alpine
+This error is by desigend.
+  - redis-cart error (this is happened because the image is in docker hub, while other deployment's image use gcp artifact with no auth and limit -- while docker hub has maximum limit):
 
-copy harbor-registry-credentials manifest in arief-ngix namespace using kubernetes dashboard:
+From Code-Server (Bastion VM):
+  - kubectx --> choose commander context
+  
+    export HARBOR_ADDRESS="$(kubectl -n kommander get kommandercluster host-cluster -o jsonpath='{.status.ingress.address}')"
+    echo $HARBOR_ADDRESS
 
-apiVersion: v1
-data:
-  ca.crt: >-
-    LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJiakNDQVJXZ0F3SUJBZ0lSQU1KaTN0QnRTbjRPZFNOY3dVbkdad013Q2dZSUtvWkl6ajBFQXdJd0Z6RVYKTUJNR0ExVUVBeE1NYTI5dGJXRnVaR1Z5TFdOaE1CNFhEVEkxTURjeU9USXlNVE14T0ZvWERUTTFNRGN5TnpJeQpNVE14T0Zvd0Z6RVZNQk1HQTFVRUF4TU1hMjl0YldGdVpHVnlMV05oTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJCnpqMERBUWNEUWdBRUpZUklyc3JQQWVtZWZhQWI3WkNMMDJqNFArRm12MXFWa0gyVTU1TW5FKzFyNm5qTXFyZHkKeGdIOGV2Q1MybXJzNzVFTzB3TVdVWDdHMlMwMTJKQmFHYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4RwpBMVVkRXdFQi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZQbm5RaHBLZ0RoZ0lIeCtTYjJPdkVXY1V4eHBNQW9HCkNDcUdTTTQ5QkFNQ0EwY0FNRVFDSUF1SXc0anVJRHMySkdjalh2K3c1V3ZUZEQyT002ZnZiVTN1enhXQisrdUkKQWlCZDNzUlZ4OUwzakxvaG9IUjM0THFRMTFEcW5CWjFQTlhnbkhYRTk1UmxMUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
-  password: bngyVGVjaDgwNiE=
-  username: bnV0YW5peA==
-kind: Secret
-metadata:
-  creationTimestamp: '2025-07-30T00:22:06Z'
-  managedFields:
-    - apiVersion: v1
-      fieldsType: FieldsV1
-      fieldsV1:
-        f:data:
-          .: {}
-          f:ca.crt: {}
-          f:password: {}
-          f:username: {}
-        f:type: {}
-      manager: kubectl-create
-      operation: Update
-      time: '2025-07-30T00:22:06Z'
-  name: harbor-registry-credentials
-  namespace: arief-nkp-lmq7d-62fgk
-  resourceVersion: '37363'
-  uid: df8554bc-dec7-44eb-b3b6-164639471b89
-type: Opaque
+Create harbor-registry-credentials manifest in new project namespace:
+---------------------------------------------------------------------
 
---> Delete Line 89-102
---> Change namespace name to your project namespace (line 104)
---> Delete Line 105-106
+kubens --> make sure you choose your new project namespace
 
-It should be like this:
+cat /etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt --> make sure the file exist
 
-apiVersion: v1
-data:
-  ca.crt: >-
-    LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUJiakNDQVJXZ0F3SUJBZ0lSQU1KaTN0QnRTbjRPZFNOY3dVbkdad013Q2dZSUtvWkl6ajBFQXdJd0Z6RVYKTUJNR0ExVUVBeE1NYTI5dGJXRnVaR1Z5TFdOaE1CNFhEVEkxTURjeU9USXlNVE14T0ZvWERUTTFNRGN5TnpJeQpNVE14T0Zvd0Z6RVZNQk1HQTFVRUF4TU1hMjl0YldGdVpHVnlMV05oTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJCnpqMERBUWNEUWdBRUpZUklyc3JQQWVtZWZhQWI3WkNMMDJqNFArRm12MXFWa0gyVTU1TW5FKzFyNm5qTXFyZHkKeGdIOGV2Q1MybXJzNzVFTzB3TVdVWDdHMlMwMTJKQmFHYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4RwpBMVVkRXdFQi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZQbm5RaHBLZ0RoZ0lIeCtTYjJPdkVXY1V4eHBNQW9HCkNDcUdTTTQ5QkFNQ0EwY0FNRVFDSUF1SXc0anVJRHMySkdjalh2K3c1V3ZUZEQyT002ZnZiVTN1enhXQisrdUkKQWlCZDNzUlZ4OUwzakxvaG9IUjM0THFRMTFEcW5CWjFQTlhnbkhYRTk1UmxMUT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
-  password: bngyVGVjaDgwNiE=
-  username: bnV0YW5peA==
-kind: Secret
-metadata:
-  name: harbor-registry-credentials
-  namespace: arief-project-p284h
-type: Opaque
+REGISTRY_USERNAME="nutanix"
+REGISTRY_PASSWORD="nx2Tech974!" #change password to your cluster password
 
---> copy modified manifest above and create new resource from kubernetes dashboard --> Create from input and paste the manifest above then click UPLOAD
+kubectl create secret generic harbor-registry-credentials \
+--from-literal username=$REGISTRY_USERNAME \
+--from-literal password=$REGISTRY_PASSWORD \
+--from-file=/etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt
 
-Modify RedisCart Deployment:
+kubectl get secrets --> "harbor-registry-credentials" secret created
 
-change the image location (line 155) to --> 10.38.13.140:5000/library/redis:alpine
-add below config in line 95 (After dnspolicy):
+Modify RedisCart Deployment to fix the problem:
+-----------------------------------------------
+From NKP Dashboard - your workspace - Projects - your project - Continues Deployment (CD) :
+  - Click 3 button menu from online-boutique GitOps Source
+  - Click Suspend
+
+From Kubernetes Dashboard:
+  - Modify Redist-Card Reployment:
+      * change the image location to --> image: 10.38.106.41:5000/proxy_cache/redis:alpine #Change the IP Address to your harbor IP
+
+add below config (After dnspolicy): *** MAKE SURE imagePullSecrets IN THE SAME INDENT WITH dnspolicy ***
       imagePullSecrets:
         - name: harbor-registry-credentials
 
+Click Update Button
+
+* Make sure deployment Running
+* For curousity open your harbor dashboard - Projects - proxy_cache ---> there is redis there in the repo with 1 pull
+
 Go to Services - frontend-external --> click the external end points IP Address (make sure application shown)
+
+From NKP Dashboard - your workspace - Projects - your project - Continues Deployment (CD) :
+  - Click 3 button menu from online-boutique GitOps Source
+  - Click Resume --> This is necessary if you already fixed the problem in the source code
+
+  but for our case (its deliberetly to be broken), we will make the status SUSPENDED
