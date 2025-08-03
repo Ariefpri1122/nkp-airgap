@@ -388,7 +388,7 @@ From NKP Dashboard - your workspace - Projects - your project - Continues Deploy
   but for our case (its deliberetly to be broken), we will make the status SUSPENDED
 
 
-OPTIONAL LAB (ONLY CAN BE DONE IF YOU HAVE NUTANIX FILES CONFIGURED IN YOUR CLUSTER)
+OPTIONAL LAB #1 (ONLY CAN BE DONE IF YOU HAVE NUTANIX FILES CONFIGURED IN YOUR CLUSTER)
 ====================================================================================
 
 Create an NFS File Share
@@ -466,3 +466,328 @@ spec:
   * Go to code-server (bastion)
     - ls /mnt/nfs_wordpress --> you will see pvc folder created by CSI driver
     - ls /mnt/nfs_wordpress/pvc-xxxxx --> you will see the same files as pod no #1 and no #2
+
+
+OPTIONAL LAB #2 (ONLY CAN BE DONE IF YOU HAVE NUTANIX OBJECT CONFIGURED IN YOUR CLUSTER)
+========================================================================================
+
+Make sure you have Object Store Configured
+------------------------------------------
+- From your Prism Central (PC) dasbboard - Unified Storage - Object - Object Stores (Ex: ntnxlab)
+- Click your Object Store (ex: ntnxlab) - Summary 
+  * Public IPs  : take a note on this IP (ex: 10.38.106.8)
+- From the left pane meu - click Access Keys
+  * Click Add People
+  * Search people or group : Administrator@ntnxlab.local - Click Next
+  * Click Generate Key - Download Key
+
+    - Username          : administrator
+    - Access Key        : G-v-kw8T3sMqQlEDL_C0-lWNLqpGAY7D
+    - Secret Key        : UAAnP7XXRp2AWRDnNg8c3KPQYpc_W8zs
+    - Display Name      : Administrator
+    - Tag               : buckets-access-key-fSbNGuEhRqXcndXexVUQwBnT
+
+Install Nutanix COSI Driver in workspace
+------------------------------------------
+- From your NKP Dashboard - Your Workspace - Clusters - Your Managed-Cluster - Application Tab
+  * Change category to General
+  * Click 3 doted menu of COSI Driver for Nutanix - Enable:
+    - Prism Central Endpoint          :   Your PC IP Address (ex: https://10.38.106.7:9440)
+    - Prism Central Username          :   admin
+    - Prism Central Password          :   Your HPOC cluster password (ex: nx2Tech974!)
+    - Nutanix Object Storage Endpoint :   Your Object Public IP Above (ex: http://10.38.106.8) 
+    - Nutanix Object Access Key       :   Your Access Key Above (ex: G-v-kw8T3sMqQlEDL_C0-lWNLqpGAY7D)
+    - Nutanix Object Secret Key       :   Your Secret Key Above (ex: UAAnP7XXRp2AWRDnNg8c3KPQYpc_W8zs)
+    - Save
+    - Wait until Nutanix COSI Driver "Deployed" not "Enable"
+
+Check Nutanix COSI Driver Components:
+-------------------------------------
+- From your Code-Server (Bastion VM):
+  * kubectl get pods -n container-object-storage-system (ex:container-object-storage-controller-6f7856b456-468xm running status )
+  * kubectl get secrets cosi-driver-nutanix -n arief-workspace-f568l-hlfzt  (change to your namepace)
+  * kubectl get crd | grep objectstorage.k8s.io
+        bucketclasses.objectstorage.k8s.io                         2025-08-01T23:21:52Z
+        bucketclaims.objectstorage.k8s.io                          2025-08-01T23:21:51Z
+        bucketaccessclasses.objectstorage.k8s.io                   2025-08-01T23:21:51Z
+        bucketaccesses.objectstorage.k8s.io                        2025-08-01T23:21:51Z
+        buckets.objectstorage.k8s.io                               2025-08-01T23:21:52Z
+
+Membuat Bucket di Object Storage Melalui Yaml:
+----------------------------------------------
+- From your kubernetes dashboard - your name namespace - nginx (ex: arief-nginx)
+  * Create new resource - create from input:
+
+apiVersion: objectstorage.k8s.io/v1alpha1
+kind: BucketClass
+metadata:
+  name: cosi-bucketclass
+driverName: ntnx.objectstorage.k8s.io
+deletionPolicy: Delete
+parameters:
+  provisioner_data: "test_data"
+
+   * Create new resource - create from input:
+
+apiVersion: objectstorage.k8s.io/v1alpha1
+kind: BucketClaim
+metadata:
+  name: cosi-bucketclaim
+spec:
+  bucketClassName: cosi-bucketclass
+  protocols:
+    - s3
+
+  *** Check your bucket has been created ***
+        - From Code-Server (Bastion VM):
+          * kubectl -n arief-nginx get bucketclaim  --> bucket shown
+            Ex: 
+            
+            NAME               AGE
+            cosi-bucketclaim   4h58m
+
+        - From your Prism Central (PC) dasbboard - Unified Storage - Object - Object Stores (Ex: ntnxlab)
+        - Click your Object Store (ex: ntnxlab) - Buckets
+          * You will find new bucket create named cosi-bucketclassxxxxxx
+          * Click "Launch Objects Browser"
+          * input your Access and Secret Keys and Login
+          * You will see your bucket has been created
+          * Click your cosi-bucketclass3f1a3aef-f215-4b47-afa3-bbf68dbaf70e --> you will see "no objects yet"
+
+   * Create new resource - create from input:
+
+apiVersion: objectstorage.k8s.io/v1alpha1
+kind: BucketAccessClass
+metadata:
+  name: cosi-bucketaccessclass
+driverName: ntnx.objectstorage.k8s.io
+authenticationType: KEY
+parameters:
+  provisioner_data: "test_data"
+
+   * Create new resource - create from input:
+
+apiVersion: objectstorage.k8s.io/v1alpha1
+kind: BucketAccess
+metadata:
+  name: cosi-bucketaccess
+spec:
+  bucketClaimName: cosi-bucketclaim
+  protocol: s3
+  bucketAccessClassName: cosi-bucketaccessclass
+  credentialsSecretName: bucketcreds
+
+  *** From your kubernetes dashboard - Go to Config and Storage - Secret --> you will find "bucketcreds" secret created ***
+      - From Code-Server (Bastion VM):
+        * kubectl -n arief-nginx get secret bucketcreds -o jsonpath='{.data.BucketInfo}' | base64 -d | jq
+          Ex:
+                    {
+                      "metadata": {
+                        "name": "bc-63df068d-8510-44cf-9a01-7f0d1e4d4018",
+                        "creationTimestamp": null
+                      },
+                      "spec": {
+                        "bucketName": "cosi-bucketclassf5e2b599-7b6f-43cd-935f-612265cdf0a8",
+                        "authenticationType": "KEY",
+                        "secretS3": {
+                          "endpoint": "http://10.38.106.8:80",
+                          "region": "us-east-1",
+                          "accessKeyID": "B-pTgRe-FbhPmqm850IcCG8Qq7G6CMmV",
+                          "accessSecretKey": "8v98uSISYb6jN-PhVbh95xLBHT-uUwc5"
+                        },
+                        "secretAzure": null,
+                        "protocols": [
+                          "s3"
+                        ]
+                      }
+                    }
+
+  *** Run this procedure from AUTOAD VM ***
+      - From your Prism Central (PC) dasbboard - Unified Storage - Object - Object Stores (Ex: ntnxlab)
+        - Click your Object Store (ex: ntnxlab) - Summary 
+        - From the left pane meu - click Access Keys
+            * You will find new access key created by cosi-driver named your-workspace-xxxxx 
+                * you will see sames access key as secret in bucketcreds above:
+                  Ex: Access Key : _4L2QdjWzth2o4wOj3fNslnJP9Z4FGEw
+        - From the left pane menu - click Object Stores - click ntnxlab object store - buckets tab
+            * Click Launch Objects Browser
+                - Access Key      : AccessKeyID stated above (ex: _4L2QdjWzth2o4wOj3fNslnJP9Z4FGEw )
+                - AccessSecretKey : AccessSecretKey stated above (ex: O7U-qMMWlFvti8T8_5ftqALeB9tbim25 )
+                - Login
+                - Click cosi-bucketclassxxxxx
+                - Upload Objects Select Files
+                - Choose nexus-3.82.0-08-linux-x86_64.tar.gz from c:\inetpub\wwwroot
+                - Until status uploaded
+                - Click Close
+            * Take note on the bucket name (ex: cosi-bucketclass86f97cef-df9f-4eae-97de-459cdbf01781)
+
+Try COSI Driver from POD
+-------------------------
+- From your kubernetes dashboard - your name namespace - nginx (ex: arief-nginx)
+  * Create new resource - create from input:
+
+
+*** THIS PROCEDURE WILL CREATE A ROLE AND ROLEBINDING TO DEFAULT SERVICE ACCOUNT SO IT CAN READ SECRETS ***
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: secret-reader
+  namespace: arief-nginx
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: secret-reader-binding
+  namespace: arief-nginx
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: arief-nginx
+roleRef:
+  kind: Role
+  name: secret-reader
+  apiGroup: rbac.authorization.k8s.io
+
+
+*** THIS PROCEDURE WILL CREATE A POD WITH INITCONTAINER (FOR EXTRACTING BUCKETCREDS TO FILE AWS-CRED.SH) AND MAIN CONTAINER (FOR WRITE TILE TO BUCKET) ***
+
+  * Create new resource - create from input: *** PUT YOUR BUCKET INFORMATION BELOW ***
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: s3-client
+  namespace: arief-nginx
+spec:
+  volumes:
+    - name: env-volume
+      emptyDir: {}
+
+  initContainers:
+    - name: init-decode-secret
+      image: 10.38.106.41:5000/proxy_cache/bitnami/kubectl:latest
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Getting secret and decoding..."
+          SECRET=$(kubectl get secret bucketcreds -n arief-nginx -o jsonpath='{.data.BucketInfo}' | base64 -d)
+          echo "Exporting to env file..."
+          echo "export AWS_ACCESS_KEY_ID=$(echo $SECRET | jq -r '.spec.secretS3.accessKeyID')" > /env/aws-creds.sh
+          echo "export AWS_SECRET_ACCESS_KEY=$(echo $SECRET | jq -r '.spec.secretS3.accessSecretKey')" >> /env/aws-creds.sh
+          echo "export AWS_REGION=$(echo $SECRET | jq -r '.spec.secretS3.region')" >> /env/aws-creds.sh
+          echo "export AWS_ENDPOINT=$(echo $SECRET | jq -r '.spec.secretS3.endpoint')" >> /env/aws-creds.sh
+          cat /env/aws-creds.sh
+      volumeMounts:
+        - name: env-volume
+          mountPath: /env
+  imagePullSecrets:
+  - name: harbor-registry-credentials
+
+  containers:
+    - name: main
+      image: 10.38.106.41:5000/proxy_cache/amazon/aws-cli
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Starting main container..."
+          source /env/aws-creds.sh
+
+          # wait until bucket exists
+          export BUCKET_NAME=cosi-bucketclass86f97cef-df9f-4eae-97de-459cdbf01781 # PUT YOUR BUCKET NAME HERE  
+          echo "BUCKET_NAME=cosi-bucketclass86f97cef-df9f-4eae-97de-459cdbf01781" >> /env/aws-creds.sh # PUT YOUR BUCKET NAME HERE 
+          source /env/aws-creds.sh
+          echo "Waiting for bucket $BUCKET_NAME to be available..."
+          while ! aws --endpoint-url=$AWS_ENDPOINT s3 ls s3://$BUCKET_NAME/ >/dev/null 2>&1; do
+            echo "Bucket not ready yet... retrying in 5 seconds"
+            sleep 5
+          done
+          echo "Bucket is now available."
+
+          echo 'File ini dibuat oleh pod melalui cosi driver' > pod-created-file.txt
+          echo 'Uploading file to bucket...'
+          aws --endpoint-url=$AWS_ENDPOINT s3 cp pod-created-file.txt s3://$BUCKET_NAME/
+          echo "Listing S3 bucket using AWS CLI..."
+          aws --endpoint-url=$AWS_ENDPOINT s3 ls
+          echo "Listing Files Inside the Bucket ..."
+          aws --endpoint-url=$AWS_ENDPOINT s3 ls s3://$BUCKET_NAME/
+          sleep 3600
+      volumeMounts:
+        - name: env-volume
+          mountPath: /env
+  imagePullSecrets:
+  - name: harbor-registry-credentials
+
+*** CHECK BUCKET ACCESS FROM INSIDE THE CONTAINER ***
+
+  - Go to Pods on the left pane menu in your kubernetes dashboard
+    * You will find s3-client PODS created. (wait until it status is RUNNING)
+    * Click 3 dot menu on the pod and click logs --> examine the init pods and main pod logs
+        ** In Init pod Logs --> You will see extracted bucketcreds secret
+        ** In Main Pod Logs --> You will see you will see file uploaded and list of existing files (including file you have uploaded) in the bucket
+
+  - From your Prism Central (PC) dasbboard - Unified Storage - Object - Object Stores (Ex: ntnxlab)
+      - Click your Object Store (ex: ntnxlab) - Buckets
+          * You will find new bucket create named cosi-bucketclassxxxxxx
+          * Click "Launch Objects Browser"
+          * input your Access and Secret Keys and Login
+          * Click your cosi-bucketclass3f1a3aef-f215-4b47-afa3-bbf68dbaf70e
+          * You will find new file "pod-created-file.txt" created by the script from main container using cosi-driver
+
+*** IF YOU NEED TO RECREATE THE WHOLE COSI LABS - PLEASE CLEAN THE MANIFEST USING BELOW SCRIPTS ***
+
+From Code-Server (Bastion VM)
+-----------------------------
+
+kubens # Choose your name-nginx namespace
+*** list ***
+kubectl get roles secret-reader
+kubectl get RoleBinding secret-reader-binding
+kubectl get bucketclass cosi-bucketclass
+kubectl get bucketclaim cosi-bucketclaim
+kubectl get bucketaccessclass cosi-bucketaccessclass
+kubectl get bucketaccess cosi-bucketaccess
+kubectl get secret bucketcreds
+kubectl get bucket
+kubectl get pods s3-client
+
+*** Delete ***
+kubectl get bucket --> Take note of the bucket name (Ex: cosi-bucketclass86f97cef-df9f-4eae-97de-459cdbf01781)
+kubectl patch bucket cosi-bucketclass86f97cef-df9f-4eae-97de-459cdbf01781 -p '{"metadata":{"finalizers":[]}}' --type=merge
+kubectl delete bucket cosi-bucketclass86f97cef-df9f-4eae-97de-459cdbf01781 
+
+  - From your Prism Central (PC) dasbboard - Unified Storage - Object - Object Stores (Ex: ntnxlab)
+      - Click your Object Store (ex: ntnxlab) - Buckets
+          * Select your bucket (ex: cosi-bucketclass86f97cef-df9f-4eae-97de-459cdbf01781)
+          * Action - Delete
+          * OK
+
+kubectl delete roles secret-reader 
+kubectl delete RoleBinding secret-reader-binding
+kubectl patch bucketclass cosi-bucketclass -p '{"metadata":{"finalizers":[]}}' --type=merge
+kubectl delete bucketclass cosi-bucketclass
+kubectl patch bucketclaim cosi-bucketclaim -p '{"metadata":{"finalizers":[]}}' --type=merge
+kubectl delete bucketclaim cosi-bucketclaim
+kubectl patch bucketaccessclass cosi-bucketaccessclass -p '{"metadata":{"finalizers":[]}}' --type=merge
+kubectl delete bucketaccessclass cosi-bucketaccessclass
+kubectl patch bucketaccess cosi-bucketaccess -p '{"metadata":{"finalizers":[]}}' --type=merge
+kubectl delete bucketaccess cosi-bucketaccess
+kubectl patch secret bucketcreds -p '{"metadata":{"finalizers":[]}}' --type=merge
+kubectl delete secret bucketcreds
+kubectl delete pods s3-client --force
+
+You can now re-start the COSI lab procedures.
+
+
+
+
+
+
