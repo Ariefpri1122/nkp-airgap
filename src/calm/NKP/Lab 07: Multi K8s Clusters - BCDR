@@ -10,7 +10,7 @@ Secondary IPAM              :   x.x.x.161-253
 
 Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
     -   Click Add Cluster - Create Cluster
-        -   Cluster Name            			:   yourname-nkp-drc (Ex: arief-nkp-drc)
+        -   Cluster Name            			:   	yourname-nkp-drc (Ex: arief-nkp-drc)
         ⁃	SSH Public Key				:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEWT+eSeTQYYX7mIhQGghmSm418n9ANHLX9nZ//eGISr arief.pribadi@nutanix.com
 		⁃	Nutanix Prism Project		:	lab
 		⁃	Nutanix AOS Cluster		:	PHX-POC334
