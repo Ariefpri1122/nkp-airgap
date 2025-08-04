@@ -10,21 +10,21 @@ Secondary IPAM              :   x.x.x.161-253
 
 Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
     -   Click Add Cluster - Create Cluster
-        -   Cluster Name            :   yourname-nkp-drc (Ex: arief-nkp-drc)
-        ⁃	SSH Public Key			:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEWT+eSeTQYYX7mIhQGghmSm418n9ANHLX9nZ//eGISr arief.pribadi@nutanix.com
-		⁃	Nutanix Prism Project	:	lab
+        -   Cluster Name            			:   yourname-nkp-drc (Ex: arief-nkp-drc)
+        ⁃	SSH Public Key				:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEWT+eSeTQYYX7mIhQGghmSm418n9ANHLX9nZ//eGISr arief.pribadi@nutanix.com
+		⁃	Nutanix Prism Project		:	lab
 		⁃	Nutanix AOS Cluster		:	PHX-POC334
-		⁃	Subnet					:	aux-1 --> Your secondary Subnet
-		⁃	OS Image				:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
+		⁃	Subnet				:	aux-1 --> Your secondary Subnet
+		⁃	OS Image			:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
 		⁃	CP End Point IP			:	1st IP from secondary vlan (132) --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.132)
 		⁃	CP Node Count			:	1
 		⁃	CPU Per Node (vCPU)		:	4
 		⁃	Memory Per Node			:	12
 		⁃	Disk Size Per Node		:	80
-		⁃	Nutanix Prism Project	:	lab
-        ⁃	Nutanix AOS Cluster		:	PHX-POC334
-		⁃	Subnet					:	aux-1 --> Your secondary Subnet
-		⁃	OS Image				:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
+		⁃	Nutanix Prism Project		:	lab
+        ⁃	Nutanix AOS Cluster			:	PHX-POC334
+		⁃	Subnet				:	aux-1 --> Your secondary Subnet
+		⁃	OS Image			:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
 		⁃	Worker Node Count		:	4
 		-	CPU Per Node (vCPU)		:	8
 		⁃	Memory Per Node			:	12
@@ -33,8 +33,8 @@ Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
 
         *** PAY ATTENTION TO BELOW CONFIGURATION ***
 
-        -   Pod Network             :   192.168.0.1/16  (NOT --> 192.168.0.0/16)
-        -   Service Network         :   10.96.0.1/12    (NOT --> 10.96.0.0/12)
+        -   Pod Network             :   192.168.1.0/16  (NOT --> 192.168.0.0/16)
+        -   Service Network         :   10.96.1.0/12    (NOT --> 10.96.0.0/12)
 
 
 		⁃	Load Balancing Start	:	x.x.x.140)--> (by default secondary vlan is free) (ex: 10.38.106.140)
