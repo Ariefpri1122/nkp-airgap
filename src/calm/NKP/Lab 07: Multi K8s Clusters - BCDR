@@ -37,18 +37,18 @@ Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
         -   Service Network         :   10.96.1.0/12    (NOT --> 10.96.0.0/12)
 
 
-		⁃	Load Balancing Start	:	x.x.x.140)--> (by default secondary vlan is free) (ex: 10.38.106.140)
-		⁃	Load Balancing End		:	x.x.x.150 --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.150)
+		⁃	Load Balancing Start			:	x.x.x.140)--> (by default secondary vlan is free) (ex: 10.38.106.140)
+		⁃	Load Balancing End			:	x.x.x.150 --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.150)
 		⁃	Image Registry Mirror	
-			⁃	URL					:	https://airgap.arief.com:5000
+			⁃	URL				:	https://airgap.arief.com:5000
 			⁃	username			:	admin
 			⁃	password			:	nutanix/4u
-			⁃	CA					:	downloaded cert.crt
+			⁃	CA				:	downloaded cert.crt
 		⁃	Private Registry	
-			⁃	URL					:	https://10.38.13.140:5000	# Your harbor URL Access as noted above
+			⁃	URL				:	https://10.38.13.140:5000	# Your harbor URL Access as noted above
 			⁃	username			:	nutanix
 			⁃	password			:	nx2Tech974!
-			⁃	CA					:	downloaded ca.cert
+			⁃	CA				:	downloaded ca.cert
 	-	Create
 
 Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
