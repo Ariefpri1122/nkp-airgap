@@ -8,7 +8,7 @@ Secondary IPAM              :   x.x.x.161-253
 
 Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
     -   Click Add Cluster - Create Cluster
-        -   Cluster Name            			:   yourname-nkp-drc (Ex: arief-nkp-drc)
+        -   Cluster Name            :   yourname-nkp-drc (Ex: arief-nkp-drc)
         ⁃	SSH Public Key				:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBM2C9FLMlL6xXcMRZt6Yjf1cgadN/1S6M8V3M6OQDbD arief.pribadi@nutanix.com # Check cat .ssh/id_ed25519.pub in bastion VM
 		⁃	Nutanix Prism Project		:	lab
 		⁃	Nutanix AOS Cluster		:	PHX-POC334
@@ -43,7 +43,7 @@ Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
 			⁃	password		:	nutanix/4u
 			⁃	CA			:	downloaded cert.crt
 		⁃	Private Registry	
-			⁃	URL			:	https://10.38.13.140:5000	# Your harbor URL Access as noted above
+			⁃	URL			:	https://10.38.106.41:5000	# Your harbor URL Access as noted above
 			⁃	username		:	nutanix
 			⁃	password		:	nx2Tech974!
 			⁃	CA			:	downloaded ca.cert
@@ -178,7 +178,7 @@ output  ex: nothing --> no files yet
 
 6.  From code-server (bastion vm)
 
-*** Create Secret to Store Bucket Credential***
+*** Create Secret to Store Bucket Credential in Managed-Cluster DC Namespace ***
 
 kubectx --> choose your 1st managed cluster (dc) cluster
 
@@ -211,7 +211,7 @@ Ex:
 aws_access_key_id=kzj-yB1gXXG1h0_57-15JGVQx4pd29Mo
 aws_secret_access_key=ytexinDnjN2kK1TGvNMWH4Al2ykmo6VV
 
-*** Create ConfigMap to Create backupStorageLocation (BSL) of Velero ***
+*** Create ConfigMap to Create backupStorageLocation (BSL) of Velero in Managed-Cluster DC Namespace ***
 
 kubectx --> choose your 1st managed cluster (dc) cluster
 
@@ -230,7 +230,7 @@ kubectl get backupstoragelocations -n ${WORKSPACE_NAMESPACE} -oyaml # --> to tro
 
 7.  Backup Process
 
-*** Test backup ***
+*** Test backup in Managed-Cluster DC Namespace ***
 
 velero backup create nutanix-velero-testbackup -n ${WORKSPACE_NAMESPACE} --storage-location ntnx-object-nkp --snapshot-volumes=false
 velero backup describe nutanix-velero-testbackup -n ${WORKSPACE_NAMESPACE}
@@ -250,9 +250,9 @@ Check Bucket from Prism Central:
           * You will see all arficact backup
 
 
-*** Backup Production yourname-nginx namespace ***
+*** Backup Production yourname-nginx namespace in Managed-Cluster DC ***
 
-velero backup create arief-nginx-backup -n ${WORKSPACE_NAMESPACE} --storage-location ntnx-object-nkp --snapshot-volumes=false --include-namespaces arief-nginx
+velero backup create arief-nginx-backup -n ${WORKSPACE_NAMESPACE} --storage-location ntnx-object-nkp --snapshot-volumes=true --include-namespaces arief-nginx
 
 velero backup describe arief-nginx-backup -n ${WORKSPACE_NAMESPACE}
 
@@ -273,7 +273,9 @@ Check Bucket from Prism Central:
 
 8.  Restore Process
 
-*** Restore yourname-nginx namespace ***
+*** Restore yourname-nginx namespace in Managed-Cluster DRC ***
+
+kubectx --> choose your 2nd managed cluster (drc) cluster
 
     -   From code-server (bastion vm)
 
@@ -288,7 +290,7 @@ Check Bucket from Prism Central:
         export NUTANIX_OBJECTS_ACCESS_KEY_ID=kzj-yB1gXXG1h0_57-15JGVQx4pd29Mo           # Your Object Store AccessKey in No. 3 Above
         export NUTANIX_OBJECTS_SECRET_ACCESS_KEY=ytexinDnjN2kK1TGvNMWH4Al2ykmo6VV       # Your Object Store SecretKey in No. 3 Above
     
-*** Create Secret to Store Bucket Credential***
+*** Create Secret to Store Bucket Credential in Managed-Cluster DRC  Namespace ***
 
 kubectx --> choose your 2nd managed cluster (drc) cluster
 
@@ -321,7 +323,7 @@ Ex:
 aws_access_key_id=kzj-yB1gXXG1h0_57-15JGVQx4pd29Mo
 aws_secret_access_key=ytexinDnjN2kK1TGvNMWH4Al2ykmo6VV
 
-*** Create ConfigMap to Create backupStorageLocation (BSL) of Velero ***
+*** Create ConfigMap to Create backupStorageLocation (BSL) of Velero in Managed-Cluster DRC Namespace ***
 
 velero backup-location create ${BSL_NAME} -n ${WORKSPACE_NAMESPACE} --provider aws --bucket ${BUCKET} --credential ${NUTANIX_OBJECTS_SECRET}=aws --config region=us-east-1,insecureSkipTLSVerify="true",s3ForcePathStyle="true",profile=${AWS_PROFILE},s3Url=http://${NUTANIX_OBJECTS_HOST}:${NUTANIX_OBJECTS_PORT}
 
@@ -329,10 +331,38 @@ kubectl get bsl -n ${WORKSPACE_NAMESPACE}
 
 kubectl get backupstoragelocations -n ${WORKSPACE_NAMESPACE} -oyaml # --> to troubleshoot if the status NOT "available".
 
-*** Restore yourname-nginx namespace ***
+*** Restore yourname-nginx namespace in Managed-Cluster DRC ***
 
 velero restore create arief-nginx-restore -n ${WORKSPACE_NAMESPACE} --from-backup arief-nginx-backup --include-namespaces arief-nginx
 
-velero backup create arief-nginx-backup -n ${WORKSPACE_NAMESPACE} --storage-location ntnx-object-nkp --snapshot-volumes=false --include-namespaces arief-nginx
-
 velero backup describe arief-nginx-backup -n ${WORKSPACE_NAMESPACE}
+
+*** Check your restore using kubernetes dashboard in Managed-Cluster DRC ***
+
+1.  You will find that your nginx deployment smoothly up and running           --  why?
+2.  You will find that your wordpress-mysql smoothly up and running            --   why?
+3.  You will find that your wordpress-xxx-xxx pods still in pending status:
+    *   0/5 nodes are available: pod has unbound immediate PersistentVolumeClaims. preemption: 0/5 nodes are available: 
+    *   Why?
+
+Solution:
+
+- From kubernetes dashboard - Your Name-nginx name space - Config and Storage 
+  * From - Storage Classes --> You will see only 1 named nutanix-volume (or with dkp-object-store if exist)
+  * From - Persistent Volume Claim --> You will see a lot of PVC with ReadWriteOnce in nutanix-volume storage class but none of its Nutanix File.
+  * Create new resource - create from input:
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nutanix-files
+provisioner: csi.nutanix.com
+parameters:
+  nfsServerName: labFS
+  nfsServer: labFS.ntnxlab.local
+  nfsPath: wordpress
+  storageType: NutanixFiles
+  squashType: root-squash
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+
