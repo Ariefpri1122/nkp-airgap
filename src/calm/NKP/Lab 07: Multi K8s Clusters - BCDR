@@ -6,12 +6,10 @@ MULTI KUBERNETES CLUSTER ENVIRONMENTS
 Secondary vlan IP range     :   x.x.x.132-254   --> By default secondary IP is still FREE
 Secondary IPAM              :   x.x.x.161-253
 
-
-
 Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
     -   Click Add Cluster - Create Cluster
-        -   Cluster Name            			:   	yourname-nkp-drc (Ex: arief-nkp-drc)
-        ⁃	SSH Public Key				:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEWT+eSeTQYYX7mIhQGghmSm418n9ANHLX9nZ//eGISr arief.pribadi@nutanix.com
+        -   Cluster Name            			:   yourname-nkp-drc (Ex: arief-nkp-drc)
+        ⁃	SSH Public Key				:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBM2C9FLMlL6xXcMRZt6Yjf1cgadN/1S6M8V3M6OQDbD arief.pribadi@nutanix.com # Check cat .ssh/id_ed25519.pub in bastion VM
 		⁃	Nutanix Prism Project		:	lab
 		⁃	Nutanix AOS Cluster		:	PHX-POC334
 		⁃	Subnet				:	aux-1 --> Your secondary Subnet
@@ -37,18 +35,18 @@ Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
         -   Service Network         :   10.96.1.0/12    (NOT --> 10.96.0.0/12)
 
 
-		⁃	Load Balancing Start			:	x.x.x.140)--> (by default secondary vlan is free) (ex: 10.38.106.140)
-		⁃	Load Balancing End			:	x.x.x.150 --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.150)
+		⁃	Load Balancing Start		:	x.x.x.140)--> (by default secondary vlan is free) (ex: 10.38.106.140)
+		⁃	Load Balancing End		:	x.x.x.150 --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.150)
 		⁃	Image Registry Mirror	
-			⁃	URL				:	https://airgap.arief.com:5000
-			⁃	username			:	admin
-			⁃	password			:	nutanix/4u
-			⁃	CA				:	downloaded cert.crt
+			⁃	URL			:	https://airgap.arief.com:5000
+			⁃	username		:	admin
+			⁃	password		:	nutanix/4u
+			⁃	CA			:	downloaded cert.crt
 		⁃	Private Registry	
-			⁃	URL				:	https://10.38.13.140:5000	# Your harbor URL Access as noted above
-			⁃	username			:	nutanix
-			⁃	password			:	nx2Tech974!
-			⁃	CA				:	downloaded ca.cert
+			⁃	URL			:	https://10.38.13.140:5000	# Your harbor URL Access as noted above
+			⁃	username		:	nutanix
+			⁃	password		:	nx2Tech974!
+			⁃	CA			:	downloaded ca.cert
 	-	Create
 
 Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
@@ -66,21 +64,41 @@ Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
         * ex: name: objective_chaplygin-10.38.106.32 (Managed DRC) --> for managed DRC cluster
 	- use kubectx to switch between cluster-context
 
+*** Other way to manage multi cluster is to merge --flaten all kubeconfig file ***
 
-*** Use Valero to Backup 1st Managed Cluster ***
+    -   Download all kubeconfig file into bastion vm (you already have kommander kubeconfig file in bastio)
+    -   Merge all 3 kubeconfig --> pay attention on how kubeconfig file use user certificate for authentication rather than TOKEN
 
-1.  Install Velero CLI
+        KUBECONFIG=airgapped-hm-nkp-demo-2.conf:arief-nkp-drc-kubeconfig.yaml:arief-nkp-kubeconfig.yaml kubectl config view --flatten > ~/.kube/config
+
+*** Install Velero on both Managed Cluster ***
+
+1.  From NKP Dashboard - Your Name Workspace - Application - Set Categories to Backup
+    -   Enable Rook Ceph
+    -   Check your 2 managed clusters
+    -   Click Enable
+    -   Verify in both clusters that velero has been "Deployed" not only "Enable"
+    -   Enable Rook Ceph Cluster
+    -   Check your 2 managed clusters
+    -   Click Enable
+    -   Verify in both clusters that velero has been "Deployed" not only "Enable"
+    -   Enable Velero
+    -   Check your 2 managed clusters
+    -   Click Enable
+    -   Verify in both clusters that velero has been "Deployed" not only "Enable"
+
+2.  Install Velero CLI on bastion VM
     - From Code-server (bastion mv)
         *   curl -L https://github.com/vmware-tanzu/velero/releases/download/v1.15.2/velero-v1.15.2-linux-amd64.tar.gz -o velero.tar.gz
         *   tar -xvf velero.tar.gz
         *   sudo mv velero-v1.15.2-linux-amd64/velero /usr/local/bin/
         *   velero version -n kommander
 
-2.  From Prism Central (PC) - Unified Storage - Objects
+3.  From Prism Central (PC) - Unified Storage - Objects
     -   Take a note on Object Store ntnxlab Object public IP --> ex: 10.38.106.8
     -   Click ntnxlab Object Stores
     -   Click Buckets Tab - Create Bucket
-        * Name      :   velero-backup
+        * Name      :   velero-backup   #   Take note on bucket name
         * Create
     -   From bucket tab
         * click velero-backup - User Access - Edit User Access - Add Users and Permissions
@@ -132,37 +150,44 @@ AWS_PROFILE=ntnx-object-nkp aws s3 ls s3://velero-backup --endpoint-url http://1
 
 output  ex: nothing --> no files yet
 
-3.  From code-server (bastion vm)
-    -   kubectx --> to your kommander
-    -   kubectl get kommandercluster -A --> take note on your kommander namespace (ex: kommander)
-    -   kubectl get cluster -A --> take no on your kommander cluster name (ex: airgapped-hm-nkp-demo-2)
-    -   kubectl get crd | grep velero --> valero.io CRD (Custom Resource Definition) listed
-    -   kubectl get pod -n kommander | grep velero  --> check velero installation
-
-        object-bucket-claims-check-dkp-velero-t2zk4                       0/1     Completed   0                2d13h
-        velero-5fc979457d-5hbh5                                           1/1     Running     0                2d13h
-        velero-backup-storage-location-updater-b79cb4bdd-hb7q9            1/1     Running     0                2d13h
-        velero-pre-install-r6cvk                                          0/1     Completed   0                2d13h
-
-    -   kubectl logs -n kommander deploy/velero | grep 'Plugin kind:'   --> velero-plugin-for-aws (init)
-
 4.  From code-server (bastion vm)
-        export CLUSTER_NAME=airgapped-hm-nkp-demo-2                     # Your Kommander Cluster Name in No. 2 Above
-        export BUCKET=velero-backup                                     # Your Bucket Name in No. 1 Above
-        export WORKSPACE_NAMESPACE=kommander                            # Your kommander namespace Name in No. 2 Above
+    -   kubectx --> to your kommander
+    -   kubectl get kommandercluster -A  --> take note on your clusters name (ex: as below)
+        
+        NAMESPACE                     NAME            DISPLAY NAME   STATUS   KUBEFED CLUSTER   AGE
+        arief-workspace-f568l-hlfzt   arief-nkp                      Joined   arief-nkp         2d23h
+        arief-workspace-f568l-hlfzt   arief-nkp-drc                  Joined   arief-nkp-drc     4h4m
+        kommander                     host-cluster                   Joined   host-cluster      3d23h
+
+    -   kubectl get crd | grep velero --> valero.io CRD (Custom Resource Definition) listed
+
+5.  Confirm Velero Installation on Managed-Cluster DC and Backup Yourname-NGINX Namespace
+
+    -   From code-server (bastion vm)
+
+        export CLUSTER_NAME=arief-nkp                                   # Your 1st Managed Cluster (DC) Name in No. 4 Above
+        export BUCKET=velero-backup                                     # Your Bucket Name in No. 3 Above
+        export WORKSPACE_NAMESPACE=arief-workspace-f568l-hlfzt          # Your 1st Managed Cluster (DC) Namepace in No. 4 Above
         export BSL_NAME=ntnx-object-nkp 
-        export NUTANIX_OBJECTS_HOST=10.38.106.8                         # Your Object Store in No. 1 Above
+        export NUTANIX_OBJECTS_HOST=10.38.106.8                         # Your Object Store IP Address in No. 3 Above
         export NUTANIX_OBJECTS_PORT=80
         export NUTANIX_OBJECTS_SECRET=velero-nutanix-credentials
         export AWS_PROFILE=ntnx-object-nkp
-        export NUTANIX_OBJECTS_ACCESS_KEY_ID=kzj-yB1gXXG1h0_57-15JGVQx4pd29Mo           # Your Object Store AccessKey in No. 1 Above
-        export NUTANIX_OBJECTS_SECRET_ACCESS_KEY=ytexinDnjN2kK1TGvNMWH4Al2ykmo6VV       # Your Object Store SecretKey in No. 1 Above
+        export NUTANIX_OBJECTS_ACCESS_KEY_ID=kzj-yB1gXXG1h0_57-15JGVQx4pd29Mo           # Your Object Store AccessKey in No. 3 Above
+        export NUTANIX_OBJECTS_SECRET_ACCESS_KEY=ytexinDnjN2kK1TGvNMWH4Al2ykmo6VV       # Your Object Store SecretKey in No. 3 Above
 
-5.  From code-server (bastion vm)
+6.  From code-server (bastion vm)
 
 *** Create Secret to Store Bucket Credential***
 
-kubectx --> choose kommander cluster
+kubectx --> choose your 1st managed cluster (dc) cluster
+
+    -   kubectl get pod -A | grep velero  # --> check velero installation
+
+arief-workspace-f568l-hlfzt       object-bucket-claims-check-dkp-velero-cd5qk                       0/1     Completed   0                5h9m
+arief-workspace-f568l-hlfzt       velero-6c94655cb9-c8hkn                                           1/1     Running     0                5h9m
+arief-workspace-f568l-hlfzt       velero-backup-storage-location-updater-77446646cd-wzlmv           1/1     Running     0                5h8m
+arief-workspace-f568l-hlfzt       velero-pre-install-jt4wm                                          0/1     Completed   0                5h40m
 
 kubectl apply -f - <<EOF 
 apiVersion: v1
@@ -188,29 +213,32 @@ aws_secret_access_key=ytexinDnjN2kK1TGvNMWH4Al2ykmo6VV
 
 *** Create ConfigMap to Create backupStorageLocation (BSL) of Velero ***
 
-kubectx --> choose kommander cluster
+kubectx --> choose your 1st managed cluster (dc) cluster
 
 
-velero --kubeconfig ${CLUSTER_NAME}.conf backup-location create ${BSL_NAME} -n ${WORKSPACE_NAMESPACE} --provider aws --bucket ${BUCKET} --credential ${NUTANIX_OBJECTS_SECRET}=aws --config region=us-east-1,insecureSkipTLSVerify="true",s3ForcePathStyle="true",profile=${AWS_PROFILE},s3Url=http://${NUTANIX_OBJECTS_HOST}:${NUTANIX_OBJECTS_PORT}
+velero backup-location create ${BSL_NAME} -n ${WORKSPACE_NAMESPACE} --provider aws --bucket ${BUCKET} --credential ${NUTANIX_OBJECTS_SECRET}=aws --config region=us-east-1,insecureSkipTLSVerify="true",s3ForcePathStyle="true",profile=${AWS_PROFILE},s3Url=http://${NUTANIX_OBJECTS_HOST}:${NUTANIX_OBJECTS_PORT}
 
 kubectl get bsl -n ${WORKSPACE_NAMESPACE}
 
 Output Ex:
 
-NAME              PHASE       LAST VALIDATED   AGE   DEFAULT
-ntnx-object-nkp   Available   34s              54m   
+NAME              PHASE       LAST VALIDATED   AGE     DEFAULT
+default           Available   37s              3h34m   
+ntnx-object-nkp   Available   28s              28s     
 
-kubectl get backupstoragelocations -n ${WORKSPACE_NAMESPACE} -oyaml --> to troubleshoot if the status NOT "available".
+kubectl get backupstoragelocations -n ${WORKSPACE_NAMESPACE} -oyaml # --> to troubleshoot if the status NOT "available".
 
 7.  Backup Process
 
 *** Test backup ***
 
-    -   velero backup create nutanix-velero-testbackup -n ${WORKSPACE_NAMESPACE} --storage-location ntnx-object-nkp --snapshot-volumes=false
-    -   velero backup describe nutanix-velero-testbackup
-    -   AWS_PROFILE=ntnx-object-nkp aws s3 ls s3://velero-backup --endpoint-url http://10.38.106.8:80
+velero backup create nutanix-velero-testbackup -n ${WORKSPACE_NAMESPACE} --storage-location ntnx-object-nkp --snapshot-volumes=false
+velero backup describe nutanix-velero-testbackup -n ${WORKSPACE_NAMESPACE}
+AWS_PROFILE=ntnx-object-nkp aws s3 ls s3://velero-backup/backups/ --endpoint-url http://10.38.106.8:80
 
-Check Bucker from Prism Central:
+    --> nutanix-velero-testbackup shown
+
+Check Bucket from Prism Central:
 
   - From your Prism Central (PC) dasbboard - Unified Storage - Object - Object Stores (Ex: ntnxlab)
       - Click your Object Store (ex: ntnxlab) - Buckets
@@ -218,5 +246,93 @@ Check Bucker from Prism Central:
           * input your Access and Secret Keys and Login
           * Click your velero-backup
           * You will find new backup folder - click backup folder
-          * You will see your backup job folder - click it
+          * You will see your backup job folder (nutanix-velero-testbackup) - click it
           * You will see all arficact backup
+
+
+*** Backup Production yourname-nginx namespace ***
+
+velero backup create arief-nginx-backup -n ${WORKSPACE_NAMESPACE} --storage-location ntnx-object-nkp --snapshot-volumes=false --include-namespaces arief-nginx
+
+velero backup describe arief-nginx-backup -n ${WORKSPACE_NAMESPACE}
+
+AWS_PROFILE=ntnx-object-nkp aws s3 ls s3://velero-backup/backups/ --endpoint-url http://10.38.106.8:80
+
+    --> nutanix-velero-testbackup shown
+
+Check Bucket from Prism Central:
+
+  - From your Prism Central (PC) dasbboard - Unified Storage - Object - Object Stores (Ex: ntnxlab)
+      - Click your Object Store (ex: ntnxlab) - Buckets
+          * Click "Launch Objects Browser"
+          * input your Access and Secret Keys and Login
+          * Click your velero-backup
+          * You will find new backup folder - click backup folder
+          * You will see your backup job folder (nutanix-velero-testbackup) - click it
+          * You will see all arficact backup
+
+8.  Restore Process
+
+*** Restore yourname-nginx namespace ***
+
+    -   From code-server (bastion vm)
+
+        export CLUSTER_NAME=arief-nkp-drc                               # Your 2nd Managed Cluster (DRC) Name in No. 4 Above
+        export BUCKET=velero-backup                                     # Your Bucket Name in No. 3 Above
+        export WORKSPACE_NAMESPACE=arief-workspace-f568l-hlfzt          # Your 1st Managed Cluster (DC) Namepace in No. 4 Above
+        export BSL_NAME=ntnx-object-nkp 
+        export NUTANIX_OBJECTS_HOST=10.38.106.8                         # Your Object Store IP Address in No. 3 Above
+        export NUTANIX_OBJECTS_PORT=80
+        export NUTANIX_OBJECTS_SECRET=velero-nutanix-credentials
+        export AWS_PROFILE=ntnx-object-nkp
+        export NUTANIX_OBJECTS_ACCESS_KEY_ID=kzj-yB1gXXG1h0_57-15JGVQx4pd29Mo           # Your Object Store AccessKey in No. 3 Above
+        export NUTANIX_OBJECTS_SECRET_ACCESS_KEY=ytexinDnjN2kK1TGvNMWH4Al2ykmo6VV       # Your Object Store SecretKey in No. 3 Above
+    
+*** Create Secret to Store Bucket Credential***
+
+kubectx --> choose your 2nd managed cluster (drc) cluster
+
+    -   kubectl get pod -A | grep velero  # --> check velero installation
+
+arief-workspace-f568l-hlfzt       object-bucket-claims-check-dkp-velero-cd5qk                       0/1     Completed   0                5h9m
+arief-workspace-f568l-hlfzt       velero-6c94655cb9-c8hkn                                           1/1     Running     0                5h9m
+arief-workspace-f568l-hlfzt       velero-backup-storage-location-updater-77446646cd-wzlmv           1/1     Running     0                5h8m
+arief-workspace-f568l-hlfzt       velero-pre-install-jt4wm                                          0/1     Completed   0                5h40m
+
+kubectl apply -f - <<EOF 
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${NUTANIX_OBJECTS_SECRET}
+  namespace: ${WORKSPACE_NAMESPACE}  
+type: Opaque
+stringData:
+  aws: |
+    [${AWS_PROFILE}]
+    aws_access_key_id=${NUTANIX_OBJECTS_ACCESS_KEY_ID}
+    aws_secret_access_key=${NUTANIX_OBJECTS_SECRET_ACCESS_KEY}
+EOF
+
+kubectl get secret ${NUTANIX_OBJECTS_SECRET} -n ${WORKSPACE_NAMESPACE} -o jsonpath="{.data.aws}" | base64 --decode
+
+Ex:
+
+[ntnx-object-nkp]
+aws_access_key_id=kzj-yB1gXXG1h0_57-15JGVQx4pd29Mo
+aws_secret_access_key=ytexinDnjN2kK1TGvNMWH4Al2ykmo6VV
+
+*** Create ConfigMap to Create backupStorageLocation (BSL) of Velero ***
+
+velero backup-location create ${BSL_NAME} -n ${WORKSPACE_NAMESPACE} --provider aws --bucket ${BUCKET} --credential ${NUTANIX_OBJECTS_SECRET}=aws --config region=us-east-1,insecureSkipTLSVerify="true",s3ForcePathStyle="true",profile=${AWS_PROFILE},s3Url=http://${NUTANIX_OBJECTS_HOST}:${NUTANIX_OBJECTS_PORT}
+
+kubectl get bsl -n ${WORKSPACE_NAMESPACE}
+
+kubectl get backupstoragelocations -n ${WORKSPACE_NAMESPACE} -oyaml # --> to troubleshoot if the status NOT "available".
+
+*** Restore yourname-nginx namespace ***
+
+velero restore create arief-nginx-restore -n ${WORKSPACE_NAMESPACE} --from-backup arief-nginx-backup --include-namespaces arief-nginx
+
+velero backup create arief-nginx-backup -n ${WORKSPACE_NAMESPACE} --storage-location ntnx-object-nkp --snapshot-volumes=false --include-namespaces arief-nginx
+
+velero backup describe arief-nginx-backup -n ${WORKSPACE_NAMESPACE}
