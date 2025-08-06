@@ -1,6 +1,9 @@
 MULTI KUBERNETES CLUSTER ENVIRONMENTS
 -------------------------------------
 
+*** BACKUP RESTORE BETWEEN 2 CLUSTERS WITH VELERO ***
+-----------------------------------------------------
+
 *** Create 2nd Managed Kubernetes Cluster ***
 
 Secondary vlan IP range     :   x.x.x.132-254   --> By default secondary IP is still FREE
@@ -8,25 +11,25 @@ Secondary IPAM              :   x.x.x.161-253
 
 Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
     -   Click Add Cluster - Create Cluster
-        -   Cluster Name            :   yourname-nkp-drc (Ex: arief-nkp-drc)
-        ⁃	SSH Public Key				:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBM2C9FLMlL6xXcMRZt6Yjf1cgadN/1S6M8V3M6OQDbD arief.pribadi@nutanix.com # Check cat .ssh/id_ed25519.pub in bastion VM
-		⁃	Nutanix Prism Project		:	lab
-		⁃	Nutanix AOS Cluster		:	PHX-POC334
-		⁃	Subnet				:	aux-1 --> Your secondary Subnet
-		⁃	OS Image			:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
-		⁃	CP End Point IP			:	1st IP from secondary vlan (132) --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.132)
-		⁃	CP Node Count			:	1
-		⁃	CPU Per Node (vCPU)		:	4
-		⁃	Memory Per Node			:	12
-		⁃	Disk Size Per Node		:	80
-		⁃	Nutanix Prism Project		:	lab
-        ⁃	Nutanix AOS Cluster			:	PHX-POC334
-		⁃	Subnet				:	aux-1 --> Your secondary Subnet
-		⁃	OS Image			:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
-		⁃	Worker Node Count		:	4
-		-	CPU Per Node (vCPU)		:	8
-		⁃	Memory Per Node			:	12
-		⁃	Disk Size Per Node		:	80
+        -   Cluster Name           		:   yourname-nkp-drc (Ex: arief-nkp-drc)
+        ⁃	SSH Public Key			:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBM2C9FLMlL6xXcMRZt6Yjf1cgadN/1S6M8V3M6OQDbD arief.pribadi@nutanix.com # Check cat .ssh/id_ed25519.pub in bastion VM
+		⁃	Nutanix Prism Project	:	lab
+		⁃	Nutanix AOS Cluster	:	PHX-POC334
+		⁃	Subnet			:	aux-1 --> Your secondary Subnet
+		⁃	OS Image		:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
+		⁃	CP End Point IP		:	1st IP from secondary vlan (132) --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.132)
+		⁃	CP Node Count		:	1
+		⁃	CPU Per Node (vCPU)	:	4
+		⁃	Memory Per Node		:	12
+		⁃	Disk Size Per Node	:	80
+		⁃	Nutanix Prism Project	:	lab
+        ⁃	Nutanix AOS Cluster		:	PHX-POC334
+		⁃	Subnet			:	aux-1 --> Your secondary Subnet
+		⁃	OS Image		:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
+		⁃	Worker Node Count	:	4
+		-	CPU Per Node (vCPU)	:	8
+		⁃	Memory Per Node		:	12
+		⁃	Disk Size Per Node	:	80
 		⁃	Storage Container			default
 
         *** PAY ATTENTION TO BELOW CONFIGURATION ***
@@ -35,18 +38,18 @@ Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
         -   Service Network         :   10.96.1.0/12    (NOT --> 10.96.0.0/12)
 
 
-		⁃	Load Balancing Start		:	x.x.x.140)--> (by default secondary vlan is free) (ex: 10.38.106.140)
-		⁃	Load Balancing End		:	x.x.x.150 --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.150)
+		⁃	Load Balancing Start			:	x.x.x.140)--> (by default secondary vlan is free) (ex: 10.38.106.140)
+		⁃	Load Balancing End			:	x.x.x.150 --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.150)
 		⁃	Image Registry Mirror	
-			⁃	URL			:	https://airgap.arief.com:5000
-			⁃	username		:	admin
-			⁃	password		:	nutanix/4u
-			⁃	CA			:	downloaded cert.crt
+			⁃	URL				:	https://airgap.arief.com:5000
+			⁃	username			:	admin
+			⁃	password			:	nutanix/4u
+			⁃	CA				:	downloaded cert.crt
 		⁃	Private Registry	
-			⁃	URL			:	https://10.38.106.41:5000	# Your harbor URL Access as noted above
-			⁃	username		:	nutanix
-			⁃	password		:	nx2Tech974!
-			⁃	CA			:	downloaded ca.cert
+			⁃	URL				:	https://10.38.106.41:5000	# Your harbor URL Access as noted above
+			⁃	username			:	nutanix
+			⁃	password			:	nx2Tech974!
+			⁃	CA				:	downloaded ca.cert
 	-	Create
 
 Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
@@ -365,4 +368,344 @@ parameters:
   squashType: root-squash
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
+
+
+*** DATA PROTECTION AND REPLICATION BETWEEN 2 CLUSTERS WITH NUTANIX DATA SERVICE FOR KUBERNETES (NDK) ***
+---------------------------------------------------------------------------------------------------------
+
+1.  NDK Airgap Installation on Your 1st Managed Cluster (DC)
+
+    -   In AUTOAD VM, open chrome and From the (NDK) page (https://portal.nutanix.com/page/downloads?product=ndk), download the following:
+            *   NDK Airgap Bundle containing the container images:
+                -   Nutanix Data Services for Kubernetes ( Version: 1.2.0 )
+
+    -   Using WinSCP copy ALL of your files to Bastion VM /home/nutanix (ex: ndk.1.2.0.tar)
+
+    -   Using Code-Server (Bastion VM)
+            *   tar -xvf ndk-1.2.0.tar
+            *   Modify 1 wrong yaml file   
+                    vi ndk-1.2.0/chart/templates/crd-upgrade-hook.yaml 
+
+                    Replace this line 17:
+
+                        data:
+                          {{ $base }}.yaml: |
+                        {{ $fileContents | toYaml | indent 4 }}
+                        ---
+                        {{- end }}
+                        apiVersion: batch/v1
+
+                    With this :
+
+                        data:
+                         {{ $base }}.yaml: |
+                        {{ $fileContents | toYaml | indent 4 }}
+                        {{- end }}
+                        ---
+                        apiVersion: batch/v1
+
+        *** Above fixing by moving '---' UNDER '{{- end }} NOT UPPER ***
+        
+            *   kubectx --> point to your kommander cluster
+            *   echo "$(kubectl -n kommander get kommandercluster host-cluster -o jsonpath='{.status.ingress.address}'):5000"
+                -   take not on your harbor URL (ex: 10.38.106.41:5000 )
+            *   docker image load -i ndk-1.2.0/ndk-1.2.0.tar
+            *   docker image ls
+            *   docker image tag ndk/manager:1.2.0 10.38.106.41:5000/library/ndk/manager:1.2.0      # --> use your airgap URL
+            *   docker image ls
+            *   docker push 10.38.106.41:5000/library/ndk/manager:1.2.0
+            *   Lets tag and push the rest of images:
+                
+                docker image ls --> take not on TAG version on each image and put it to correct image and version below:
+
+                docker image tag ndk/infra-manager:1.2.0 10.38.106.41:5000/library/ndk/infra-manager:1.2.0
+                docker image tag ndk/job-scheduler:1.2.0 10.38.106.41:5000/library/ndk/job-scheduler:1.2.0
+                docker image tag ndk/kube-rbac-proxy:v0.19.0 10.38.106.41:5000/library/ndk/kube-rbac-proxy:v0.19.0
+                docker image tag ndk/kubectl:1.32.3 10.38.106.41:5000/library/ndk/kubectl:1.32.3
+
+                docker push 10.38.106.41:5000/library/ndk/infra-manager:1.2.0
+                docker push 10.38.106.41:5000/library/ndk/job-scheduler:1.2.0
+                docker push 10.38.106.41:5000/library/ndk/kube-rbac-proxy:v0.19.0
+                docker push 10.38.106.41:5000/library/ndk/kubectl:1.32.3
+
+                Open your harbor dashboard and make sure all the images are listed.
+
+            *   Install NDK using to 1st managed cluster (DC) and ntnx-system namespace
+                -   kubectx --> make sure you point to your 1st managed cluster (DC)
+                -   Create secret in ntnx-system namespace
+                        REGISTRY_USERNAME="nutanix"
+                        REGISTRY_PASSWORD="nx2Tech974!"     #   --> put your HPOC cluster password
+
+                        kubectl create secret generic -n ntnx-system harbor-registry-credentials \
+                        --from-literal username=$REGISTRY_USERNAME \
+                        --from-literal password=$REGISTRY_PASSWORD \
+                        --from-file=/etc/docker/certs.d/10.38.106.41:5000/ca.crt
+                
+                        kubectl create secret generic ntnx-pc-secret \
+                        --from-literal=key='10.38.106.7:9440:admin:nx2Tech974!' \
+                        -n ntnx-system
+
+                -   Execute this command below: --> use your Harbor URL
+
+                helm install ndk -n ntnx-system ndk-1.2.0/chart/ \
+                --set manager.repository=10.38.106.41:5000/library/ndk/manager \
+                --set manager.tag=1.2.0 \
+                --set infraManager.repository=10.38.106.41:5000/library/ndk/infra-manager \
+                --set infraManager.tag=1.2.0 \
+                --set kubeRbacProxy.repository=10.38.106.41:5000/library/ndk/kube-rbac-proxy \
+                --set kubeRbacProxy.tag=v0.19.0 \
+                --set kubectl.repository=10.38.106.41:5000/library/ndk/kubectl \
+                --set kubectl.tag=1.32.3 \
+                --set jobScheduler.repository=10.38.106.41:5000/library/ndk/job-scheduler \
+                --set jobScheduler.tag=1.2.0 \
+                --set tls.server.enable=false \
+                --set config.secret.name=nutanix-csi-credentials \
+                --set imageCredentials.imagePullSecretName=harbor-registry-credentials
+
+            *   kubectl get svc ndk-intercom-service -n ntnx-system
+
+                NAME                   TYPE           CLUSTER-IP      EXTERNAL-IP    PORT(S)          AGE
+                ndk-intercom-service   LoadBalancer   10.103.215.62   10.38.106.56   2021:31993/TCP   114s
+
+
+2.  NDK Airgap Installation on Your 2nd Managed Cluster (DRC)
+
+            *   Install NDK using to 2nd managed cluster (DRC) and ntnx-system namespace
+                -   kubectx --> make sure you point to your 2nd managed cluster (DRC)
+                -   Create secret in ntnx-system namespace
+                        REGISTRY_USERNAME="nutanix"
+                        REGISTRY_PASSWORD="nx2Tech974!"     #   --> put your HPOC cluster password
+
+                        kubectl create secret generic -n ntnx-system harbor-registry-credentials \
+                        --from-literal username=$REGISTRY_USERNAME \
+                        --from-literal password=$REGISTRY_PASSWORD \
+                        --from-file=/etc/docker/certs.d/10.38.106.41:5000/ca.crt
+                
+                        kubectl create secret generic ntnx-pc-secret \
+                        --from-literal=key='10.38.106.7:9440:admin:nx2Tech974!' \
+                        -n ntnx-system
+
+                -   Execute this command below: --> use your Harbor URL
+
+                helm install ndk -n ntnx-system ndk-1.2.0/chart/ \
+                --set manager.repository=10.38.106.41:5000/library/ndk/manager \
+                --set manager.tag=1.2.0 \
+                --set infraManager.repository=10.38.106.41:5000/library/ndk/infra-manager \
+                --set infraManager.tag=1.2.0 \
+                --set kubeRbacProxy.repository=10.38.106.41:5000/library/ndk/kube-rbac-proxy \
+                --set kubeRbacProxy.tag=v0.19.0 \
+                --set kubectl.repository=10.38.106.41:5000/library/ndk/kubectl \
+                --set kubectl.tag=1.32.3 \
+                --set jobScheduler.repository=10.38.106.41:5000/library/ndk/job-scheduler \
+                --set jobScheduler.tag=1.2.0 \
+                --set tls.server.enable=false \
+                --set config.secret.name=nutanix-csi-credentials \
+                --set imageCredentials.imagePullSecretName=harbor-registry-credentials
+
+            *   kubectl get svc ndk-intercom-service -n ntnx-system
+
+                NAME                   TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)          AGE
+                ndk-intercom-service   LoadBalancer   10.100.66.84   10.38.106.142   2021:32369/TCP   151m
+
+3.  Deploy nginx with pvc application ion your 1st managed cluster (DC)
+
+    - From Code Server (Bastion VM)
+        
+        wget https://github.com/Ariefpri1122/nkp-airgap/blob/main/src/calm/NKP/nginx-vpc.yaml
+        kubectx --> choose your 1st managed cluster (DC)
+        kubectl apply -f nginx-vpc.yaml
+
+
+    -   From your kubernetes dasboard in 1st managed cluster (DC)
+        *   Choose yourname-nginx namespace
+        *   Click pods from the left menu
+        *   Click 3 dot menu (on the right side) of your nginx pod - exec
+                    apt-get update
+                    apt-get install vim -y
+        *   vi /usr/share/nginx/html/index.html
+        *   Modify existing content:
+
+<html>
+<body>
+<h1><center>
+WELCOME TO ARIEF'S NDK REPLICATION LAB
+</h1></center>
+</body>
+</html>
+
+        * Examine the website by clicking its service external IP in kubernetes dashboard
+
+4.  Create Storage Cluster Instance on Your 1st Managed Cluster (DC)
+
+    - Get UUID of your Prism Element (PE) and Prism Central (PC) 
+            *   ssh from you CVM (PE)   -->   ncli cluster info
+
+                    Cluster Uuid    :   00063b3d-9795-f221-6161-7cc255051991
+
+            *   ssh from your PCVM (PC) -->   ncli cluster info
+
+                    Cluster Uuid    :   68aedcbb-09e6-4acf-9d89-1ffde29f9f12
+
+    -   Create the storage cluster CRD
+
+apiVersion: dataservices.nutanix.com/v1alpha1
+kind: StorageCluster
+metadata:
+    name: my-ndk-storage-cluster
+spec:
+    storageServerUuid: 00063b3d-9795-f221-6161-7cc255051991
+    managementServerUuid: 68aedcbb-09e6-4acf-9d89-1ffde29f9f12
+
+5.  Creating a Remote CR on the 1st Managed Cluster (DC)
+
+apiVersion: dataservices.nutanix.com/v1alpha1
+kind: Remote
+metadata:
+  name: remote-cr-drc
+spec:
+  clusterName: remote-cr-drc
+  ndkServiceIp: 10.38.106.142 
+  ndkServicePort: 2021
+
+    -   kubectx --> choose you 1st managed cluster (DC)
+        kubectl get remote -A
+
+        NAME                ADDRESS        PORT   AVAILABLE
+        remote-cr-primary   10.38.106.142   2021   True
+
+6.  Create Storage Cluster Instance on Your 2nd Managed Cluster (DRC)
+
+    - Get UUID of your Prism Element (PE) and Prism Central (PC) 
+            *   ssh from you CVM (PE)   -->   ncli cluster info
+
+                    Cluster Uuid    :   00063b3d-9795-f221-6161-7cc255051991
+
+            *   ssh from your PCVM (PC) -->   ncli cluster info
+
+                    Cluster Uuid    :   68aedcbb-09e6-4acf-9d89-1ffde29f9f12
+
+    -   Create the storage cluster CRD
+
+apiVersion: dataservices.nutanix.com/v1alpha1
+kind: StorageCluster
+metadata:
+    name: my-ndk-storage-cluster
+spec:
+    storageServerUuid: 00063b3d-9795-f221-6161-7cc255051991
+    managementServerUuid: 68aedcbb-09e6-4acf-9d89-1ffde29f9f12
+
+7.  Creating a Remote CR on the 2nd Managed Cluster (DRC)
+
+apiVersion: dataservices.nutanix.com/v1alpha1
+kind: Remote
+metadata:
+  name: remote-cr-dc
+spec:
+  clusterName: remote-cr-dc
+  ndkServiceIp: 10.38.106.56
+  ndkServicePort: 2021
+
+    -   kubectx --> choose you 1st managed cluster (DRC)
+        kubectl get remote -A
+
+        NAME                ADDRESS        PORT   AVAILABLE
+        remote-cr-primary   10.38.106.56   2021   True
+
+8.  Creating a Replication Target CR on the 1st Managed Cluster (DC)
+
+apiVersion: dataservices.nutanix.com/v1alpha1
+kind: ReplicationTarget
+metadata:
+  name: replication-target-drc
+  namespace: arief-nginx
+spec:
+  namespaceName: arief-nginx
+  remoteName: remote-cr-drc
+  serviceAccountName: default
+
+        kubectl get replicationtargets -n arief-nginx
+
+        NAME                     REMOTE-NAME     REMOTE-NAMESPACE   AVAILABLE
+        replication-target-drc   remote-cr-drc   arief-nginx        True
+
+9. Creating Application CR and Snaphot in 1st Managed Cluster (DC)
+
+apiVersion: dataservices.nutanix.com/v1alpha1
+kind: Application
+metadata:
+  name: nginx-only
+  namespace: arief-nginx
+spec:
+  applicationSelector:
+    resourceLabelSelectors:
+      - labelSelector:
+          matchLabels:
+            k8s-app: arief-nginx-pvc
+
+apiVersion: dataservices.nutanix.com/v1alpha1
+kind: ApplicationSnapshot
+metadata:
+  name: ndk-snapshot
+  namespace: arief-nginx
+spec:
+  source:
+    applicationRef:
+      name: nginx-only
+  expiresAfter: 180m
+
+kubectl get Application -n arief-nginx
+kubectl get applicationsnapshot -n arief-nginx  # --> Wait until ready-to-use true
+
+NAME           AGE   READY-TO-USE   BOUND-SNAPSHOTCONTENT                      SNAPSHOT-AGE
+ndk-snapshot   13s   true           asc-fd5c9688-d819-41ec-a7ab-8adb170af72a   8s
+
+kubectl get applicationsnapshot -n arief-nginx ndk-snapshot  -o yaml -w
+
+*** script to cleanup ***
+kubectl delete Application -n arief-nginx nginx-only
+kubectl delete applicationsnapshot -n arief-nginx ndk-snapshot
+
+10. Replication Applicatoin Snapshot from DC to DRC
+
+apiVersion: dataservices.nutanix.com/v1alpha1
+kind: ApplicationSnapshotReplication
+metadata:
+  name: nginx-only-replication
+  namespace: arief-nginx
+spec:
+  applicationSnapshotName: ndk-snapshot
+  replicationTargetName: replication-target-drc
+
+kubectl get applicationsnapshotreplication -n arief-nginx
+
+NAME                     AVAILABLE   APPLICATIONSNAPSHOT   REPLICATIONTARGET        AGE
+nginx-only-replication   True        ndk-snapshot          replication-target-drc   24s
+
+*** script to cleanup ***
+kubectl delete applicationsnapshotreplication -n arief-nginx nginx-only-replication
+
+11. Restore Snaphot in 2nd Managed Cluster (DRC)
+    
+    -   Check snapshot has been replication from 1st managed cluster (DC)
+
+        kubectl get applicationsnapshot -n arief-nginx
+
+        NAME           AGE   READY-TO-USE   BOUND-SNAPSHOTCONTENT                                  SNAPSHOT-AGE
+        ndk-snapshot   20m   true           asc-fd5c9688-d819-41ec-a7ab-8adb170af72a-1987f9198a8   20m
+
+    -   Create new resource below:
+
+apiVersion: dataservices.nutanix.com/v1alpha1
+kind: ApplicationSnapshotRestore
+metadata:
+  name: restore-nginx-only
+  namespace: arief-nginx
+spec:
+  applicationSnapshotName: ndk-snapshot
+
+kubectl get ApplicationSnapshotRestore -n arief-nginx
+
+*** script to cleanup ***
+kubectl delete applicationsnapshot -n arief-nginx ndk-snapshot
+kubectl delete ApplicationSnapshotRestore -n arief-nginx restore-nginx-only
 
