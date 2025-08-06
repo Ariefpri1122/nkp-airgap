@@ -377,7 +377,7 @@ add below config (After dnspolicy): *** MAKE SURE imagePullSecrets IN THE SAME I
 
 Click Update Button
 
-* Make sure deployment Running
+* Make sure deployment Running (Click Restart from 3 menu button on redis-cart deployment)
 * For curousity open your harbor dashboard - Projects - proxy_cache ---> there is redis there in the repo with 1 pull
 
 Go to Services - frontend-external --> click the external end points IP Address (make sure application shown)
