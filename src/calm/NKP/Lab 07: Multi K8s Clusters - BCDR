@@ -1,8 +1,8 @@
 MULTI KUBERNETES CLUSTER ENVIRONMENTS
 -------------------------------------
 
-*** BACKUP RESTORE BETWEEN 2 CLUSTERS WITH VELERO ***
------------------------------------------------------
+*** A. BACKUP RESTORE BETWEEN 2 CLUSTERS WITH VELERO ***
+--------------------------------------------------------
 
 *** Create 2nd Managed Kubernetes Cluster ***
 
@@ -11,25 +11,25 @@ Secondary IPAM              :   x.x.x.161-253
 
 Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
     -   Click Add Cluster - Create Cluster
-        -   Cluster Name           		:   yourname-nkp-drc (Ex: arief-nkp-drc)
+        -   Cluster Name            :   yourname-nkp-drc (Ex: arief-nkp-drc)
         ⁃	SSH Public Key			:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBM2C9FLMlL6xXcMRZt6Yjf1cgadN/1S6M8V3M6OQDbD arief.pribadi@nutanix.com # Check cat .ssh/id_ed25519.pub in bastion VM
 		⁃	Nutanix Prism Project	:	lab
-		⁃	Nutanix AOS Cluster	:	PHX-POC334
-		⁃	Subnet			:	aux-1 --> Your secondary Subnet
-		⁃	OS Image		:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
-		⁃	CP End Point IP		:	1st IP from secondary vlan (132) --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.132)
-		⁃	CP Node Count		:	1
-		⁃	CPU Per Node (vCPU)	:	4
-		⁃	Memory Per Node		:	12
-		⁃	Disk Size Per Node	:	80
+		⁃	Nutanix AOS Cluster		:	PHX-POC334
+		⁃	Subnet					:	aux-1 --> Your secondary Subnet
+		⁃	OS Image				:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
+		⁃	CP End Point IP			:	1st IP from secondary vlan (132) --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.132)
+		⁃	CP Node Count			:	1
+		⁃	CPU Per Node (vCPU)		:	4
+		⁃	Memory Per Node			:	12
+		⁃	Disk Size Per Node		:	80
 		⁃	Nutanix Prism Project	:	lab
         ⁃	Nutanix AOS Cluster		:	PHX-POC334
-		⁃	Subnet			:	aux-1 --> Your secondary Subnet
-		⁃	OS Image		:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
-		⁃	Worker Node Count	:	4
-		-	CPU Per Node (vCPU)	:	8
-		⁃	Memory Per Node		:	12
-		⁃	Disk Size Per Node	:	80
+		⁃	Subnet					:	aux-1 --> Your secondary Subnet
+		⁃	OS Image				:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
+		⁃	Worker Node Count		:	4
+		-	CPU Per Node (vCPU)		:	8
+		⁃	Memory Per Node			:	12
+		⁃	Disk Size Per Node		:	80
 		⁃	Storage Container			default
 
         *** PAY ATTENTION TO BELOW CONFIGURATION ***
@@ -38,18 +38,18 @@ Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
         -   Service Network         :   10.96.1.0/12    (NOT --> 10.96.0.0/12)
 
 
-		⁃	Load Balancing Start			:	x.x.x.140)--> (by default secondary vlan is free) (ex: 10.38.106.140)
-		⁃	Load Balancing End			:	x.x.x.150 --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.150)
+		⁃	Load Balancing Start	:	x.x.x.140)--> (by default secondary vlan is free) (ex: 10.38.106.140)
+		⁃	Load Balancing End		:	x.x.x.150 --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.150)
 		⁃	Image Registry Mirror	
-			⁃	URL				:	https://airgap.arief.com:5000
+			⁃	URL					:	https://airgap.arief.com:5000
 			⁃	username			:	admin
 			⁃	password			:	nutanix/4u
-			⁃	CA				:	downloaded cert.crt
+			⁃	CA					:	downloaded cert.crt
 		⁃	Private Registry	
-			⁃	URL				:	https://10.38.106.41:5000	# Your harbor URL Access as noted above
+			⁃	URL					:	https://10.38.106.41:5000	# Your harbor URL Access as noted above
 			⁃	username			:	nutanix
 			⁃	password			:	nx2Tech974!
-			⁃	CA				:	downloaded ca.cert
+			⁃	CA					:	downloaded ca.cert
 	-	Create
 
 Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
@@ -370,8 +370,8 @@ reclaimPolicy: Delete
 volumeBindingMode: Immediate
 
 
-*** DATA PROTECTION AND REPLICATION BETWEEN 2 CLUSTERS WITH NUTANIX DATA SERVICE FOR KUBERNETES (NDK) ***
----------------------------------------------------------------------------------------------------------
+*** B. DATA PROTECTION AND REPLICATION BETWEEN 2 CLUSTERS WITH NUTANIX DATA SERVICE FOR KUBERNETES (NDK) ***
+------------------------------------------------------------------------------------------------------------
 
 1.  NDK Airgap Installation on Your 1st Managed Cluster (DC)
 
@@ -709,3 +709,86 @@ kubectl get ApplicationSnapshotRestore -n arief-nginx
 kubectl delete applicationsnapshot -n arief-nginx ndk-snapshot
 kubectl delete ApplicationSnapshotRestore -n arief-nginx restore-nginx-only
 
+
+*** C. Multi-CLuster GitOps Application Continues Deployment ***
+----------------------------------------------------------------
+
+Examine existing 1st Managed Cluster (DC) 
+-----------------------------------------
+From NKP Manage-Cluster Dasboard - Your Workspace - Projects - Click your name project, explore the tabs and you will see this setups:
+
+Clusters                        :  Only 1 Cluster listed (your 1st managed cluster (DC) )
+Continuous Deployment (CD)      :  online-boutique
+Repository URL                  :  https://github.com/nutanixdev/nkp-microservices-demo.git
+
+
+-   We will add our 2nd Managed Cluster (DRC) as part of this project so it will get same settings including the GitOps Setting
+    *   online-boutique will be deployed to your 2nd managed cluster (DRC)
+
+    * Click Edit Project (top right corner)
+    * Select your 2nd managed cluster
+    * Save
+    * Now you will see 2 clusters in your project.
+
+    * Click COntinues Deployment (CD)
+    * Click 3 dot menu (right side) of online-boutique GitOps Source
+    * CLick RESUME
+
+
+Check the deployment 
+--------------------
+
+Done below steps from 2nd Managed Cluster (DRC)
+
+From Kubernetes Dashboard  -->  Check Deployment, make sure deployment success (Please be aware that creating new project will create new namespace based on your project name)
+
+Troubleshooting redis card pod:
+-------------------------------
+
+This error is by desigend.
+  - redis-cart error (this is happened because the image is in docker hub, while other deployment's image use gcp artifact with no auth and limit -- while docker hub has maximum limit):
+
+From Code-Server (Bastion VM):
+  - kubectx --> choose commander context
+  
+    export HARBOR_ADDRESS="$(kubectl -n kommander get kommandercluster host-cluster -o jsonpath='{.status.ingress.address}')"
+    echo $HARBOR_ADDRESS
+
+Create harbor-registry-credentials manifest in new project namespace:
+---------------------------------------------------------------------
+
+kubectx --> choose your 2nd Managed Cluster (DRC)
+kubens --> make sure you choose your new project namespace
+
+cat /etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt --> make sure the file exist
+
+REGISTRY_USERNAME="nutanix"
+REGISTRY_PASSWORD="nx2Tech974!" #change password to your cluster password
+
+kubectl create secret generic harbor-registry-credentials \
+--from-literal username=$REGISTRY_USERNAME \
+--from-literal password=$REGISTRY_PASSWORD \
+--from-file=/etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt
+
+kubectl get secrets --> "harbor-registry-credentials" secret created
+
+Modify RedisCart Deployment to fix the problem:
+-----------------------------------------------
+From NKP Dashboard - your workspace - Projects - your project - Continues Deployment (CD) :
+  - Click 3 button menu from online-boutique GitOps Source
+  - Click Suspend
+
+From Kubernetes Dashboard:
+  - Modify Redist-Card Deployment:
+      * change the image location to --> image: 10.38.106.41:5000/proxy_cache/redis:alpine #Change the IP Address to your harbor IP
+
+add below config (After dnspolicy): *** MAKE SURE imagePullSecrets IN THE SAME INDENT WITH dnspolicy ***
+      imagePullSecrets:
+        - name: harbor-registry-credentials
+
+Click Update Button
+
+* Make sure deployment Running (Click Restart from 3 menu button on redis-cart deployment)
+* For curousity open your harbor dashboard - Projects - proxy_cache ---> there is redis there in the repo with 1 pull
+
+Go to Services - frontend-external --> click the external end points IP Address (make sure application shown)
