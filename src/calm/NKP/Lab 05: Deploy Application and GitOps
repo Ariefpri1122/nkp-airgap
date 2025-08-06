@@ -368,7 +368,7 @@ From NKP Dashboard - your workspace - Projects - your project - Continues Deploy
   - Click Suspend
 
 From Kubernetes Dashboard:
-  - Modify Redist-Card Reployment:
+  - Modify Redist-Card Deployment:
       * change the image location to --> image: 10.38.106.41:5000/proxy_cache/redis:alpine #Change the IP Address to your harbor IP
 
 add below config (After dnspolicy): *** MAKE SURE imagePullSecrets IN THE SAME INDENT WITH dnspolicy ***
