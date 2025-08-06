@@ -346,6 +346,7 @@ From Code-Server (Bastion VM):
 Create harbor-registry-credentials manifest in new project namespace:
 ---------------------------------------------------------------------
 
+kubectx --> choose your 1st Managed Cluster (DC)
 kubens --> make sure you choose your new project namespace
 
 cat /etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt --> make sure the file exist
