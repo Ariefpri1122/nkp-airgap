@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: arief-nginx-pvc
+  name: arief-nginx-pvc
+  namespace: arief-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: arief-nginx-pvc
+  template:
+    metadata:
+      labels:
+        k8s-app: arief-nginx-pvc
+    spec:
+      containers:
+        - image: 10.38.106.41:5000/library/arief-nginx
+          name: arief-nginx-pvc
+          volumeMounts:
+            - name: nginx-persistent-storage
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: nginx-persistent-storage
+          persistentVolumeClaim:
+            claimName: nginx-pv-claim
+      imagePullSecrets:
+        - name: harbor-registry-credentials
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: arief-nginx-pvc
+  name: arief-nginx-pvc
+  namespace: arief-nginx
+spec:
+  selector:
+    k8s-app: arief-nginx-pvc
+  ports:
+    - name: tcp-80
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-pv-claim
+  namespace: arief-nginx
+  labels:
+    k8s-app: arief-nginx-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
