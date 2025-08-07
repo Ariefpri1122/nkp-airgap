@@ -2,7 +2,9 @@ Lab 10: CI/CD with Gitlab
 --------------------------
 
 Deploy Gitlab Blueprint:
-———————————
+———————————-------------
+
+From Prism Central:
 
 Download BP Gitlab from https://github.com/Ariefpri1122/nkp-airgap/blob/main/src/calm/APR_Gitlab.json
 Upload BP Private_Mirror Jason  to Self-service
@@ -12,15 +14,19 @@ Configure Gitlab_VM:
         2. in VM Name : add your initial in front of the vm name --> ‘apr-‘
         3. Configure Image —> AHV_ROCKY_89
         4. Add Nic and select vlan —> make sure use DYNAMIC IP
-        5. Check log-in upon create and every subsequent
         6. Save
 Launch Blueprint —> Name: “Your_init”_Gitlab
+
+From AUTOAD VM:
+
 Add DNS Host A Record gitlab.arief.com mapped to its IP Address
-Login to gitlab —> username:root with password in —> sudo cat /etc/gitlab/initial_root_password
+
+Login to gitlab —> username:root with password in —> sudo cat /etc/gitlab/initial_root_password (ssh rocky@gitlab.arief.com)
 Click → Preferences→Password to nutanix/4u
-Login with new username password —> Admin Area - CI/CD - Runners - Click 3 dot menu near ‘Create instance runner’ - Copy Registration Token
-Take note on the registration token (ex: YCw89xxJizzhD7FSyr5m )
-Take note on the harbor IP Address
+Login with new username password —> Admin Area (Below Left Menu) - CI/CD - Runners - Click 3 dot menu near ‘Create instance runner’ - Copy Registration Token
+
+Take note on the registration token (ex: k4iyzpJSg25G7qxF1myA )
+Take note on the harbor IP Address --> 10.38.106.41 (just IP Address not URL or Port Number)
 Take note on the harbor ca file located in AUTOAD VM http://[autoad vm ip]/ca.crt
 
 
@@ -53,9 +59,9 @@ Fork Application to Your Gitlab Repository
 Login to your gitlab dashboard - Setting - General - Import and Export Settings - Checked —> Github and Repository by URL
 Click Save Chages
 
-Click Home - Projects - Click New Project button - Import Project - Repository bu URL
+Click Home (Click Gitlab Logo left top corner) - Projects - Click New Project button - Import Project - Repository by URL
 Git repository URL	: 	https://github.com/Ariefpri1122/NKP_Advance_Workshop.git
-Project Name		:	[yourname] Workshop Advanced
+Project Name		:	[yourname] NKP Workshop Advanced
 Project URL		:	make sure use “root”
 Click Create Project
 
@@ -65,13 +71,22 @@ Go to settings in the downside of left menu:
 
 Go to you project - edit .gitlab-ci.yml :
 - Line 13	—> change URL to your harbor IP, change username to nutanix and change the password to nutanix cluster password 
-				(ex: docker login https://10.38.13.140:5000 -u nutanix -p nx2Tech806!)
+				(ex: docker login https://10.38.106.41:5000 -u nutanix -p nx2Tech974!)
 - Line 17 —> change URL to your harbor IP and add /library in front of 5000:
-				(ex: docker tag arief_laravel_$CI_COMMIT_BRANCH 10.38.13.140:5000/library/arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG
+				(ex: docker tag arief_laravel_$CI_COMMIT_BRANCH 10.38.106.41:5000/library/arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG
 - Line 18 —> change URL to your harbor IP and add /library in front of 5000:
-				(ex: docker push 10.38.13.140:5000/library/arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG
+				(ex: docker push 10.38.106.41:5000/library/arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG
 - Commit message —> put “nyalip”
+
 Click Commit Changes
+
+Go to Build - Pipelines - Click the running pipeline - Click 'Application Deployment Production'
+  * You will see the CICD Pipeline (.gitlan-ci.yml) tasks has been executed
+  * The las step of the pipline is to PUSH built container image to harbor registry
+
+From Harbor Dashboard - Projects - Library
+  * You will see library/[yourname]_laravel_master artifact is pushed 
+  
 
 Create workshop_advanced-gitops Project: --> for GitOps (Flux) Monitoring changes
 ---------------------------------------------------------------------------------
@@ -92,7 +107,10 @@ Folder Structure:
         └── deployment.yaml
 
 Each Deployment.yaml --> take a not that different deployment will have different "environment labels"
-** Make sure you use correct namepace and yourname to replace "arief" name based on your CICD pipeline
+
+Input the yaml below to /envs/master/deployment.yaml:
+
+*** Make sure you use correct namepace, harbor IP Address, image tags, and yourname to replace "arief" name based on your CICD pipeline (if you change it) ***
 
 apiVersion: apps/v1
 kind: Deployment
@@ -100,7 +118,7 @@ metadata:
   labels:
     k8s-app: arief-landon
   name: arief-landon
-  namespace: arief-project-p284h
+  namespace: arief-project-zc6sw
 spec:
   replicas: 1
   selector:
@@ -113,7 +131,7 @@ spec:
       name: arief-landon
     spec:
       containers:
-        - image: 10.38.13.140:5000/library/arief_laravel_master:v1.0.0-c00ea196
+        - image: 10.38.106.41:5000/library/arief_laravel_master:v1.0.0-6302a336
           name: arief-landon
           resources: {}
       imagePullSecrets:
@@ -127,7 +145,7 @@ metadata:
   labels:
     k8s-app: arief-landon
   name: arief-landon
-  namespace: arief-project-p284h
+  namespace: arief-project-zc6sw
 spec:
   ports:
     - name: tcp-9999-9999-5mnkm
@@ -143,46 +161,66 @@ spec:
 Store GitOps Token in GitLab CI/CD variables in your Workshop Advanced Project (not in workshop_advanced-gitops)
 ----------------------------------------------------------------------------------------------------------------
 
-How to Create a Personal Access Token in GitLab
-Log in to GitLab.
+Create a Personal Access Token in GitLab  :
 
-Go to your Profile:
-Click your avatar (top-right) → Edit profile.
-Go to Access Tokens:
-In the left sidebar, select Access Tokens (or Personal Access Tokens, depending on GitLab version) - Add new toker button
-Fill in the token form:
-Name: gitops-ci-token
+  - Log in to GitLab.
+  - Click your avatar (top-right) → Edit profile.
+  - In the left sidebar, select Access Tokens (or Personal Access Tokens, depending on GitLab version) - Add new token button
+  - Fill in the token form:
+      Name: gitops-ci-token
 
-Scopes (tick the following):
+        Scopes (tick the following):
 
-✅ api
-✅ write_repository
-✅ read_repository
+        ✅ api
+        ✅ write_repository
+        ✅ read_repository
 
-Click "Create personal access token".
-Copy and save the token
-glpat-PQ6czkPtU1ixpq81--bG
+  - Click "Create personal access token".
+  - Copy and save the token
 
-Add the following CI/CD variables to your app repo:
-GITOPS_USER → your GitLab username
-GITOPS_TOKEN → personal access token with repo write permission
+      glpat-S6KX-JSXCxJGscbLmvuC
 
-Go to your GitLab project: Open your project in GitLab. in your Workshop Advanced Project (not in workshop_advanced-gitops)
-Navigate to CI/CD settings: On the left sidebar, go to Settings > CI/CD.
-Expand Auto DevOps section: Unchecked Default to Auto DevOps pipeline --> save changes
-Expand the Variables section: Scroll down to the Variables section and click Expand.
-Add a new variable: Click Add variable.
-For the GitOps user:
-Key: GITOPS_USER
-Value: root
+Add CI/CD variables to your app repo:
 
-For the GitOps token:
-Key: GITOPS_TOKEN
-Value: your GitOps token (personal access token or deploy token)
-Save the variables: Click Add variable for each variable.
+- Go to your GitLab project: Open your project in GitLab. in your Workshop Advanced Project (not in workshop_advanced-gitops)
+- On the left sidebar, go to Settings > CI/CD.
+- Expand Auto DevOps section: Unchecked Default to Auto DevOps pipeline --> save changes (if not yet done)
+- Expand the Variables section: Scroll down to the Variables section and click Expand.
+    * Add a new variable: Click Add variable.
 
-Update existing Gitlab-ci.yaml to support GitOps your Workshop Advanced Project (not in workshop_advanced-gitops)
-------------------------------------------------------------------------------------------------------------------
+          Key: GITOPS_USER
+          Value: root
+
+          Save
+
+          Key: GITOPS_TOKEN
+          Value: your GitOps token (personal access token or deploy token)
+
+          Save
+
+- From code-server (bastion VM):
+    
+    export GITOPS_USER=root
+    export GITOPS_TOKEN=glpat-S6KX-JSXCxJGscbLmvuC    # your gitlab token
+
+    git clone http://$GITOPS_USER:$GITOPS_TOKEN@gitlab.arief.com/root/arief-nkp-advance-workshop.git
+
+      Cloning into 'arief-nkp-advance-workshop'...
+      remote: Enumerating objects: 7686, done.
+      remote: Counting objects: 100% (18/18), done.
+      remote: Compressing objects: 100% (18/18), done.
+      remote: Total 7686 (delta 7), reused 0 (delta 0), pack-reused 7668 (from 1)
+      Receiving objects: 100% (7686/7686), 9.49 MiB | 35.35 MiB/s, done.
+      Resolving deltas: 100% (1816/1816), done.
+
+    Cloning process must be successfull
+
+Update existing Gitlab-ci.yaml to support GitOps your Workshop Advanced Project (not in workshop_advanced-gitops project)
+-------------------------------------------------------------------------------------------------------------------------
+
+Add below lines 19 --> Modify as necessary (ex: harbor IP address, or other names if you use your name)
+
+*** Make sure the - git command align with previous/above - git command (yaml is indent sensitive) ***
 
      # Clone the GitOps repo
      - git config --global user.email "ci@example.com"
@@ -192,7 +230,7 @@ Update existing Gitlab-ci.yaml to support GitOps your Workshop Advanced Project 
      
      # Patch the deployment.yaml image tag
      - |
-        sed -i "s|image: .*|image: 10.38.13.140:5000/library/arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG|g" deployment.yaml
+        sed -i "s|image: .*|image: 10.38.106.41:5000/library/arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG|g" deployment.yaml
      # Only proceed if there are actual changes
      - |
         if git diff --quiet; then
@@ -205,7 +243,15 @@ Update existing Gitlab-ci.yaml to support GitOps your Workshop Advanced Project 
           git push origin main
         fi
 
-Commit Changes
+CLick Commit Changes 2x
+
+From Gitlab Dashboard - Your NKP Advance Workshop:
+- Click Code Button (Top Right)
+- Click Copy button Clone with HTTP:
+
+    http://gitlab.arief.com/root/arief-nkp-advance-workshop.git
+
+- Take note of above URL --> make sure the URL match with URL in below script
 
 Configure GitOps in NKP Project
 -------------------------------
@@ -215,13 +261,75 @@ Data  : Add Key Value Pair
         Key   : username
         value : root
         key   : password
-        value : glpat-PQ6czkPtU1ixpq81--bG
+        value : glpat-S6KX-JSXCxJGscbLmvuC    # Your Gitlab Token
 Click Create
 
 Go to your NKP Dashboard - Chooce your project workshop - Continous Deployment (CD) - Add GitOps Source
 Name                : gitopsmaster
-URL                 : http://10.38.13.171/root/workshop_advanced-gitops.git --> you can test this from you laptop/bastion vm from browser
+URL                 : http://gitlab.arief.com/root/workshop_advanced-gitops.git --> Change this to your GITOPS PROJECT URL (Not NKP_Advanced Project)
 Branch              : main
 Path                : ./envs/master
 Primary Git Secret  : gitlab-tokens
 Click Save
+
+Make changes in source code and Examining CI/CD Process
+-------------------------------------------------------
+
+1.  Modify Source Code
+    - From gitlab your NKP Advance Workshop - Repository
+      * resources / views / contents / home.blade.php
+      * Edit single file
+      * Modify <h4> header with different name
+      * Commit changes
+      * put "nyalip" in commit message
+      * commit changes
+2.  Examine CICD Pipeline
+    - From Pipelines (left pane menu)
+      * Click running pipline
+      * Click Application Deployment Production
+      * examine the tasks executed, you will notice --> Changes is image tag (version)
+
+          $ git clone http://$GITOPS_USER:$GITOPS_TOKEN@gitlab.arief.com/root/workshop_advanced-gitops.git
+          Cloning into 'workshop_advanced-gitops'...
+          $ cd workshop_advanced-gitops/envs/$CI_COMMIT_BRANCH
+          $ sed -i "s|image: .*|image: 10.38.106.41:5000/library/arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG|g" deployment.yaml
+          $ if git diff --quiet; then # collapsed multi-line command
+          [main f6226de] Update image to arief_laravel_master:v1.0.0-8bd00717
+          1 file changed, 1 insertion(+), 1 deletion(-)
+          To http://gitlab.arief.com/root/workshop_advanced-gitops.git
+
+3.  Check changes in workshop_advanced-gitops project
+    - From gitlab your Advance Workshop - GitOPS in New WINDOWS (so you can easily compare)
+      * You will notice there is an updates on envs folder
+      * click that env folder --> notice there is changes in master folder
+      * click that master folder --> notice there a change in deployment.yaml (changes happened in line 20 which is the image tag/version changed)
+      
+    NKP GitOps (Flux) with monitor this workshop_advanced-gitops project for changes based on per minute job/check.
+
+4.  Deployment.yaml will be exeuted --> examine deployment in project-xxx namespace
+    - From Kubernetes Dashboard - choose your Project-xxx namespace
+      * Click deployments
+      * Examine new application deployment
+
+5.  Open the application frontpage by clicking its services external ip address from kubernetes dashboard
+    - From Kubernetes Dashboard - choose your Project-xxx namespace
+      * Click Service - Services
+      * Examine your application external endpoints - click the IP
+
+6.  Modify Source Code Again (2nd Time)
+    - From gitlab your NKP Advance Workshop - Repository
+      * resources / views / contents / home.blade.php
+      * Edit single file
+      * Modify line 7 : src="images/together.jpg" --> change to src="images/london.jpg"
+      * Commit changes
+      * put "nyalip" in commit message
+      * commit changes
+7.  Examine CICD Pipeline --> make sure "passed"
+8.  Check changes in workshop_advanced-gitops project --> Notice the changes happened again (see last updated time)
+9.  Deployment.yaml will be exeuted --> examine Replica Set in project-xxx namespace
+10.  Open the application frontpage by clicking its services external ip address from kubernetes dashboard
+
+Take note that this deployment is applied to both Managed Cluster DC and DRC.
+
+
+
