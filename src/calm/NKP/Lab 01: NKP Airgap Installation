@@ -319,7 +319,29 @@ nkp create cluster nutanix \
     --self-managed \
     --airgapped
 
-If Failed:
+If Failed - Troubleshoot:
+
+    -   From Code-Server (Bastion VM):
+
+        export KUBECONFIG=airgapped-hm-nkp-demo-2-bootstrap.conf (file may varies based on your cluster name)
+        kubectl get machine
+
+            NAME                                             CLUSTER                   NODENAME   PROVIDERID   PHASE     AGE   VERSION
+            airgapped-hm-nkp-demo-2-md-0-cbs49-w9l7x-8sj55   airgapped-hm-nkp-demo-2                           Pending   57s   v1.32.3
+            airgapped-hm-nkp-demo-2-md-0-cbs49-w9l7x-kfntt   airgapped-hm-nkp-demo-2                           Pending   57s   v1.32.3
+            airgapped-hm-nkp-demo-2-md-0-cbs49-w9l7x-vvwtz   airgapped-hm-nkp-demo-2                           Pending   57s   v1.32.3
+            airgapped-hm-nkp-demo-2-md-0-cbs49-w9l7x-zv4kg   airgapped-hm-nkp-demo-2                           Pending   57s   v1.32.3
+            airgapped-hm-nkp-demo-2-nlv59-dqqqf              airgapped-hm-nkp-demo-2                           Failed    71s   v1.32.3
+
+        kubectl describe machine airgapped-hm-nkp-demo-2-nlv59-dqqqf | more
+
+            Failure Message:         Failure detected from referenced resource infrastructure.cluster.x-k8s.io/v1beta1, Kind=NutanixMachine with name "airgapped-hm-nkp-demo-2-nlv59-dqqqf": failed to get the disk list to create the VM airgapped-hm-nkp-demo-2-nlv59-dqqqf. more than one image found with name nkp-rocky-9.5-release-1.32.3-20250605191120.qcow2
+            Failure Reason:          CreateError
+            Last Updated:            2025-08-07T06:52:23Z
+            Observed Generation:     2
+            Phase:                   Failed
+
+If Failed - Re-run:
     1. in PC go to Infrastructure - Storage - Volume Groups
     2. Click pvc that created by nkp (named with pvc**) - Manage Connection - DELETE selected virtual machine - save
     3. Click delete button - check Acknowledgement - Delete
