@@ -5,12 +5,12 @@ From autoad VM - Administrative Tools - Active Directory User and Computers:
 	1.	Create your own NKP admin account
 		- From AD User and Computer - Click Users Folder
 		- Copy User Account Administrator and create new user account based on your name
-			* First Name		: arief
+			* First Name			: arief
 			* Last Name			: pribadi
-			* User Logon Name	: arief.pribadi
+			* User Logon Name		: arief.pribadi
 			* Next
 			* Password			: [your complex password]
-			* Confirm Password	: [your complex password]
+			* Confirm Password		: [your complex password]
 			* Check User cannot change password
 			* Check Password never expires
 			* Next
@@ -29,28 +29,28 @@ From autoad VM - Administrative Tools - Active Directory User and Computers:
 (Lets get back to Lab01)
 
 	4.	From NKP Dashboard - Global - Identity Providers - Add Identity Provider - Click LDAP
-			Workspace					:	All Workspace
-			Name						: 	ntnxlab.local
-			Host						: 	[autoad vm ip address:389] (ex: 10.38.106.6:389)
+			Workspace				:	All Workspace
+			Name					: 	ntnxlab.local
+			Host					: 	[autoad vm ip address:389] (ex: 10.38.106.6:389)
 			Bind DN				    	: 	CN=administrator,CN=Users,DC=ntnxlab,DC=local
 			Bind Password				: 	[cluster password] (ex: nx2Tech974!)
 			Root CA				    	: 	Check Insecure No SSL and Check Insecure Skip TLS Verify
 			User Search Base DN			: 	CN=Users,DC=ntnxlab,DC=local
-			User Search Username		: 	sAMAccountName
-			User Search ID Attribute	: 	DN
+			User Search Username			: 	sAMAccountName
+			User Search ID Attribute		: 	DN
 			User Search E-Mail			: 	userPrincipalName
 			User Search Name			: 	name
 			Checked —> group search queries for groups
-			Group Search Base DN		: 	CN=Users,DC=ntnxlab,DC=local
+			Group Search Base DN			: 	CN=Users,DC=ntnxlab,DC=local
 			Group Search Filter			: 	(objectClass=group)
-			Group Search Name Attribute	: 	cn
+			Group Search Name Attribute		: 	cn
 			Add —> User Matchers
 			Group Search Group Attribute: 	member
-			Group Search User Attribute	:	DN
+			Group Search User Attribute		:	DN
 			Save
 
 	5.	From NKP Dashboard - Global - Identity Providers - Groups - Create Group
-			Name						: NKP Admins
+			Name					: NKP Admins
 			Click Add Group
 			Groups				        : oidc:NKP Admins
 			Save
