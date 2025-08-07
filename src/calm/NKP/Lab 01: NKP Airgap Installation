@@ -193,6 +193,9 @@ Remote SSH to nutanix@bastion VM IP Address from your laptop or autoad VM
         - ~/.fzf/install --> Follow the instruction with YES answer
         - source ~/.bashrc
         - fzf --version
+- Create kubectl alias:
+        alias k=kubectl
+        complete -o default -F __start_kubectl k
 
 From your laptop -- Check avail NKP Ultimate license and its expired Date
     1. https://portal.nutanix.com/page/licensing - In left pane menu - click - clusters - Licensed with Key 
