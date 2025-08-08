@@ -8,7 +8,7 @@ Deploy NKP Cluster Commander AirGap Method
 
 Multi-Cluster HPOC:
 * Note that IP Address range in HPOC Primary VLAN is —> x.x.x.1 - x.x.x.126
-* IPAM range    :   x.x.x.39-x.x.x.125  --> Need to be modified to x.x.x.60-x.x.x.125 (please configure ip pool in default vlan in prism element/central)
+* IPAM range    :   x.x.x.39-x.x.x.125  --> Need to be modified to x.x.x.80-x.x.x.125 (please configure ip pool in default vlan in prism element/central)
                                             *****************************************
 
 * Note that IP Address range in HPOC Secondary VLAN is —> x.x.x.132 - x.x.x.254
