@@ -42,7 +42,7 @@ From NKP Dashboard - Global - Workspaces:
 		⁃	Disk Size Per Node		:	80
 		⁃	Storage Container			default
 		⁃	Load Balancing Start		:	Start +1 IP from CP End Point Above (ex: 10.38.106.53)--> make sure checked by PING or IP Scanner its a FREE IP
-		⁃	Load Balancing End		:	End +6 IP from above --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.59)
+		⁃	Load Balancing End		:	End +12 IP from above --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.65)
 		⁃	Image Registry Mirror	
 			⁃	URL				:	https://airgap.arief.com:5000
 			⁃	username			:	admin
