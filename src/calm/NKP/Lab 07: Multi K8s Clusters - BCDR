@@ -34,7 +34,7 @@ Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
 
         *** PAY ATTENTION TO BELOW CONFIGURATION ***
 
-        -   Pod Network             :   172.20.0.0/16  (NOT --> 192.168.0.0/16)
+        -   Pod Network             :   172.20.0.0/16  	(NOT --> 192.168.0.0/16)
         -   Service Network         :   10.120.0.0/12   (NOT --> 10.96.0.0/12)
 
 
