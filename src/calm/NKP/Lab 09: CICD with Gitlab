@@ -1,0 +1,839 @@
+Lab 09: CI/CD with Gitlab
+--------------------------
+
+Deploy Gitlab Blueprint:
+———————————-------------
+
+From Prism Central:
+
+Download BP Gitlab from https://github.com/Ariefpri1122/nkp-airgap/blob/main/src/calm/APR_Gitlab.json
+Upload BP Private_Mirror Jason  to Self-service
+Input GITLAB_DNS_NAME variable (ex: gitlab.arief.com)
+Configure Gitlab_VM:
+        1. Configure Cluster
+        2. in VM Name : add your initial in front of the vm name --> ‘apr-‘
+        3. Configure Image —> AHV_ROCKY_89
+        4. Add Nic and select vlan —> make sure use DYNAMIC IP
+        6. Save
+Launch Blueprint —> Name: “Your_init”_Gitlab
+
+From AUTOAD VM:
+
+Add DNS Host A Record gitlab.arief.com mapped to its IP Address
+
+Login to gitlab —> username:root with password in —> sudo cat /etc/gitlab/initial_root_password (ssh rocky@gitlab.arief.com)
+Click → Preferences→Password to nutanix/4u
+Login with new username password —> Admin Area (Below Left Menu) - CI/CD - Runners - Click 3 dot menu near ‘Create instance runner’ - Copy Registration Token
+
+Take note on the registration token (ex: k4iyzpJSg25G7qxF1myA )
+Take note on the harbor IP Address --> 10.38.106.41 (just IP Address not URL or Port Number)
+Take note on the harbor ca file located in AUTOAD VM http://[autoad vm ip]/ca.crt
+
+
+Deploy Gitlab-runner Blueprint
+——————————————
+
+Download BP Gitlab Runner from https://github.com/Ariefpri1122/nkp-airgap/blob/main/src/calm/APR_Gitlab_Runner.json
+Upload BP Girlab Runner Jason  to Self-service
+Input blueprint variables:
+- harbor_ip_address
+- runner_token
+- your domain_name
+- registry_ca —> which is our harbor ca file located in autoad vm URL 
+Configure Gitlab_Runner_VM:
+	1.	Configure Cluster
+	2.	Service Name : Gitllab_Runner
+	3.	Name : VM_GitlabRunner
+	4.	in VM Name : add your initial in front of the vm name --> ‘apr-Gitlab_Runner‘
+	5.	Configure Image —> Rocky-9-GenericCloud-Base.latest.x86
+	6.	Add Nic and select vlan —> make sure use DYNAMIC IP
+	7.	Check log-in upon create and every subsequent
+	8.	Save
+
+Launch Blueprint —> Name: “Your_init”_Gitlab_Runner
+Add DNS Host A Record runner.arief.com mapped to its IP Address
+
+Fork Application to Your Gitlab Repository
+———————————————————
+
+Login to your gitlab dashboard - Setting - General - Import and Export Settings - Checked —> Github and Repository by URL
+Click Save Chages
+
+Click Home (Click Gitlab Logo left top corner) - Projects - Click New Project button - Import Project - Repository by URL
+Git repository URL	: 	https://github.com/Ariefpri1122/NKP_Advance_Workshop.git
+Project Name		:	[yourname] NKP Workshop Advanced
+Project URL		:	make sure use “root”
+Click Create Project
+
+Go to settings in the downside of left menu:
+- CICD - Unchecked Auto DevOps - Save Changes
+- Runners - Make sure to turn on instance runner for this project
+
+Go to you project - edit .gitlab-ci.yml :
+- Line 13	—> change URL to your harbor IP, change username to nutanix and change the password to nutanix cluster password 
+				(ex: docker login https://10.38.106.41:5000 -u nutanix -p nx2Tech974!)
+- Line 17 —> change URL to your harbor IP and add /library in front of 5000:
+				(ex: docker tag arief_laravel_$CI_COMMIT_BRANCH 10.38.106.41:5000/library/arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG
+- Line 18 —> change URL to your harbor IP and add /library in front of 5000:
+				(ex: docker push 10.38.106.41:5000/library/arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG
+- Commit message —> put “nyalip”
+
+Click Commit Changes
+
+Go to Build - Pipelines - Click the running pipeline - Click 'Application Deployment Production'
+  * You will see the CICD Pipeline (.gitlan-ci.yml) tasks has been executed
+  * The las step of the pipline is to PUSH built container image to harbor registry
+
+From Harbor Dashboard - Projects - Library
+  * You will see library/[yourname]_laravel_master artifact is pushed 
+  
+
+Create workshop_advanced-gitops Project: --> for GitOps (Flux) Monitoring changes
+---------------------------------------------------------------------------------
+
+From Home Gitlab dashboard - click New Project Button - Create Blank project
+Project Name  : workshop_advanced-gitops
+Project URL   : make sure use "root"
+Click Create Project 
+Create below folder structure:
+Folder Structure:
+.
+└── envs/
+    ├── development/
+    │   └── deployment.yaml
+    ├── stagging/
+    │   └── deployment.yaml
+    └── master/
+        └── deployment.yaml
+
+Each Deployment.yaml --> take a not that different deployment will have different "environment labels"
+
+
+==========================================================================================================================
+Input the yaml below to /envs/master/deployment.yaml:
+==========================================================================================================================
+*** Make sure you use correct namepace, harbor IP Address, image tags, and yourname to replace "arief" name based on your CICD pipeline (if you change it) ***
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: arief-landon-master
+  name: arief-landon-master
+  namespace: arief-project-zc6sw
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: arief-landon-master
+  template:
+    metadata:
+      labels:
+        k8s-app: arief-landon-master
+      name: arief-landon-master
+    spec:
+      containers:
+        - image: 10.38.106.41:5000/library/arief_laravel_master:v1.0.0-6302a336
+          name: arief-landon-master
+          resources: {}
+      imagePullSecrets:
+        - name: harbor-registry-credentials
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    k8s-app: arief-landon-master
+  name: arief-landon-master
+  namespace: arief-project-zc6sw
+spec:
+  ports:
+    - name: tcp-9999-master
+      port: 9999
+      protocol: TCP
+      targetPort: 9999
+  selector:
+    k8s-app: arief-landon-master
+  type: LoadBalancer
+
+==========================================================================================================================
+Input above yaml to /envs/development/deployment.yaml
+==========================================================================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: arief-landon-development
+  name: arief-landon-development
+  namespace: arief-project-zc6sw
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: arief-landon-development
+  template:
+    metadata:
+      labels:
+        k8s-app: arief-landon-development
+      name: arief-landon-development
+    spec:
+      containers:
+        - image: 10.38.106.41:5000/library/arief_laravel_development:v1.0.0-6302a336
+          name: arief-landon-development
+          resources: {}
+      imagePullSecrets:
+        - name: harbor-registry-credentials
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    k8s-app: arief-landon-development
+  name: arief-landon-development
+  namespace: arief-project-zc6sw
+spec:
+  ports:
+    - name: tcp-9999-development
+      port: 9999
+      protocol: TCP
+      targetPort: 9999
+  selector:
+    k8s-app: arief-landon-development
+  type: LoadBalancer
+
+==========================================================================================================================
+Input above yaml to /envs/stagging/deployment.yaml with changes in below code line:
+==========================================================================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: arief-landon-stagging
+  name: arief-landon-stagging
+  namespace: arief-project-zc6sw
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: arief-landon-stagging
+  template:
+    metadata:
+      labels:
+        k8s-app: arief-landon-stagging
+      name: arief-landon-stagging
+    spec:
+      containers:
+        - image: 10.38.106.41:5000/library/arief_laravel_stagging:v1.0.0-6302a336
+          name: arief-landon-stagging
+          resources: {}
+      imagePullSecrets:
+        - name: harbor-registry-credentials
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    k8s-app: arief-landon-stagging
+  name: arief-landon-stagging
+  namespace: arief-project-zc6sw
+spec:
+  ports:
+    - name: tcp-9999-stagging
+      port: 9999
+      protocol: TCP
+      targetPort: 9999
+  selector:
+    k8s-app: arief-landon-stagging
+  type: LoadBalancer
+==========================================================================================================================
+
+
+Store GitOps Token in GitLab CI/CD variables in your Workshop Advanced Project (not in workshop_advanced-gitops)
+----------------------------------------------------------------------------------------------------------------
+
+Create a Personal Access Token in GitLab  :
+
+  - Log in to GitLab.
+  - Click your avatar (top-right) → Edit profile.
+  - In the left sidebar, select Access Tokens (or Personal Access Tokens, depending on GitLab version) - Add new token button
+  - Fill in the token form:
+      Name: gitops-ci-token
+
+        Scopes (tick the following):
+
+        ✅ api
+        ✅ write_repository
+        ✅ read_repository
+
+  - Click "Create personal access token".
+  - Copy and save the token
+
+      glpat-S6KX-JSXCxJGscbLmvuC
+
+Add CI/CD variables to your app repo:
+
+- Go to your GitLab project: Open your project in GitLab. in your Workshop Advanced Project (not in workshop_advanced-gitops)
+- On the left sidebar, go to Settings > CI/CD.
+- Expand Auto DevOps section: Unchecked Default to Auto DevOps pipeline --> save changes (if not yet done)
+- Expand the Variables section: Scroll down to the Variables section and click Expand.
+    * Add a new variable: Click Add variable.
+
+          Key: GITOPS_USER
+          Value: root
+
+          Save
+
+          Key: GITOPS_TOKEN
+          Value: your GitOps token (personal access token or deploy token)
+
+          Save
+
+- From code-server (bastion VM):
+    
+    export GITOPS_USER=root
+    export GITOPS_TOKEN=glpat-S6KX-JSXCxJGscbLmvuC    # your gitlab token
+
+    git clone http://$GITOPS_USER:$GITOPS_TOKEN@gitlab.arief.com/root/arief-nkp-advance-workshop.git
+
+      Cloning into 'arief-nkp-advance-workshop'...
+      remote: Enumerating objects: 7686, done.
+      remote: Counting objects: 100% (18/18), done.
+      remote: Compressing objects: 100% (18/18), done.
+      remote: Total 7686 (delta 7), reused 0 (delta 0), pack-reused 7668 (from 1)
+      Receiving objects: 100% (7686/7686), 9.49 MiB | 35.35 MiB/s, done.
+      Resolving deltas: 100% (1816/1816), done.
+
+    Cloning process must be successfull
+
+Update existing Gitlab-ci.yaml to support GitOps your Workshop Advanced Project (not in workshop_advanced-gitops project)
+-------------------------------------------------------------------------------------------------------------------------
+
+Add below lines 19 --> Modify as necessary (ex: harbor IP address, or other names if you use your name)
+
+*** Make sure the - git command align with previous/above - git command (yaml is indent sensitive) ***
+
+     # Clone the GitOps repo
+     - git config --global user.email "ci@example.com"
+     - git config --global user.name "CI Bot"
+     - git clone http://$GITOPS_USER:$GITOPS_TOKEN@gitlab.arief.com/root/workshop_advanced-gitops.git
+     - cd workshop_advanced-gitops/envs/$CI_COMMIT_BRANCH
+     
+     # Patch the deployment.yaml image tag
+     - |
+        sed -i "s|image: .*|image: 10.38.106.41:5000/library/arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG|g" deployment.yaml
+     # Only proceed if there are actual changes
+     - |
+        if git diff --quiet; then
+          echo "No changes to commit"
+        else
+          git config user.email "ci@example.com"
+          git config user.name "GitLab CI"
+          git add deployment.yaml
+          git commit -m "Update image to arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG"
+          git push origin main
+        fi
+
+CLick Commit Changes 2x
+
+From Gitlab Dashboard - Your NKP Advance Workshop:
+- Click Code Button (Top Right)
+- Click Copy button Clone with HTTP:
+
+    http://gitlab.arief.com/root/arief-nkp-advance-workshop.git
+
+- Take note of above URL --> make sure the URL match with URL in below script
+
+Configure GitOps in NKP Project
+-------------------------------
+Go to your NKP Dashboard - Chooce your project workshop - Secrets - Create Secret
+Name  : gitlab-tokens
+Data  : Add Key Value Pair
+        Key   : username
+        value : root
+        key   : password
+        value : glpat-S6KX-JSXCxJGscbLmvuC    # Your Gitlab Token
+Click Create
+
+Go to your NKP Dashboard - Chooce your project workshop - Continous Deployment (CD) - Add GitOps Source
+Name                : gitopsmaster
+URL                 : http://gitlab.arief.com/root/workshop_advanced-gitops.git --> Change this to your GITOPS PROJECT URL (Not NKP_Advanced Project)
+Branch              : main
+Path                : ./envs/master
+Primary Git Secret  : gitlab-tokens
+Click Save
+
+Go to your NKP Dashboard - Chooce your project workshop - Continous Deployment (CD) - Add GitOps Source
+Name                : gitopsdevlopment
+URL                 : http://gitlab.arief.com/root/workshop_advanced-gitops.git --> Change this to your GITOPS PROJECT URL (Not NKP_Advanced Project)
+Branch              : main
+Path                : ./envs/development
+Primary Git Secret  : gitlab-tokens
+Click Save
+
+Make changes in source code and Examining CI/CD Process
+-------------------------------------------------------
+
+1.  Modify Source Code
+    - From gitlab your NKP Advance Workshop - Repository
+      * resources / views / contents / home.blade.php
+      * Edit single file
+      * Modify <h4> header with different name
+      * Commit changes
+      * put "nyalip" in commit message
+      * commit changes
+2.  Examine CICD Pipeline
+    - From Pipelines (left pane menu)
+      * Click running pipline
+      * Click Application Deployment Production
+      * examine the tasks executed, you will notice --> Changes is image tag (version)
+
+          $ git clone http://$GITOPS_USER:$GITOPS_TOKEN@gitlab.arief.com/root/workshop_advanced-gitops.git
+          Cloning into 'workshop_advanced-gitops'...
+          $ cd workshop_advanced-gitops/envs/$CI_COMMIT_BRANCH
+          $ sed -i "s|image: .*|image: 10.38.106.41:5000/library/arief_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG|g" deployment.yaml
+          $ if git diff --quiet; then # collapsed multi-line command
+          [main f6226de] Update image to arief_laravel_master:v1.0.0-8bd00717
+          1 file changed, 1 insertion(+), 1 deletion(-)
+          To http://gitlab.arief.com/root/workshop_advanced-gitops.git
+
+3.  Check changes in workshop_advanced-gitops project
+    - From gitlab your Advance Workshop - GitOPS in New WINDOWS (so you can easily compare)
+      * You will notice there is an updates on envs folder
+      * click that env folder --> notice there is changes in master folder
+      * click that master folder --> notice there a change in deployment.yaml (changes happened in line 20 which is the image tag/version changed)
+      
+    NKP GitOps (Flux) with monitor this workshop_advanced-gitops project for changes based on per minute job/check.
+
+4.  Deployment.yaml will be exeuted --> examine deployment in project-xxx namespace
+    - From Kubernetes Dashboard - choose your Project-xxx namespace
+      * Click deployments
+      * Examine new application deployment
+
+5.  Open the application frontpage by clicking its services external ip address from kubernetes dashboard
+    - From Kubernetes Dashboard - choose your Project-xxx namespace
+      * Click Service - Services
+      * Examine your application external endpoints - click the IP
+
+6.  Modify Source Code Again (2nd Time)
+    - From gitlab your NKP Advance Workshop - Repository
+      * resources / views / contents / home.blade.php
+      * Edit single file
+      * Modify line 7 : src="images/together.jpg" --> change to src="images/london.jpg"
+      * Commit changes
+      * put "nyalip" in commit message
+      * commit changes
+7.  Examine CICD Pipeline --> make sure "passed"
+8.  Check changes in workshop_advanced-gitops project --> Notice the changes happened again (see last updated time)
+9.  Deployment.yaml will be exeuted --> examine Replica Set in project-xxx namespace
+10.  Open the application frontpage by clicking its services external ip address from kubernetes dashboard
+
+Take note that this deployment is applied to both Managed Cluster DC and DRC.
+
+
+NDB Operator Integration
+-------------------------
+
+Please identify your NDB information:
+
+From Prism Central:
+- Identify NDB VM IP Address  --> 	10.38.106.14
+- Login to NDB Dashboard
+    username    : admin
+    password    : Your HPOC admin password 
+
+From NDB Dashboard:
+- Click 3 bar menu (top left) - Profile - Compute
+- Click Create Button
+    * Profile Name      : DEFAULT_OOB_SMALL_COMPUTE
+    * vCPUs             : 2
+    * Core per CPU      : 2
+    * Memory (DB)       : 16
+    * Create
+
+From code-server (Bastion VM):
+- cat .ssh/id_ed25519.pub 
+
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBM2C9FLMlL6xXcMRZt6Yjf1cgadN/1S6M8V3M6OQDbD arief.pribadi@nutanix.com
+
+1.  Installation of NDB Operator
+
+      helm repo add nutanix-helm-repo https://nutanix.github.io/helm
+      helm repo update
+
+      kubectl create namespace ndb-operator
+
+      helm install ndb-operator nutanix-helm-repo/ndb-operator \
+      --namespace ndb-operator \
+      --set ndb.address=10.38.106.14 \
+      --set ndb.port=8443 \
+      --set ndb.username=admin \
+      --set ndb.password=nx2Tech974! \
+      --set ndb.skipCertVerification=true
+
+            NAME: ndb-operator
+            LAST DEPLOYED: Thu Aug  7 14:20:59 2025
+            NAMESPACE: ndb-operator
+            STATUS: deployed
+            REVISION: 1
+
+      kubectl get pods -n ndb-operator
+
+            NAME                                               READY   STATUS    RESTARTS   AGE
+            ndb-operator-controller-manager-77b896b5f9-xcwmt   2/2     Running   0          29s            
+
+2.  Create NDB Secret from code-server (bastion vm)
+
+kubens  --> Select Your Project Namespace
+
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ndb-secret
+type: Opaque
+stringData:
+  username: admin
+  password: nx2Tech974!
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-instance-secret-name
+type: Opaque
+stringData:
+  password: nutanix/4u
+  ssh_public_key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBM2C9FLMlL6xXcMRZt6Yjf1cgadN/1S6M8V3M6OQDbD arief.pribadi@nutanix.com
+EOF
+
+kubectl get secrets
+
+    NAME                          TYPE     DATA   AGE
+    db-instance-secret-name       Opaque   2      80s
+    gitlab-tokens                 Opaque   2      9h
+    harbor-registry-credentials   Opaque   3      5d22h
+    ndb-secret                    Opaque   2      80s
+    tls-root-ca                   Opaque   1      5d22h
+
+2.  Create NDBServer Resource from code-server (bastion vm)
+
+kubectl apply -f - <<EOF
+
+apiVersion: ndb.nutanix.com/v1alpha1
+kind: NDBServer
+metadata:
+  labels:
+    app.kubernetes.io/name: ndbserver
+    app.kubernetes.io/instance: ndbserver
+    app.kubernetes.io/part-of: ndb-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: ndb-operator
+  name: ndb
+spec:
+    # Name of the secret that holds the credentials for NDB: username, password and ca_certificate created earlier
+    credentialSecret: ndb-secret
+    # NDB Server's API URL
+    server: https://10.38.106.14:8443/era/v0.9
+    # Set to true to skip SSL certificate validation, should be false if ca_certificate is provided in the credential secret.
+    skipCertificateVerification: true
+
+EOF
+
+kubectl get ndbservers.ndb.nutanix.com
+
+    NAME   STATUS   UPDATED AT
+    ndb    Ok       2025-08-07 23:14:55
+
+curl -k -u admin:nx2Tech974! https://10.38.106.14:8443/era/v0.9/clusters | jq # --> change password to HPOC password
+
+    {"id":"b6aa9662-f7c5-4303-8150-1e0489cb6baa"
+
+3.  Deploy a Database
+
+kubectl apply -f - <<EOF
+
+apiVersion: ndb.nutanix.com/v1alpha1
+kind: Database
+metadata:
+  name: db
+spec:
+  ndbRef: ndb
+  isClone: false
+  databaseInstance:
+    clusterId: "b6aa9662-f7c5-4303-8150-1e0489cb6baa"
+    name: "PGDB-Instance"
+    description: PostgreSQL Created by NDB Operator
+    databaseNames:
+      - apr_landon
+    credentialSecret: db-instance-secret-name
+    size: 10
+    timezone: "UTC"
+    type: postgres
+    profiles:
+      compute:
+        name: "DEFAULT_OOB_SMALL_COMPUTE"
+EOF
+
+4.  While waiting Database to be provision
+
+    * Install pgadmin tools in your project name space
+
+      - From your 1st managed-cluster (DC) kubernetes dashboard
+      - Choose your project namespace
+      - Create new resource (+ sing top right corner)
+      - Create from form
+          App name          : pgadmin
+          container image   : 10.38.106.41:5000/proxy_cache/dpage/pgadmin4
+          number of pods    : 1
+          service           : external
+          port              : 80
+          target port       : 80
+          namespace         : your project namespace
+  
+          Click show advanced options
+
+          image pull secret : harbor-registry-credentials
+
+          Environments variables:
+            * PGADMIN_DEFAULT_EMAIL     :     arief.pribadi@nutanix.com
+            * PGADMIN_DEFAULT_PASSWORD  :     nutanix/4u
+
+          Click Deploy Button
+
+        - Go to Service - services - CLick pgadmin external endpoints
+        - Login using your email address and password aboce
+        - Note on the URL
+            --> http://10.38.106.59/browser/
+
+5.  Login to your database using PGAdmin and check the connectivity
+
+    - From your NDB Dashboard
+      * click dashboard
+      * click Databases Sources in the top left box of your dashboard (not in left pane menu)
+      * click PGDB-Instance - click connect description and take note on:
+            username      :   postgres
+            IP Address    :   10.38.106.92 (your IP may vary)
+            Database Name :   postgres
+            LIsterner port:   5432
+
+    - From PGAdmin Dashboard
+      * Click Servers (under Object Explorer) Object - Register Server
+            General - name            :   pgdb_master
+            Connection - Host/Address :   10.38.106.92 (your IP)
+            Connection - username     :   postgres
+            Connection - password     :   nutanix/4u
+            Click Save Password
+            Save
+      * from your laptop --> download   
+      
+                https://raw.githubusercontent.com/Ariefpri1122/nkp-airgap/main/src/calm/singledb.sql
+
+      * From Object Explroer - Servers - pgdb_master - Databases - apr_landon
+            Right click apr_landon - Restore
+            CLick filename
+            on select file windows - click 3 dot menu (top right) - upload - click to select files - choose singledb.sql file
+            close the upload windows after 100%
+            slect the singledb.sql file
+            click restore
+
+            right click apr_landon - refresh
+            explore schemas - public - tables ---> you will find new tables restored
+
+    - From kubernetes dashboard - Your Project Namespace - Workload pods - click 3 dot menu (right side) from your username-landon-master pods - Exec
+            apt install -y postgresql
+
+            export DB_HOST=db-svc.arief-project-zc6sw # --> Find your Database service in your project namespace - services - db-svc (Kubernetes Dashboard)
+            export DB_PORT=80
+            export DB_NAME=apr_landon
+            export DB_USER=postgres
+            export DB_PASSWORD=nutanix/4u 
+
+            psql -h $DB_HOST -U $DB_USER -p $DB_PORT -d $DB_NAME
+
+            \dt
+
+            SELECT * FROM clients;
+
+6.  Modify master .env file in source code
+
+    - From gitlab dashboard - your NKP advance workshop project - Edit env.master file:
+
+          * line 9  : DB_HOST=192.168.3.51  --> DB_HOST=db-svc.arief-project-zc6sw
+          * line 10 : DB_PORT=5000          --> DB_PORT=80
+
+          Commit Changes
+          Put "nyalip" as commit message
+          Commit changes
+
+          Examine the CICD Process and browse the application.
+
+          From the landon application click Clients
+          * you will see 1 row called Mr. Single Database:
+            --> check in PGadmin CLients table it will be the same (right client clients table - view edit data - All Rows
+          * back to landon application - Click Add New client - Put your information there - click save
+            --> check in PGadmin CLients table it will be the same (right client clients table - view edit data - All Rows
+
+7.  Create Developer Branch from your nkp-advance-workshop
+
+    - From gitlab dashboard - got to your NKP advance workshop project
+    - CLick + button beside your nkp-advance-workshop
+    - Click new branch:
+        * Branch Name   :   development
+        * Create From   :   master
+    - Click Create branch
+
+    - Make sure you are in development branch (see the box above you BIG nkp-advance-workshop name with Folder ICON)
+      * Go to Setting (Bottom Left Pane Menu) - Repository
+      * Expand Protected branches
+      * Add Protected branch button
+          Branch                    :   Development
+          Allowed to merge          :   Maintainers
+          Allower to push and merge :   Maintaners
+      * Click Protect button
+
+    - From gitlab your NKP Advance Workshop - Repository
+      * resources / views / contents / home.blade.php
+      * Edit single file
+      * Modify <h4> [MASTER ENVIRONMENT] - NKP ADVANCED WORKSHOP </h4> --> to <h4> [DEVELOPMENT ENVIRONMENT] - NKP ADVANCED WORKSHOP </h4> 
+      * Commit changes
+      * put "nyalip" in commit message
+      * commit changes
+    - Examine CICD Pipeline
+    - Check changes in workshop_advanced-gitops project 
+    - Check your harbor dashboard --> you will finde new library/arief_laravel_development image
+    - Deployment.yaml will be executed --> examine Deployment in project-xxx namespace
+    - Open the application frontpage by clicking its services external ip address from kubernetes dashboard
+
+    *** Trivia Question : From the landon application (development branch above) you click Clients Tab, you will find Error - why ? ***
+
+8.  Create Database Snapshot
+    - From NDB Dashboard - Data Protection - Time Machines - List
+    - Select PGDB-Instance_TM
+    - Click Action - Snapshot
+    - Snapshot Name : snapshot_for_clone
+    - Create
+    - Wait until snapshot finished
+
+9.  Clone a Database
+
+curl -k -u admin:nx2Tech974! https://10.38.106.14:8443/era/v0.9/clusters | jq # --> change password to HPOC password
+
+    "id":"b6aa9662-f7c5-4303-8150-1e0489cb6baa"
+
+curl -k -u admin:nx2Tech974! https://10.38.106.14:8443/era/v0.9/databases? | jq # --> change password to HPOC password
+
+   Database Source ID   :    
+
+        "id": "ad47f30c-4fae-44ab-8e13-69fc57688057",
+        "name": "PGDB-Instance",
+        "description": "PostgreSQL Created by NDB Operator",
+
+curl -k -u admin:nx2Tech974! https://10.38.106.14:8443/era/v0.9/snapshots? | jq # --> change password to HPOC password
+
+   Snapshot ID          :   
+
+        "id": "573d1bb6-a615-4bb5-9de8-873e88fe497a",
+        "name": "snap_for_clone",
+
+
+kubectl apply -f - <<EOF
+
+apiVersion: ndb.nutanix.com/v1alpha1
+kind: Database
+metadata:
+  name: db-clone
+spec:
+  ndbRef: ndb
+  isClone: true
+  clone:
+    type: postgres
+    profiles:
+      compute:
+        name: "DEFAULT_OOB_SMALL_COMPUTE"
+    name: "PGDB-Clone-Instance"
+    description: PostgreSQL Clone Created by NDB Operator
+    clusterId: "b6aa9662-f7c5-4303-8150-1e0489cb6baa"
+    credentialSecret: db-instance-secret-name
+    timezone: "UTC"
+    sourceDatabaseId: "ad47f30c-4fae-44ab-8e13-69fc57688057"
+    snapshotId: "573d1bb6-a615-4bb5-9de8-873e88fe497a"
+EOF
+
+*** While Waiting for Clonce Process ***
+
+    * lets learn about MVC Framework
+
+        --> Access this URL:  https://ntnxbootcamp.notion.site/Understand-MVC-Framework-Concept-4334403550a14720afa824b6ddd51304
+
+10.  Login to your database using PGAdmin and check the connectivity
+
+    - Wait until cloning process is finished
+    - From your NDB Dashboard
+      * click dashboard
+      * click Databases Clone in the top left box of your dashboard (not in left pane menu)
+      * click PGDB-Clone-Instance - click connect description and take note on:
+            username      :   postgres
+            IP Address    :   10.38.106.108 (your IP may vary)
+            Database Name :   postgres
+            LIsterner port:   5432
+
+    - From PGAdmin Dashboard
+      * Login to your PGAdmin Dashboard
+
+          - http://10.38.106.59/browser/
+          - username: your email address (ex: arief.pribadi@nutanix.com)
+          - password: nutanix/4u
+
+      * Click Servers (under Object Explorer) Object - Register Server
+            General - name            :   pgdb_master_clone
+            Connection - Host/Address :   10.38.106.108 (your IP)
+            Connection - username     :   postgres
+            Connection - password     :   nutanix/4u
+            Click Save Password
+            Save
+
+      * From Object Explroer - Servers - pgdb_master - Databases - apr_landon - Schemas - Public - Tables - Clients
+            Right click Clients - View edit data - All rows
+            
+            * You will find your database and its tables dan rows are exactly the same like its origin
+
+    - From kubernetes dashboard - Your Project Namespace - Workload pods - click 3 dot menu (right side) from your username-landon-development pods - Exec
+            apt install -y postgresql
+
+            export DB_HOST=db-clone-svc.arief-project-zc6sw # --> Find your Database service in your project namespace - services - db-svc (Kubernetes Dashboard)
+            export DB_PORT=80
+            export DB_NAME=apr_landon
+            export DB_USER=postgres
+            export DB_PASSWORD=nutanix/4u 
+
+            psql -h $DB_HOST -U $DB_USER -p $DB_PORT -d $DB_NAME
+
+            \dt
+
+            SELECT * FROM clients;
+
+11.  Modify development .env file in source code (make sure you are in DEVELOPMENT BRANCH not MASTER)
+
+    - From gitlab dashboard - your NKP advance workshop project - Development Branch - Edit env.development file:
+
+          * line 9  : DB_HOST=192.168.3.51                --> DB_HOST=db-clone-svc.arief-project-zc6sw  # --> make use you are using the same address as above
+          * line 10 : DB_PORT=5000                        --> DB_PORT=80
+          * line 11 : DB_DATABASE=app_landon_development  --> DB_DATABASE=apr_landon
+
+          Commit Changes
+          Put "nyalip" as commit message
+          Commit changes
+
+          Examine the CICD Process and browse the application.
+
+          From the landon DEVELOPMENT application click Clients
+          * you will see ROWs Not Error as previous condition
+            --> check in PGadmin CLients table it will be the same (right client clients table - view edit data - All Rows
+          * back to landon development application - Click Add New client - Put your information there - click save
+            --> check in PGadmin CLients table it will be the same (right client clients table - view edit data - All Rows
+
