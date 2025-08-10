@@ -28,7 +28,7 @@ Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
 		⁃	OS Image				:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
 		⁃	Worker Node Count		:	4
 		-	CPU Per Node (vCPU)		:	8
-		⁃	Memory Per Node			:	12
+		⁃	Memory Per Node			:	24
 		⁃	Disk Size Per Node		:	80
 		⁃	Storage Container			default
 
