@@ -34,8 +34,8 @@ Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
 
         *** PAY ATTENTION TO BELOW CONFIGURATION ***
 
-        -   Pod Network             :   172.20.0.0/16  	(NOT --> 192.168.0.0/16)
-        -   Service Network         :  	10.136.0.0/12   (NOT --> 10.96.0.0/12 )
+        -   Pod Network             :   172.20.0.0/16   (NOT --> 192.168.0.0/16)
+        -   Service Network         :   10.136.0.0/12   (NOT --> 10.96.0.0/12 )
 
 
 		⁃	Load Balancing Start	:	x.x.x.140)--> (by default secondary vlan is free) (ex: 10.38.106.140)
@@ -420,13 +420,13 @@ volumeBindingMode: Immediate
 
                 docker image tag ndk/infra-manager:1.2.0 10.38.106.41:5000/library/ndk/infra-manager:1.2.0
                 docker image tag ndk/job-scheduler:1.2.0 10.38.106.41:5000/library/ndk/job-scheduler:1.2.0
-                docker image tag ndk/kube-rbac-proxy:v0.19.0 10.38.106.41:5000/library/ndk/kube-rbac-proxy:v0.19.0
-                docker image tag ndk/kubectl:1.32.3 10.38.106.41:5000/library/ndk/kubectl:1.32.3
+                docker image tag ndk/kube-rbac-proxy:v0.17.0 10.38.106.41:5000/library/ndk/kube-rbac-proxy:v0.17.0
+                docker image tag ndk/bitnami-kubectl:1.30.3 10.38.106.41:5000/library/ndk/bitnami-kubectl:1.30.3
 
                 docker push 10.38.106.41:5000/library/ndk/infra-manager:1.2.0
                 docker push 10.38.106.41:5000/library/ndk/job-scheduler:1.2.0
-                docker push 10.38.106.41:5000/library/ndk/kube-rbac-proxy:v0.19.0
-                docker push 10.38.106.41:5000/library/ndk/kubectl:1.32.3
+                docker push 10.38.106.41:5000/library/ndk/kube-rbac-proxy:v0.17.0
+                docker push 10.38.106.41:5000/library/ndk/bitnami-kubectl:1.30.3
 
                 Open your harbor dashboard and make sure all the images are listed.
 
@@ -453,9 +453,9 @@ volumeBindingMode: Immediate
                 --set infraManager.repository=10.38.106.41:5000/library/ndk/infra-manager \
                 --set infraManager.tag=1.2.0 \
                 --set kubeRbacProxy.repository=10.38.106.41:5000/library/ndk/kube-rbac-proxy \
-                --set kubeRbacProxy.tag=v0.19.0 \
-                --set kubectl.repository=10.38.106.41:5000/library/ndk/kubectl \
-                --set kubectl.tag=1.32.3 \
+                --set kubeRbacProxy.tag=v0.17.0 \
+                --set kubectl.repository=10.38.106.41:5000/library/ndk/bitnami-kubectl \
+                --set kubectl.tag=1.30.3 \
                 --set jobScheduler.repository=10.38.106.41:5000/library/ndk/job-scheduler \
                 --set jobScheduler.tag=1.2.0 \
                 --set tls.server.enable=false \
@@ -493,9 +493,9 @@ volumeBindingMode: Immediate
                 --set infraManager.repository=10.38.106.41:5000/library/ndk/infra-manager \
                 --set infraManager.tag=1.2.0 \
                 --set kubeRbacProxy.repository=10.38.106.41:5000/library/ndk/kube-rbac-proxy \
-                --set kubeRbacProxy.tag=v0.19.0 \
-                --set kubectl.repository=10.38.106.41:5000/library/ndk/kubectl \
-                --set kubectl.tag=1.32.3 \
+                --set kubeRbacProxy.tag=v0.17.0 \
+                --set kubectl.repository=10.38.106.41:5000/library/ndk/bitnami-kubectl \
+                --set kubectl.tag=1.30.3 \
                 --set jobScheduler.repository=10.38.106.41:5000/library/ndk/job-scheduler \
                 --set jobScheduler.tag=1.2.0 \
                 --set tls.server.enable=false \
