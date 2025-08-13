@@ -23,36 +23,36 @@ From NKP Dashboard - Global - Workspaces:
 	⁃	Action - Add Cluster
 		⁃	cluster name			:	arief-nkp
 		⁃	SSH Public Key			:	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBM2C9FLMlL6xXcMRZt6Yjf1cgadN/1S6M8V3M6OQDbD arief.pribadi@nutanix.com	# Check cat .ssh/id_ed25519.pub in bastion VM
-		⁃	Nutanix Prism Project		:	lab
+		⁃	Nutanix Prism Project	:	lab
 		⁃	Nutanix AOS Cluster		:	PHX-POC334
-		⁃	Subnet				:	primary-PHX-POC334
-		⁃	OS Image			:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
+		⁃	Subnet					:	primary-PHX-POC334
+		⁃	OS Image				:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
 		⁃	CP End Point IP			:	+1 IP from LAST COMMANDER LB RANGE --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.52)
 		⁃	CP Node Count			:	1
 		⁃	CPU Per Node (vCPU)		:	4
 		⁃	Memory Per Node			:	12
 		⁃	Disk Size Per Node		:	80
 		⁃	Nutanix AOS Cluster		:	PHX-POC334
-		⁃	Subnet				:	primary-PHX-POC334
-		⁃	OS Image			:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
-		⁃	Nutanix Prism Project		:	lab
+		⁃	Subnet					:	primary-PHX-POC334
+		⁃	OS Image				:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
+		⁃	Nutanix Prism Project	:	lab
 		⁃	Worker Node Count		:	4
 		-	CPU Per Node (vCPU)		:	8
 		⁃	Memory Per Node			:	12
 		⁃	Disk Size Per Node		:	80
 		⁃	Storage Container			default
-		⁃	Load Balancing Start		:	Start +1 IP from CP End Point Above (ex: 10.38.106.53)--> make sure checked by PING or IP Scanner its a FREE IP
+		⁃	Load Balancing Start	:	Start +1 IP from CP End Point Above (ex: 10.38.106.53)--> make sure checked by PING or IP Scanner its a FREE IP
 		⁃	Load Balancing End		:	End +12 IP from above --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.65)
 		⁃	Image Registry Mirror	
-			⁃	URL				:	https://airgap.arief.com:5000
+			⁃	URL					:	https://airgap.arief.com:5000
 			⁃	username			:	admin
 			⁃	password			:	nutanix/4u
-			⁃	CA				:	downloaded cert.crt
+			⁃	CA					:	downloaded cert.crt
 		⁃	Private Registry	
-			⁃	URL				:	https://10.38.106.41:5000	# Your harbor URL Access as noted above
+			⁃	URL					:	https://10.38.106.41:5000	# Your harbor URL Access as noted above
 			⁃	username			:	nutanix
 			⁃	password			:	nx2Tech974!
-			⁃	CA				:	downloaded ca.cert
+			⁃	CA					:	downloaded ca.cert
 	-	Create
 
 From NKP Dashboard - Your Workspace - CLusters - view details your cluster:
