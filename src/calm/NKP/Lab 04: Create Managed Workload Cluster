@@ -30,7 +30,7 @@ From NKP Dashboard - Global - Workspaces:
 		⁃	CP End Point IP			:	+1 IP from LAST COMMANDER LB RANGE --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.52)
 		⁃	CP Node Count			:	1
 		⁃	CPU Per Node (vCPU)		:	4
-		⁃	Memory Per Node			:	12
+		⁃	Memory Per Node			:	32
 		⁃	Disk Size Per Node		:	80
 		⁃	Nutanix AOS Cluster		:	PHX-POC334
 		⁃	Subnet					:	primary-PHX-POC334
@@ -38,7 +38,7 @@ From NKP Dashboard - Global - Workspaces:
 		⁃	Nutanix Prism Project	:	lab
 		⁃	Worker Node Count		:	4
 		-	CPU Per Node (vCPU)		:	8
-		⁃	Memory Per Node			:	12
+		⁃	Memory Per Node			:	32
 		⁃	Disk Size Per Node		:	80
 		⁃	Storage Container			default
 		⁃	Load Balancing Start	:	Start +1 IP from CP End Point Above (ex: 10.38.106.53)--> make sure checked by PING or IP Scanner its a FREE IP
