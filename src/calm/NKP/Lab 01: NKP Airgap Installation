@@ -2,9 +2,15 @@ Deploy NKP Cluster Commander AirGap Method
 ------------------------------------------ 
 
 1. Reserved HPOC
-    1. PC = pc.2024.3.1.4
+    1. PC = pc.2024.3.1.5
     2. AOS = 6.10
-    3. NKP = 2.13.2
+    3. Self Service Enabled
+    4. NDB 2.8
+    5. Files 5.10
+    6. Object enabled with object store created
+
+    Images:
+    -    Windows 2019
 
 Multi-Cluster HPOC:
 * Note that IP Address range in HPOC Primary VLAN is —> x.x.x.1 - x.x.x.126
