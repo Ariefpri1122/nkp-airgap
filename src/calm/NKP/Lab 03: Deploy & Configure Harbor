@@ -52,9 +52,8 @@ Harbor Installation
 		⁃	cat ca.crt
         -   sudo cp ca.crt /etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt
 		⁃	sudo systemctl restart docker
-		-	sudo mkdir -p /etc/buildkit/certs.d/$HARBOR_ADDRESS:5000
-		-	sudo cp /etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt /etc/buildkit/certs.d/$HARBOR_ADDRESS:5000/ca.crt
-		- 	sudo systemctl restart buildkit
+		-	sudo cp /etc/docker/certs.d/10.38.222.13:5000/ca.crt /etc/pki/ca-trust/source/anchors/
+		-	sudo update-ca-trust
 
 		Test Login to Harbor:
         -   Please be aware to change the password with your cluster password !!!
