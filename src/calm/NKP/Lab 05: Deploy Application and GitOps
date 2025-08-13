@@ -53,7 +53,7 @@ REGISTRY_PASSWORD="nx2Tech974!" #change password to your cluster password
 kubectl create secret generic harbor-registry-credentials \
 --from-literal username=$REGISTRY_USERNAME \
 --from-literal password=$REGISTRY_PASSWORD \
---from-file=/etc/docker/certs.d/10.38.106.41:5000/ca.crt
+--from-file=/etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt
 
 *** DONT FORGET TO REPLACE YOUR HARBOR IP ADDRESS ABOVE BEFORE COPY PASTE ***
 
