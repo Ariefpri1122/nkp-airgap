@@ -10,6 +10,10 @@ Harbor Installation
 		-	Enable Harbor - Choose “Rook Chef” as S3 Object Store
 			* Using k8s dashboard see the deployment finished and success --> if no harbor deployment shown in k8s dashboard in 5 minutes, try to disable and enable again harbor application from NKP Dashboard
 			* Confirmed in Management Cluster - Applications -  Harbor is “Deployed” —> not “Enabled”
+		- Open your kubernetes dashboard - open namespace "ncr-system"
+			* click the Workloads icon (Top left under kubertenes logo)
+			* you will see harbor jobs (creating database cluster), pods and other resources start running
+			* wait ultil deployment resource created and finished
 
 	3.	From code-server (Bastion) —> kubectl get secrets -n ncr-system harbor-admin-password -o jsonpath='{.data.HARBOR_ADMIN_PASSWORD}' | base64 -d
 		-	TlooTlYb6i=gKBYF20Np
