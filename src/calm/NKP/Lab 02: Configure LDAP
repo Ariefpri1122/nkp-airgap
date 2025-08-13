@@ -22,7 +22,7 @@ From autoad VM - Administrative Tools - Active Directory User and Computers:
 			* Group Type		: Security (default)
 			* OK
 			* Double click your new group - Members Tab - Add Button
-				- Enter the object names to select	:	administrator;nkpsvc;arief.pribadi (your new user) - Click check names button
+				- Enter the object names to select	:	administrator;arief.pribadi (your new user) - Click check names button
 				- OK
 				- OK
 	
