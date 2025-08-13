@@ -55,9 +55,6 @@ kubectl create secret generic harbor-registry-credentials \
 --from-literal password=$REGISTRY_PASSWORD \
 --from-file=/etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt
 
-*** DONT FORGET TO REPLACE YOUR HARBOR IP ADDRESS ABOVE BEFORE COPY PASTE ***
-
-
 From Managed Cluster Kubernetes Dashboard:
 
 Choose yourname namespace
