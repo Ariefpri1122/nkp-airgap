@@ -5,6 +5,10 @@ cd workshop
 mkdir arief
 cd arief
 
+kubectx --> choose kommander cluster
+export HARBOR_ADDRESS="$(kubectl -n kommander get kommandercluster host-cluster -o jsonpath='{.status.ingress.address}')"
+echo $HARBOR_ADDRESS 
+
 vi Dockerfile #change ip address to your harbor registry ip address
 from 10.38.106.41:5000/proxy_cache/nginx 
 copy index.html /usr/share/nginx/html
@@ -20,8 +24,7 @@ LANDING PAGE ..... Arief Pribadi
 </BODY>
 </HTML>
 
-export HARBOR_ADDRESS="$(kubectl -n kommander get kommandercluster host-cluster -o jsonpath='{.status.ingress.address}')"
-echo $HARBOR_ADDRESS 
+
 
 docker login -u nutanix -p nx2Tech974! https://$HARBOR_ADDRESS:5000/ #change ip address to your harbor registry ip address
 docker build -f Dockerfile -t arief-nginx . # -->  If Failed, check endpoint healthy in harbor dashboard  
