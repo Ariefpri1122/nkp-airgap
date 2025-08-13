@@ -13,7 +13,7 @@ Harbor Installation
 		- Open your kubernetes dashboard - open namespace "ncr-system"
 			* click the Workloads icon (Top left under kubertenes logo)
 			* you will see harbor jobs (creating database cluster), pods and other resources start running
-			* wait ultil deployment resource created and finished
+			* wait until deployment resources created and finished
 
 	3.	From code-server (Bastion) —> kubectl get secrets -n ncr-system harbor-admin-password -o jsonpath='{.data.HARBOR_ADMIN_PASSWORD}' | base64 -d
 		-	TlooTlYb6i=gKBYF20Np
