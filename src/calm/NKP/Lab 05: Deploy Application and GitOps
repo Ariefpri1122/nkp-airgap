@@ -50,6 +50,8 @@ kubens --> make sure you choose yourname-nginx namespace
 REGISTRY_USERNAME="nutanix"
 REGISTRY_PASSWORD="nx2Tech974!" #change password to your cluster password
 
+echo $REGISTRY_USERNAME : $REGISTRY_PASSWORD  # --> make sure username and password correct !!!
+
 kubectl create secret generic harbor-registry-credentials \
 --from-literal username=$REGISTRY_USERNAME \
 --from-literal password=$REGISTRY_PASSWORD \
