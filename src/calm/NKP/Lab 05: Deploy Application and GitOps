@@ -271,7 +271,7 @@ Check WordPress Deployment:
         - password: nutanix/4u
     * show databases;
     * use wordpress;
-    * show tables;
+    * show tables;  # row still empty
 
 Create Ingress to access wordpress:
 -----------------------------------
@@ -314,7 +314,19 @@ Click service - ingresses --> make sure there is a wordpress ingress
 --> or add wordpress and its kommander-traefik services External End Point (Ex: 10.38.106.53) into your laptop host file
 
 ** Check wordpress application https://wordpress.arief.com
+    - Create username and password 
+    - Install workdpress
+    - Login using your new created login
 
+** Check again the database - from you kubernetes dashboard
+  - Using kubernetes dashboard - Pods - wordpress-mysql-xxx --> Click 3 button menu and click Exec
+    * you are inside the mysql container --> ls /var/lib/mysql --> you will find wordress database directory there
+    * ls /var/lib/mysql/wordpress/ --> to explore more the wordpress database files
+    * mysql -u wordpress -p 
+        - password: nutanix/4u
+    * show databases;
+    * use wordpress;
+    * show tables;     # row now populated proven the database has been established from the application container.
 
 Deploy Application using GitOps Deployment
 ------------------------------------------
