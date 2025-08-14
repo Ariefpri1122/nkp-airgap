@@ -343,7 +343,7 @@ Path              :  ./release/without-istio
 Git Secret        :  none
 Save
 
-From Kubernetes Dashboard  -->  Check Deployment, make sure deployment success (Please be aware that creating new project will create new namespace based on your project name)
+From Kubernetes Dashboard  -->  Choose Yourname-Project-xxx Namespace - Check Deployment, make sure deployment success (Please be aware that creating new project will create new namespace based on your project name)
 
 Troubleshooting redis card pod:
 -------------------------------
