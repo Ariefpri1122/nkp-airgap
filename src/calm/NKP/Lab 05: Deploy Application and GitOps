@@ -474,6 +474,7 @@ spec:
             claimName: wp-pv-claim --> replace 'wp-pv-claim' to 'wp-pv-claim-nfs'
     - Go to spec:
         - replicas: 1 --> change it into replicas: 2 (move your cursor UP NOT DOWN)
+    - CLick UPDATE
   * Go to Pods:
     - you will see 2 new created PODS 
       - Click 3 dot menu pod no #1 - click exec --> you are now in /var/www/html folder (this is the folder that using NFS CSI share), examine the files
