@@ -330,7 +330,7 @@ Click service - ingresses --> make sure there is a wordpress ingress
 
 Deploy Application using GitOps Deployment
 ------------------------------------------
-From NKP Manage-Cluster Dasboard - Projects - Create Project
+From Your NKP Manage-Cluster (NOT Kommander Cluster) Dasboard - Projects - Create Project
 Name              :  arief-project
 Select Your Managed-Cluster
 Create - Continue to project
