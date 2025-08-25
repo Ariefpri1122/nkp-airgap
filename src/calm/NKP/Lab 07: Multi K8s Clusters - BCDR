@@ -18,9 +18,9 @@ Using NKP Dashboard - Your Name Workspace - Select Clusters from left pane menu
 		⁃	Subnet			        :	aux-1 --> Your secondary Subnet
 		⁃	OS Image				:	nkp-rocky-9.5-release-1.31.9-20250702204537.qcow2
 		⁃	CP End Point IP			:	1st IP from secondary vlan (132) --> make sure checked by PING or IP Scanner its a FREE IP (ex: 10.38.106.132)
-		⁃	CP Node Count			:	1
+		⁃	CP Node Count			:	3
 		⁃	CPU Per Node (vCPU)		:	4
-		⁃	Memory Per Node			:	12
+		⁃	Memory Per Node			:	16
 		⁃	Disk Size Per Node		:	80
 		⁃	Nutanix Prism Project	:	lab
         ⁃	Nutanix AOS Cluster		:	PHX-POC334
