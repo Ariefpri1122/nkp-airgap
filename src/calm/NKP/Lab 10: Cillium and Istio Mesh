@@ -1,7 +1,506 @@
 Lab 10: Cillium and Istio Mesh
 ------------------------------
 
-*** Trivia Question ***
-*** 1. Open landon application both master and development from your 2nd managed-cluster (DRC), the app looks good ? ***
-*** 2. Click Clients Tab from the application ... Why there is error there? ***
+# Kubeconfig Consolidation
+
+Download both managed cluster (DC and DRC) kubeconfig to bastion.
+  * ex: dc-kubeconfig.yaml and/or dc-kubeconfig.conf (renamed by me)
+  * ex: drc-kubeconfig.yaml and/or drc-kubeconfig.conf (renamed by me)
+
+  * KUBECONFIG=airgapped-hm-nkp-demo-2.conf:dc-kubeconfig.conf:drc-kubeconfig.conf kubectl config view --flatten > ~/.kube/config
+  * export KUBECONFIG=~/.kube/config
+
+kubectl config rename-context dc-admin@dc dc
+kubectl config rename-context drc-admin@drc drc
+kubectl config rename-context airgapped-hm-nkp-demo-2-admin@airgapped-hm-nkp-demo-2 kommander # --> change 'airgapped-xx-xx-xxx-x' with your host cluster name
+
+# Cilium Server Mesh Preparation
+
+kubectl --context=dc get nodes -o wide
+kubectl --context=drc get nodes -o wide
+
+kubectl --context=dc get node -o jsonpath='{.items[0].spec.podCIDR}{"\n"}'
+kubectl --context=drc get node -o jsonpath='{.items[0].spec.podCIDR}{"\n"}'
+
+      172.20.0.0/24
+      172.50.4.0/24
+
+# Cilium Cluster ID and Name
+
+kubectx kommander
+kubectl get clusters -A
+
+NAMESPACE               NAME                      CLUSTERCLASS          PHASE         AGE     VERSION
+arief-nkp-xqwkw-8hthq   arief-nkp                 nkp-nutanix-v2.15.0   Provisioned   3d10h   v1.32.3
+arief-nkp-xqwkw-8hthq   arief-nkp-drc             nkp-nutanix-v2.15.0   Provisioned   20h     v1.32.3
+default                 airgapped-hm-nkp-demo-2   nkp-nutanix-v2.15.0   Provisioned   3d13h   v1.32.3
+
+# Make sure both cluster using same ca key
+==========================================
+
+# Create private key for CA
+openssl genrsa -out clustermesh-ca.key 4096
+
+# Create self-signed certificate for CA (valid 10 tahun)
+openssl req -x509 -new -nodes \
+  -key clustermesh-ca.key \
+  -sha256 -days 3650 \
+  -subj "/CN=clustermesh-ca" \
+  -out clustermesh-ca.crt
+
+*** Install Cilium CLI on Bastion ***
+
+CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
+CLI_ARCH=amd64   # kalau pakai x86_64
+
+curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-linux-${CLI_ARCH}.tar.gz
+
+sudo tar xzvf cilium-linux-${CLI_ARCH}.tar.gz -C /usr/local/bin
+
+cilium version
+
+*** MODIFY CILIUM CONFIGURTION ***
+==================================
+
+kubectl --context=kommander get helmchartproxies.addons.cluster.x-k8s.io -A | grep cilium
+
+arief-workspace-mtnvx-gskts   cilium-0198e382-76d9-7d6c-a248-e8321fa7ed86                   True    
+arief-workspace-mtnvx-gskts   cilium-0198e386-010a-7d73-b678-494aa67a3457                   True    
+default                       cilium-0198de81-4229-7653-a11e-b6f45f550a5a                   True    
+
+kubectl --context=kommander -n arief-workspace-mtnvx-gskts get helmreleaseproxy | grep cilium
+
+*** Delete previous secret created ***
+
+kubectl --context=dc delete secret cilium-ca -n kube-system
+kubectl --context=dc delete secret hubble-relay-client-certs -n kube-system
+kubectl --context=dc delete secret hubble-server-certs -n kube-system
+kubectl --context=dc delete secret hubble-relay-server-certs -n kube-system
+kubectl --context=drc delete secret cilium-ca -n kube-system
+kubectl --context=drc delete secret hubble-relay-client-certs -n kube-system
+kubectl --context=drc delete secret hubble-server-certs -n kube-system
+kubectl --context=drc delete secret hubble-relay-server-certs -n kube-system
+
+*** Modify Cilium config through helmchartproxies addons ***
+
+# DC Cluster #
+==============
+
+kubectl --context=kommander -n arief-workspace-mtnvx-gskts edit helmchartproxies.addons.cluster.x-k8s.io cilium-0198e382-76d9-7d6c-a248-e8321fa7ed86
+
+DC:
+spec:
+  chartName: cilium
+  clusterSelector:
+    matchLabels:
+      cluster.x-k8s.io/cluster-name: arief-nkp
+  namespace: kube-system
+  options:
+    enableClientCache: false
+    install:
+      createNamespace: true
+    timeout: 10m0s
+    upgrade:
+      maxHistory: 10
+  releaseName: cilium
+  repoURL: oci://helm-repository.caren-system.svc/charts
+  tlsConfig:
+    caSecret:
+      name: helm-repository-tls
+      namespace: caren-system
+*** Delete Existing Lines start from HERE and REPLACE it with these new lines ***
+  valuesTemplate: |-
+    cni:
+      chainingMode: portmap
+      exclusive: false
+    cluster:
+      id: 1        # untuk DC
+      name: dc
+    tls:
+      ca:
+        cert:  LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZFekNDQXZ1Z0F3SUJBZ0lVZGVjbEI3blVXR2xPZ0s1QWdzOU4rY2drb0VVd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0dURVhNQlVHQTFVRUF3d09ZMngxYzNSbGNtMWxjMmd0WTJFd0hoY05NalV3T0RJMk1ESXhOVEE0V2hjTgpNelV3T0RJME1ESXhOVEE0V2pBWk1SY3dGUVlEVlFRRERBNWpiSFZ6ZEdWeWJXVnphQzFqWVRDQ0FpSXdEUVlKCktvWklodmNOQVFFQkJRQURnZ0lQQURDQ0Fnb0NnZ0lCQUxMWGVzcTFreTZEcDFFNmhuaWtDNWt1cm41UGoxcFAKR1QyRGtFUXluS2lnVXdtZlB5a1BLVllZcGZESHlvaXNUSThjMXd4TGh2VmNFYUdPcVNBWjZMaElTbDVyb0lycQpxREF5c1lwNDhwWEpSb3RuaW4rZzVETWtNUDkvVWpOT3JjZ0UrQTRvU2hOSVlFckZDRndkMXJ4R0lTcEx5WGZjCm5mQS9yOXhVUGVEMHZRYTRlaW1vc21MdUNjNXVDb0Nma0hBT0ZQQ2VNUXdEdXBnQUJnUzkzQkpOMmcvMDQyZHUKd2RUTE1nbGY3ck93Sk1FYXRuTkIzOEw3QU9iWXdFY0VnczZzOFZYSFFGUU5vb282V3p0TFlBOGlxY0pZLzNrKwpNMkhncjlPYlpBU2ZGWDdSNnh6K3ZPd0gxWmRGWlRiOXovUmNIaDg4amJYeWZQRmIvQTFVa2g0eXViV1AxYTVHCkFUZC9TYkRscHpyak9rcDVIeGp5ci9Ed211WExhVzNuaWFoUE1LdmNEMTY4N29oUEJ4YnZBQmtPTHJpSlc3MlIKN21tYml0M3dGMFRUNUdlY1UvNHJ2UDlHYjNmSDhtb2J3MFNwSWtNUy9rUU5aZnFZVTU0RkZpZnNZYjRYdHpsLwpxMmU2OFNDTVV0K2EwM0xXRzZoM2FzRkxDaGdwZ09RL0hDcHoyQlJjaGpNZWNEU3VtV2EwcDJBZmY5Nno4QnQ4CnY4S3o2Mms3ZkpLTjQ4c0c5UGNNYTF1c0U0bVBsK09aZGg4UjVERlJ3dHN1NDFlWjEwRUFxZzY3WFN6dWlGTm0KU09XV01PTEFEYkp5dG8wU0ZUUTVDTnpMNGFudEI1c3VqZkFJY1FFWCtlT2ExWWVsNzdZcTBJMkZRN256VFg2QgpXR29ZdGUxMzZISnJBZ01CQUFHalV6QlJNQjBHQTFVZERnUVdCQlE4VFBpVW9OQTZIQWQxZm05U1pZRHRNMHpYCkF6QWZCZ05WSFNNRUdEQVdnQlE4VFBpVW9OQTZIQWQxZm05U1pZRHRNMHpYQXpBUEJnTlZIUk1CQWY4RUJUQUQKQVFIL01BMEdDU3FHU0liM0RRRUJDd1VBQTRJQ0FRQjNIb0xvbFNqZC9Yd3NNVU5GMUx0MzNpTzJBTTk2TmcrQQp4TEhCY3dXblJDazdJVFZWK29nMW5uSzNKUklwckdhV2RsQngwVUt2enRVSTd3dXNZM3JpalhoUll0RTVYQ0kwCjBleGQ4SExuSW9PdHR6S2pCUnIzTENkYUliZFJrcUxQTFdoZjBtd3VsR21nbXdLNGp6aG1DWmp1dEdGNjNiakgKSGd6cnRGSXBqbkJWRGNHdDFML2V1WTdJMG5qTVNEWkU0WnpsaFA3OFczUGo3dWJXQ05mTzl6OWtFZk9aWnNKRgo1VVJwUVdoZ0lGNnQ0NnNkdnNzNTgweTBqU2FSdE1SbW0xRXRLL1VRdVA4emNPaUtPZ0sxbVdnczVPWHBTZnBvCnIzbGFIcnIrek1mQUhhWnU5aXMyZ1h6dTlSUHRXamxHS2srZ0EwU05iVExsSHVpNlh2WFVvRDZVb1ZBMHRZWUYKYlBKOTJjUnNDZE1jYlF0akZaM0NnMHdhSEp0QzA4ZXdUdzZMSTVVSzJwN1Z3RXp6RzhFRngzOEwrZnlaQUYxSQpLVTJibkIvU2haUXpFQ1g2MlFIWWE2RHlEYkFCaHYyYmV5Zzd5eUlZeUp5WldyL2RiVHZOUXZqTmhZeGFFYTROClNKWGkvQzFrYkMrVDFpVXdISFRJckpmYW1GRWVnQUtqbHlYT0g2SXp0bFp4RVlzeXVXaE1INWI5bnpQamFKV0YKbFNubnBnanlnNXcvWkVmWWRieEd1N1JBQ0xjR1N4R1hFS1VwZGlKV3F2eUFOUkh4QUVHZGp5UXhkZEtRbkpIYgoyMUtpSVhTQUZCbDBpL0ZMdkN6WFQyK0FWTXF6THZSWGJqUm5kNWpWeFlVekhPenpoL0dvS3cyMlJ1c2lKWGR4CmFodDYvS0s1TlE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+        key:  LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRQ3kxM3JLdFpNdWc2ZFIKT29aNHBBdVpMcTUrVDQ5YVR4azlnNUJFTXB5b29GTUpuejhwRHlsV0dLWHd4OHFJckV5UEhOY01TNGIxWEJHaApqcWtnR2VpNFNFcGVhNkNLNnFnd01yR0tlUEtWeVVhTFo0cC9vT1F6SkREL2YxSXpUcTNJQlBnT0tFb1RTR0JLCnhRaGNIZGE4UmlFcVM4bDMzSjN3UDYvY1ZEM2c5TDBHdUhvcHFMSmk3Z25PYmdxQW41QndEaFR3bmpFTUE3cVkKQUFZRXZkd1NUZG9QOU9ObmJzSFV5eklKWCs2enNDVEJHclp6UWQvQyt3RG0yTUJIQklMT3JQRlZ4MEJVRGFLSwpPbHM3UzJBUElxbkNXUDk1UGpOaDRLL1RtMlFFbnhWKzBlc2MvcnpzQjlXWFJXVTIvYy8wWEI0ZlBJMjE4bnp4Clcvd05WSkllTXJtMWo5V3VSZ0UzZjBtdzVhYzY0enBLZVI4WThxL3c4SnJseTJsdDU0bW9UekNyM0E5ZXZPNkkKVHdjVzd3QVpEaTY0aVZ1OWtlNXBtNHJkOEJkRTArUm5uRlArSzd6L1JtOTN4L0pxRzhORXFTSkRFdjVFRFdYNgptRk9lQlJZbjdHRytGN2M1ZjZ0bnV2RWdqRkxmbXROeTFodW9kMnJCU3dvWUtZRGtQeHdxYzlnVVhJWXpIbkEwCnJwbG10S2RnSDMvZXMvQWJmTC9Dcyt0cE8zeVNqZVBMQnZUM0RHdGJyQk9KajVmam1YWWZFZVF4VWNMYkx1TlgKbWRkQkFLb091MTBzN29oVFpramxsakRpd0EyeWNyYU5FaFUwT1FqY3krR3A3UWViTG8zd0NIRUJGL25qbXRXSApwZSsyS3RDTmhVTzU4MDErZ1ZocUdMWHRkK2h5YXdJREFRQUJBb0lDQUFJVUVPSWpvTUNSZlhWcGJ5TE41ZTg4Cm9PNlEyMVY5cU4xbmk4RXRVQWNiZTViOTdDOVVWNkordGhmbEJ0bGtLeHAxMzIxMlJBb3hpRkpadXE1TGV5RmYKVFQ0dXNtdVhyQlREaXIyaUxGQTYrWGo5TnN5L3RZeXlRa05KaHdXRGdsMVdrcGFCWEVZNHp1ZTZnNnBpdS96MAp4c1hXTFV1VnZFb1hpTjZkQVdMNTkrUHk0Q1lPMGV0eFE4YlRGdWNTRytFUkNqTWsrczYyT1JGWHh5OG9BaWVPCnM4WlFqaHpNR00yb2lmVGVWWmtzWFhrMkxTVzRHVklhU0VMRm5wbmJGWmZwSGphWVZHWlhDaHh6QktjMHdTRWUKTDVTR0ZUbjZ4VVpFM1lyUFRFUXVaYTdJVmM0bkxDMlR3TzVObW1tNDRPSXVVSE5xbUhybE5HUU9tQ1oxeTNZbwo5V0lGTWFQRjlHM2pHR0VRMlFLb2U1eHhYd2k4aVRuc2lwN2JDbzMyZWJ1bTFCNmoveEFrbnJOQzdBQjMvZldWCk1qY3lLTmEzSmxjdzkwdUwxS09weUFMb1FVYlpNR3VBVkhvQXVRVk9Mc2xuclNMOFdUcXZvaTRyWW5kTU1tcnEKYmZsdjcxNGFRQkU1Y3U0Yzhad0hlcXRwVldFaWJ6bFpQVFp5TGROOEhwYU83Q0pObnBWLzVHMEhBSDJCUC9zRApJTkpRYjJSMjR1aWtONU5TZ0kvS04yZ0V3YzQ4T0J3dWNkTEdTc0VRTnI1RFQrU2VmcXp4WjQyVXNDdXo4dnJHClYxUS81V2YvT1RRUy9aTFZjUlVxWDNLZU1RTEFOY0YrN0l3OEFYTjBFZi9xT01BV1VJb3duS1lITWNTcWc2V3IKMUYyVTl0bG9vbzlBQ1djZXdQWmhBb0lCQVFEMlZ4dnRqZlJwak9WZklNTVJCQTFDbDJNeElnODdUNHR3aG1odwpFWkZncDRyaWo0YzQvcm1KUC81QUdpYXVIblFMaFZHUmpVZWU5c1d5K01EUWRKL1lHaFc3dXRqdmd1VWlHUWcyCk5DZTJWcHlFZEdMK0tmaVhvZmp6Z0JvcExERHNCOHBlai90ZTFxWjZZbWtZcVBtVFYxZVRTSFpxZzRPcXAvVTMKVHdNcXl0SmtyZGh6WWVjSHZ6K1dqeW1EWm5mdnlOZSt3SW5PRDdRb1QxQ1BKNmJLcFowaWZQdVplR05mZlRvNQpNajk4ak8vUGh3ejRGR2c3cWpwUjN0Wk1lRmhDL3JXZU5LdzVvWDJ3N3FwUWpENWdKYXFDYTF5dGdKNFRnbTdLCmJDZnc0cUUydGpSaW5IOW8rYVdldFRldnd2VVExUjdhL1RtL1M0dk52L2hVMzNUUkFvSUJBUUM1MnNrRUE0cncKdkhBL2tkNm9YbHBaTHJBWWowMGF0OGNRTldIdjlDTTFRQkl4Q2pYemt4Y3Z2OEFOSGplVW43d1h5amhRSXlOawpUdG1ma3hDeFhRa2tGS1piSjFRaXZzTlZiYkJ3NlJ3NG56NFNJcUgrdWdTQjh3aWVQdHEyQWpiVVZrOGZDUFc3Ck1EamZXMUpxNUpXN3lTZFA5ekgvYWl1eDNYYnczOGJjWnFXdEErTnBPNGJFNHBFeTRXKzFKZG92dHBTdExuWEUKY3RscVBkYmg1b2xRckxRZENOOWVwWUlPbjdjQnQrR09vaExtbVNFVzFwUXdqQ2FvMUFOVWhBcEpodGViNkJkdwpVZWJzUGxvSWN6TU1Rdm1kbHFVU1lKTnN4TEkyL0dXTFFjOGE0RzJMZ1BkSnpvTFM5N05qS1BYeW5ubXdXR3ZpCkViOUJiMzZZc3JKN0FvSUJBUUNYS1BiTE81dHFGWG8rZUdVYWtPanVIdVZRSmYxQXdOdm9yYUZ5ZTJWQThTNUoKUGhlVkFzR3BGZXFYUFRUVkRYemFBUEgvcGJqNE02YzIzbXU2dm9YRFhxWk5ieWRsT1dZUEdWc3ZuNnRxdVJVTQpOanIwaVo2d3RVU0ZidXNlcnE1S2Q3RlhlM1NkU293WGQwSFVUd1B1eE43SlV1TFBFMnA5RXRsbkdnWHdnVXEvCld1b0NTMll3Rzh3U1FFRVNENU96UVFRYVdoMTFvNjlDT1FGUEJ0N1RaUExhVWVVMTFHanVGSExnM0JPWEF3aTQKeUw5Tmo0QXlkSSthNDJtT3ZSNHo1Z1plVVNZSnF5M3NuMWRGVy9sK21ENWNEek5zaUFyNEg4YUtVZm5rVjd6agpUTVV5YWFQSkw3L1FkcFQ0Tm1LWTlKNGRkTnUxcGM3ZzcxYWNCZzZ4QW9JQkFHekdqVUlKSk1lVE1vc3lQOFFCClBSWFhTbitGVjVaY20yaDBKZmIveDUrQitXTzBXekZORkpRQXdWR3NMdEdRejlDSXJYN1JvZ1F5VmhLY1MzZlQKUU9kYUlxZFZGRndsbEVPcXFFcmRWSVFiUjRQcnV5NVFCeFZiZmQ3SVlNK0g2amxLcnBJMmQwUHdqRWpGdFM0VQp6VUlVRUNzd1BaWUV1TUFvSTFZRlV1bHFObXRWekVLcDhVM0lZVDBMVG9zU05Xb1pqVmp5eVVDS0M0K3YwOVZ4ClRVcm5XWjlvc3ZzOUdTcWY5Y2RPclBnRENkYm5Kc09zSVIxczJhK1VMc0xIYVJIeGxyMk1FRFBQNjd5M0haQzIKZzlrWVZlb1M0bGdvS0FEUCtwSk9GTXgxWHRhWEplWXhQQXA1a0g0VE5XM0M2bmZ1b3NCQWNCdm5VUzNtS0kwTQpnWU1DZ2dFQUJWRHAwYVgxalllektaNk8wL3hPREpMVHlpMG9mdjBzYk1zVzkvREh3Vm8xdzY3LzlYTG85Sm9ECjJzb3IvK2Q3UDJSN3BsQldHcTBsOHFRcnNIVmljVjFFWm1BeWZMNTNuUzFSem1hTEF3TCtNMVdUYjZlU0xodnUKV21iSkk2dFhrYzdNeFJQb1hFWWZTejJncGZGQi9PV1plVDZ3SEg0MVBZTFRCSFFFelpkOGNiYkFiMkxWTEljNgp3RzRkeGRxdy84bk0xbWFDTkFoVkJ6bDJuMXlURit1L0dnbThDK0FUeE5KcXl2cFBrVzJxWVZrYlNINUdYZ2ZUCmp0MElXc2JvQXQ5VEZ1YlE5dzJ3QXhoRWt2MERqRkVpOUxQd2ZadWJVRnVtQ3h1bUl4OFQwNCtHZU9pY1FZZU8KazlEeFkwSnVUR29hait4dkwreC9QNnZHQ2FPL2FBPT0KLS0tLS1FTkQgUFJJVkFURSBLRVktLS0tLQo=
+    clustermesh:
+      apiserver:
+        enabled: true
+        service:
+          type: LoadBalancer
+        tls:
+          auto:
+            enabled: true
+            method: cronJob
+            schedule: 0 0 1 */4 *
+      enableMCSAPI: true
+      config:
+        enabled: true      # kita pakai CLI untuk koneksikan (lebih simpel)
+      useAPIServer: true
+    hubble:
+      enabled: true
+      relay:
+        enabled: true
+        image:
+          useDigest: false
+        priorityClassName: system-cluster-critical
+        tls:
+          server:
+            enabled: true
+            mtls: true
+      tls:
+        auto:
+          enabled: true
+          certValidityDuration: 60
+          method: cronJob
+          schedule: 0 0 1 * *
+    ipam:
+      mode: kubernetes
+    image:
+      useDigest: false
+    operator:
+      image:
+        useDigest: false
+    certgen:
+      image:
+        useDigest: false
+    socketLB:
+      hostNamespaceOnly: true
+    envoy:
+      image:
+        useDigest: false
+*** Until this Lines ***
+  Version:  1.17.3
+
+*** Check the changes ***
+kubectl --context=kommander -n arief-workspace-mtnvx-gskts describe helmchartproxies.addons.cluster.x-k8s.io cilium-0198e382-76d9-7d6c-a248-e8321fa7ed86
+kubectl --context=kommander -n arief-workspace-mtnvx-gskts get helmreleaseproxy | grep cilium
+
+*** Make sure all add.ons cilium status "TRUE" and "DEPLOYED" ***
+
+
+# DRC Cluster #
+==============
+
+kubectl --context=kommander -n arief-workspace-mtnvx-gskts edit helmchartproxies.addons.cluster.x-k8s.io cilium-0198e386-010a-7d73-b678-494aa67a3457
+
+DRC:
+spec:
+  chartName: cilium
+  clusterSelector:
+    matchLabels:
+      cluster.x-k8s.io/cluster-name: arief-nkp-drc
+  namespace: kube-system
+  options:
+    enableClientCache: false
+    install:
+      createNamespace: true
+    timeout: 10m0s
+    upgrade:
+      maxHistory: 10
+  releaseName: cilium
+  repoURL: oci://helm-repository.caren-system.svc/charts
+  tlsConfig:
+    caSecret:
+      name: helm-repository-tls
+      namespace: caren-system
+*** Delete Existing Lines start from HERE and REPLACE it with these new lines ***
+  valuesTemplate: |-
+    cni:
+      chainingMode: portmap
+      exclusive: false
+    cluster:
+      id: 2        # untuk DRC
+      name: drc
+    tls:
+      ca:
+        cert:  LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZFekNDQXZ1Z0F3SUJBZ0lVZGVjbEI3blVXR2xPZ0s1QWdzOU4rY2drb0VVd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0dURVhNQlVHQTFVRUF3d09ZMngxYzNSbGNtMWxjMmd0WTJFd0hoY05NalV3T0RJMk1ESXhOVEE0V2hjTgpNelV3T0RJME1ESXhOVEE0V2pBWk1SY3dGUVlEVlFRRERBNWpiSFZ6ZEdWeWJXVnphQzFqWVRDQ0FpSXdEUVlKCktvWklodmNOQVFFQkJRQURnZ0lQQURDQ0Fnb0NnZ0lCQUxMWGVzcTFreTZEcDFFNmhuaWtDNWt1cm41UGoxcFAKR1QyRGtFUXluS2lnVXdtZlB5a1BLVllZcGZESHlvaXNUSThjMXd4TGh2VmNFYUdPcVNBWjZMaElTbDVyb0lycQpxREF5c1lwNDhwWEpSb3RuaW4rZzVETWtNUDkvVWpOT3JjZ0UrQTRvU2hOSVlFckZDRndkMXJ4R0lTcEx5WGZjCm5mQS9yOXhVUGVEMHZRYTRlaW1vc21MdUNjNXVDb0Nma0hBT0ZQQ2VNUXdEdXBnQUJnUzkzQkpOMmcvMDQyZHUKd2RUTE1nbGY3ck93Sk1FYXRuTkIzOEw3QU9iWXdFY0VnczZzOFZYSFFGUU5vb282V3p0TFlBOGlxY0pZLzNrKwpNMkhncjlPYlpBU2ZGWDdSNnh6K3ZPd0gxWmRGWlRiOXovUmNIaDg4amJYeWZQRmIvQTFVa2g0eXViV1AxYTVHCkFUZC9TYkRscHpyak9rcDVIeGp5ci9Ed211WExhVzNuaWFoUE1LdmNEMTY4N29oUEJ4YnZBQmtPTHJpSlc3MlIKN21tYml0M3dGMFRUNUdlY1UvNHJ2UDlHYjNmSDhtb2J3MFNwSWtNUy9rUU5aZnFZVTU0RkZpZnNZYjRYdHpsLwpxMmU2OFNDTVV0K2EwM0xXRzZoM2FzRkxDaGdwZ09RL0hDcHoyQlJjaGpNZWNEU3VtV2EwcDJBZmY5Nno4QnQ4CnY4S3o2Mms3ZkpLTjQ4c0c5UGNNYTF1c0U0bVBsK09aZGg4UjVERlJ3dHN1NDFlWjEwRUFxZzY3WFN6dWlGTm0KU09XV01PTEFEYkp5dG8wU0ZUUTVDTnpMNGFudEI1c3VqZkFJY1FFWCtlT2ExWWVsNzdZcTBJMkZRN256VFg2QgpXR29ZdGUxMzZISnJBZ01CQUFHalV6QlJNQjBHQTFVZERnUVdCQlE4VFBpVW9OQTZIQWQxZm05U1pZRHRNMHpYCkF6QWZCZ05WSFNNRUdEQVdnQlE4VFBpVW9OQTZIQWQxZm05U1pZRHRNMHpYQXpBUEJnTlZIUk1CQWY4RUJUQUQKQVFIL01BMEdDU3FHU0liM0RRRUJDd1VBQTRJQ0FRQjNIb0xvbFNqZC9Yd3NNVU5GMUx0MzNpTzJBTTk2TmcrQQp4TEhCY3dXblJDazdJVFZWK29nMW5uSzNKUklwckdhV2RsQngwVUt2enRVSTd3dXNZM3JpalhoUll0RTVYQ0kwCjBleGQ4SExuSW9PdHR6S2pCUnIzTENkYUliZFJrcUxQTFdoZjBtd3VsR21nbXdLNGp6aG1DWmp1dEdGNjNiakgKSGd6cnRGSXBqbkJWRGNHdDFML2V1WTdJMG5qTVNEWkU0WnpsaFA3OFczUGo3dWJXQ05mTzl6OWtFZk9aWnNKRgo1VVJwUVdoZ0lGNnQ0NnNkdnNzNTgweTBqU2FSdE1SbW0xRXRLL1VRdVA4emNPaUtPZ0sxbVdnczVPWHBTZnBvCnIzbGFIcnIrek1mQUhhWnU5aXMyZ1h6dTlSUHRXamxHS2srZ0EwU05iVExsSHVpNlh2WFVvRDZVb1ZBMHRZWUYKYlBKOTJjUnNDZE1jYlF0akZaM0NnMHdhSEp0QzA4ZXdUdzZMSTVVSzJwN1Z3RXp6RzhFRngzOEwrZnlaQUYxSQpLVTJibkIvU2haUXpFQ1g2MlFIWWE2RHlEYkFCaHYyYmV5Zzd5eUlZeUp5WldyL2RiVHZOUXZqTmhZeGFFYTROClNKWGkvQzFrYkMrVDFpVXdISFRJckpmYW1GRWVnQUtqbHlYT0g2SXp0bFp4RVlzeXVXaE1INWI5bnpQamFKV0YKbFNubnBnanlnNXcvWkVmWWRieEd1N1JBQ0xjR1N4R1hFS1VwZGlKV3F2eUFOUkh4QUVHZGp5UXhkZEtRbkpIYgoyMUtpSVhTQUZCbDBpL0ZMdkN6WFQyK0FWTXF6THZSWGJqUm5kNWpWeFlVekhPenpoL0dvS3cyMlJ1c2lKWGR4CmFodDYvS0s1TlE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+        key:  LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRQ3kxM3JLdFpNdWc2ZFIKT29aNHBBdVpMcTUrVDQ5YVR4azlnNUJFTXB5b29GTUpuejhwRHlsV0dLWHd4OHFJckV5UEhOY01TNGIxWEJHaApqcWtnR2VpNFNFcGVhNkNLNnFnd01yR0tlUEtWeVVhTFo0cC9vT1F6SkREL2YxSXpUcTNJQlBnT0tFb1RTR0JLCnhRaGNIZGE4UmlFcVM4bDMzSjN3UDYvY1ZEM2c5TDBHdUhvcHFMSmk3Z25PYmdxQW41QndEaFR3bmpFTUE3cVkKQUFZRXZkd1NUZG9QOU9ObmJzSFV5eklKWCs2enNDVEJHclp6UWQvQyt3RG0yTUJIQklMT3JQRlZ4MEJVRGFLSwpPbHM3UzJBUElxbkNXUDk1UGpOaDRLL1RtMlFFbnhWKzBlc2MvcnpzQjlXWFJXVTIvYy8wWEI0ZlBJMjE4bnp4Clcvd05WSkllTXJtMWo5V3VSZ0UzZjBtdzVhYzY0enBLZVI4WThxL3c4SnJseTJsdDU0bW9UekNyM0E5ZXZPNkkKVHdjVzd3QVpEaTY0aVZ1OWtlNXBtNHJkOEJkRTArUm5uRlArSzd6L1JtOTN4L0pxRzhORXFTSkRFdjVFRFdYNgptRk9lQlJZbjdHRytGN2M1ZjZ0bnV2RWdqRkxmbXROeTFodW9kMnJCU3dvWUtZRGtQeHdxYzlnVVhJWXpIbkEwCnJwbG10S2RnSDMvZXMvQWJmTC9Dcyt0cE8zeVNqZVBMQnZUM0RHdGJyQk9KajVmam1YWWZFZVF4VWNMYkx1TlgKbWRkQkFLb091MTBzN29oVFpramxsakRpd0EyeWNyYU5FaFUwT1FqY3krR3A3UWViTG8zd0NIRUJGL25qbXRXSApwZSsyS3RDTmhVTzU4MDErZ1ZocUdMWHRkK2h5YXdJREFRQUJBb0lDQUFJVUVPSWpvTUNSZlhWcGJ5TE41ZTg4Cm9PNlEyMVY5cU4xbmk4RXRVQWNiZTViOTdDOVVWNkordGhmbEJ0bGtLeHAxMzIxMlJBb3hpRkpadXE1TGV5RmYKVFQ0dXNtdVhyQlREaXIyaUxGQTYrWGo5TnN5L3RZeXlRa05KaHdXRGdsMVdrcGFCWEVZNHp1ZTZnNnBpdS96MAp4c1hXTFV1VnZFb1hpTjZkQVdMNTkrUHk0Q1lPMGV0eFE4YlRGdWNTRytFUkNqTWsrczYyT1JGWHh5OG9BaWVPCnM4WlFqaHpNR00yb2lmVGVWWmtzWFhrMkxTVzRHVklhU0VMRm5wbmJGWmZwSGphWVZHWlhDaHh6QktjMHdTRWUKTDVTR0ZUbjZ4VVpFM1lyUFRFUXVaYTdJVmM0bkxDMlR3TzVObW1tNDRPSXVVSE5xbUhybE5HUU9tQ1oxeTNZbwo5V0lGTWFQRjlHM2pHR0VRMlFLb2U1eHhYd2k4aVRuc2lwN2JDbzMyZWJ1bTFCNmoveEFrbnJOQzdBQjMvZldWCk1qY3lLTmEzSmxjdzkwdUwxS09weUFMb1FVYlpNR3VBVkhvQXVRVk9Mc2xuclNMOFdUcXZvaTRyWW5kTU1tcnEKYmZsdjcxNGFRQkU1Y3U0Yzhad0hlcXRwVldFaWJ6bFpQVFp5TGROOEhwYU83Q0pObnBWLzVHMEhBSDJCUC9zRApJTkpRYjJSMjR1aWtONU5TZ0kvS04yZ0V3YzQ4T0J3dWNkTEdTc0VRTnI1RFQrU2VmcXp4WjQyVXNDdXo4dnJHClYxUS81V2YvT1RRUy9aTFZjUlVxWDNLZU1RTEFOY0YrN0l3OEFYTjBFZi9xT01BV1VJb3duS1lITWNTcWc2V3IKMUYyVTl0bG9vbzlBQ1djZXdQWmhBb0lCQVFEMlZ4dnRqZlJwak9WZklNTVJCQTFDbDJNeElnODdUNHR3aG1odwpFWkZncDRyaWo0YzQvcm1KUC81QUdpYXVIblFMaFZHUmpVZWU5c1d5K01EUWRKL1lHaFc3dXRqdmd1VWlHUWcyCk5DZTJWcHlFZEdMK0tmaVhvZmp6Z0JvcExERHNCOHBlai90ZTFxWjZZbWtZcVBtVFYxZVRTSFpxZzRPcXAvVTMKVHdNcXl0SmtyZGh6WWVjSHZ6K1dqeW1EWm5mdnlOZSt3SW5PRDdRb1QxQ1BKNmJLcFowaWZQdVplR05mZlRvNQpNajk4ak8vUGh3ejRGR2c3cWpwUjN0Wk1lRmhDL3JXZU5LdzVvWDJ3N3FwUWpENWdKYXFDYTF5dGdKNFRnbTdLCmJDZnc0cUUydGpSaW5IOW8rYVdldFRldnd2VVExUjdhL1RtL1M0dk52L2hVMzNUUkFvSUJBUUM1MnNrRUE0cncKdkhBL2tkNm9YbHBaTHJBWWowMGF0OGNRTldIdjlDTTFRQkl4Q2pYemt4Y3Z2OEFOSGplVW43d1h5amhRSXlOawpUdG1ma3hDeFhRa2tGS1piSjFRaXZzTlZiYkJ3NlJ3NG56NFNJcUgrdWdTQjh3aWVQdHEyQWpiVVZrOGZDUFc3Ck1EamZXMUpxNUpXN3lTZFA5ekgvYWl1eDNYYnczOGJjWnFXdEErTnBPNGJFNHBFeTRXKzFKZG92dHBTdExuWEUKY3RscVBkYmg1b2xRckxRZENOOWVwWUlPbjdjQnQrR09vaExtbVNFVzFwUXdqQ2FvMUFOVWhBcEpodGViNkJkdwpVZWJzUGxvSWN6TU1Rdm1kbHFVU1lKTnN4TEkyL0dXTFFjOGE0RzJMZ1BkSnpvTFM5N05qS1BYeW5ubXdXR3ZpCkViOUJiMzZZc3JKN0FvSUJBUUNYS1BiTE81dHFGWG8rZUdVYWtPanVIdVZRSmYxQXdOdm9yYUZ5ZTJWQThTNUoKUGhlVkFzR3BGZXFYUFRUVkRYemFBUEgvcGJqNE02YzIzbXU2dm9YRFhxWk5ieWRsT1dZUEdWc3ZuNnRxdVJVTQpOanIwaVo2d3RVU0ZidXNlcnE1S2Q3RlhlM1NkU293WGQwSFVUd1B1eE43SlV1TFBFMnA5RXRsbkdnWHdnVXEvCld1b0NTMll3Rzh3U1FFRVNENU96UVFRYVdoMTFvNjlDT1FGUEJ0N1RaUExhVWVVMTFHanVGSExnM0JPWEF3aTQKeUw5Tmo0QXlkSSthNDJtT3ZSNHo1Z1plVVNZSnF5M3NuMWRGVy9sK21ENWNEek5zaUFyNEg4YUtVZm5rVjd6agpUTVV5YWFQSkw3L1FkcFQ0Tm1LWTlKNGRkTnUxcGM3ZzcxYWNCZzZ4QW9JQkFHekdqVUlKSk1lVE1vc3lQOFFCClBSWFhTbitGVjVaY20yaDBKZmIveDUrQitXTzBXekZORkpRQXdWR3NMdEdRejlDSXJYN1JvZ1F5VmhLY1MzZlQKUU9kYUlxZFZGRndsbEVPcXFFcmRWSVFiUjRQcnV5NVFCeFZiZmQ3SVlNK0g2amxLcnBJMmQwUHdqRWpGdFM0VQp6VUlVRUNzd1BaWUV1TUFvSTFZRlV1bHFObXRWekVLcDhVM0lZVDBMVG9zU05Xb1pqVmp5eVVDS0M0K3YwOVZ4ClRVcm5XWjlvc3ZzOUdTcWY5Y2RPclBnRENkYm5Kc09zSVIxczJhK1VMc0xIYVJIeGxyMk1FRFBQNjd5M0haQzIKZzlrWVZlb1M0bGdvS0FEUCtwSk9GTXgxWHRhWEplWXhQQXA1a0g0VE5XM0M2bmZ1b3NCQWNCdm5VUzNtS0kwTQpnWU1DZ2dFQUJWRHAwYVgxalllektaNk8wL3hPREpMVHlpMG9mdjBzYk1zVzkvREh3Vm8xdzY3LzlYTG85Sm9ECjJzb3IvK2Q3UDJSN3BsQldHcTBsOHFRcnNIVmljVjFFWm1BeWZMNTNuUzFSem1hTEF3TCtNMVdUYjZlU0xodnUKV21iSkk2dFhrYzdNeFJQb1hFWWZTejJncGZGQi9PV1plVDZ3SEg0MVBZTFRCSFFFelpkOGNiYkFiMkxWTEljNgp3RzRkeGRxdy84bk0xbWFDTkFoVkJ6bDJuMXlURit1L0dnbThDK0FUeE5KcXl2cFBrVzJxWVZrYlNINUdYZ2ZUCmp0MElXc2JvQXQ5VEZ1YlE5dzJ3QXhoRWt2MERqRkVpOUxQd2ZadWJVRnVtQ3h1bUl4OFQwNCtHZU9pY1FZZU8KazlEeFkwSnVUR29hait4dkwreC9QNnZHQ2FPL2FBPT0KLS0tLS1FTkQgUFJJVkFURSBLRVktLS0tLQo=
+    clustermesh:
+      apiserver:
+        enabled: true
+        service:
+          type: LoadBalancer
+        tls:
+          auto:
+            enabled: true
+            method: cronJob
+            schedule: 0 0 1 */4 *
+      enableMCSAPI: true
+      config:
+        enabled: true      # kita pakai CLI untuk koneksikan (lebih simpel)
+      useAPIServer: true
+    hubble:
+      enabled: true
+      relay:
+        enabled: true
+        image:
+          useDigest: false
+        priorityClassName: system-cluster-critical
+        tls:
+          server:
+            enabled: true
+            mtls: true
+      tls:
+        auto:
+          enabled: true
+          certValidityDuration: 60
+          method: cronJob
+          schedule: 0 0 1 * *
+    ipam:
+      mode: kubernetes
+    image:
+      useDigest: false
+    operator:
+      image:
+        useDigest: false
+    certgen:
+      image:
+        useDigest: false
+    socketLB:
+      hostNamespaceOnly: true
+    envoy:
+      image:
+        useDigest: false
+*** Until this Lines ***
+  Version:  1.17.3
+
+*** Check the changes ***
+kubectl --context=kommander -n arief-workspace-mtnvx-gskts describe helmchartproxies.addons.cluster.x-k8s.io cilium-0198e386-010a-7d73-b678-494aa67a3457
+kubectl --context=kommander -n arief-workspace-mtnvx-gskts get helmreleaseproxy | grep cilium
+
+*** Make sure all add.ons cilium status "TRUE" and "DEPLOYED" ***
+
+# Make sure new configuration changes applied to all PODS by Restarting the PODS
+
+kubectl --context=dc -n kube-system rollout restart daemonset cilium
+kubectl --context=drc -n kube-system rollout restart daemonset cilium
+kubectl -n kube-system rollout restart deploy/cilium-operator --context=dc
+kubectl -n kube-system rollout restart deploy/cilium-operator --context=drc
+kubectl --context=dc -n kube-system rollout restart deployment clustermesh-apiserver   
+kubectl --context=drc -n kube-system rollout restart deployment clustermesh-apiserver
+
+
+*** Check all PODS are UP ***
+kubectl --context=dc -n kube-system get pods -l k8s-app=cilium -o wide
+kubectl --context=drc -n kube-system get pods -l k8s-app=cilium -o wide
+kubectl --context=dc -n kube-system get pods | grep clustermesh
+kubectl --context=drc -n kube-system get pods | grep clustermesh
+
+*** Preparaion of Cillium CLustermesh Setup ***
+
+# Check CA cert and fingerprint are the same between clusters
+kubectl --context=dc -n kube-system get secret cilium-ca -o jsonpath='{.data.server.cert}' | base64 --decode | sha256sum
+kubectl --context=drc -n kube-system get secret cilium-ca -o jsonpath='{.data.server.cert}' | base64 --decode | sha256sum
+kubectl --context=dc -n kube-system get secret cilium-ca -o jsonpath='{.data.ca\.crt}' | base64 --decode | openssl x509 -noout -fingerprint -sha256
+kubectl --context=drc -n kube-system get secret cilium-ca -o jsonpath='{.data.ca\.crt}' | base64 --decode | openssl x509 -noout -fingerprint -sha256
+
+# Check cilium and clustermesh status
+cilium --context=dc status
+cilium --context=drc status
+
+cilium clustermesh status --context dc
+cilium clustermesh status --context drc
+
+DC: *** Take note on cluster API Endpoint IP Address ***
+✅ Cluster access information is available:
+  - 10.55.35.55:2379
+
+DRC: *** Take note on cluster API Endpoint IP Address ***
+✅ Cluster access information is available:
+  - 10.55.35.141:2379
+
+# Connect Cilium Clustermesh
+
+cilium --context=dc clustermesh connect --destination-context=drc
+cilium --context=drc clustermesh connect --destination-context=dc
+
+cilium --context=dc clustermesh status
+cilium --context=drc clustermesh status
+
+*** Make sure both clusters are connected ***
+
+🔌 Cluster Connections:
+  - drc: 7/7 configured, 7/7 connected - KVStoreMesh: 1/1 configured, 1/1 connected
+
+🔌 Cluster Connections:
+  - dc: 7/7 configured, 7/7 connected - KVStoreMesh: 1/1 configured, 1/1 connected
+
+*** Check pod-to-pod connectivity ***
+
+From code-server (Bastion VM)
+
+cd /home/nutanix
+
+kubectx kommander # --> make sure you use commander-cluster cluster context
+export HARBOR_ADDRESS="$(kubectl -n kommander get kommandercluster host-cluster -o jsonpath='{.status.ingress.address}')"
+echo $HARBOR_ADDRESS 
+
+kubectx dc
+kubectl create ns arief-nginx #use your name 
+
+kubens arief-nginx # --> make sure you choose yourname-nginx namespace
+
+REGISTRY_USERNAME="nutanix"
+REGISTRY_PASSWORD="nx2Tech319!" #change password to your cluster password
+
+kubectl create secret generic harbor-registry-credentials \
+--from-literal username=$REGISTRY_USERNAME \
+--from-literal password=$REGISTRY_PASSWORD \
+--from-file=/etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt
+
+*** DONT FORGET TO REPLACE YOUR HARBOR IP ADDRESS ABOVE BEFORE COPY PASTE ***
+
+From DC Cluster Kubernetes Dashboard:
+-------------------------------------
+Choose yourname-nginx namespace
+Create new resource - Create from Form
+
+Name              :  arief-nginx
+container image   :  10.55.35.42:5000/library/arief-nginx # change to your harbor registry ip address
+number of pods    :  1
+service           :  External
+Port              :  80
+Target Port       :  80
+Show advanced option
+image pull secret :  harbor-registry-credentials
+
+Check deployment running
+Check Services created - click external endpoint --> the web application shown
+
+*** From Code-Server (Bastion VM) ***
+
+kubectx drc
+kubens default # --> use default namespace
+
+REGISTRY_USERNAME="nutanix"
+REGISTRY_PASSWORD="nx2Tech319!" #change password to your cluster password
+
+kubectl create secret generic harbor-registry-credentials \
+--from-literal username=$REGISTRY_USERNAME \
+--from-literal password=$REGISTRY_PASSWORD \
+--from-file=/etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt
+
+From DRC Cluster Kubernetes Dashboard:
+-------------------------------------
+Choose default namespace
+
+Create new resource - Create from Form input
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rocky-pod
+spec:
+  containers:
+    - name: rocky-container
+      image: 10.55.35.42:5000/proxy_cache/rockylinux:8     # change the IP address into your Harbor URL/IP
+      command: ["/bin/bash", "-c", "sleep infinity"]        # Example command to keep container running
+  imagePullSecrets:
+  - name: harbor-registry-credentials
+
+From Workload - Pods - Click 3 dot menu in rocky-pod container and click exec
+
+Check Both POds IP Addreses:
+A (DC - NGINX)  - 192.168.4.144 (POd)
+                - 10.102.75.111 (Service)
+B (DRC - Rocky) - 172.20.3.113  (Pod)
+
+From both PODS Exec --> Ping each other pods        --> What Happened?
+
+If no Ping utils avail:
+
+    apt-get update
+    apt-get install -y iputils-ping
+
+# Disonnect Cilium Clustermesh
+
+cilium --context=dc clustermesh disconnect --destination-context=drc
+cilium --context=drc clustermesh disconnect --destination-context=dc
+
+# Connect Cilium Clustermesh
+
+cilium --context=dc clustermesh connect --destination-context=drc
+cilium --context=drc clustermesh connect --destination-context=dc
+
+*** Make PERMANENT Connection by Modify Cilium config through helmchartproxies addons ***
+
+# DC Cluster #
+==============
+
+kubectl --context=kommander -n arief-workspace-mtnvx-gskts edit helmchartproxies.addons.cluster.x-k8s.io cilium-0198e382-76d9-7d6c-a248-e8321fa7ed86
+
+    clustermesh:
+      apiserver:
+        enabled: true
+        service:
+          type: LoadBalancer
+        tls:
+          auto:
+            enabled: true
+            method: cronJob
+            schedule: 0 0 1 */4 *
+      enableMCSAPI: true
+      config:
+        enabled: true      # kita pakai CLI untuk koneksikan (lebih simpel)
+*** add this Lines ***
+        clusters:
+        - ips:
+          - 10.55.35.141    #   --> Your DRC cluster API Endpoint IP Address
+          name: drc         #   --> Your DRC cluster name
+          port: 2379
+*** Until this Lines ***
+      useAPIServer: true
+    hubble:
+
+kubectl --context=kommander -n arief-workspace-mtnvx-gskts describe helmchartproxies.addons.cluster.x-k8s.io cilium-0198e382-76d9-7d6c-a248-e8321fa7ed86
+
+# DRC Cluster #
+==============
+
+kubectl --context=kommander -n arief-workspace-mtnvx-gskts edit helmchartproxies.addons.cluster.x-k8s.io cilium-0198e386-010a-7d73-b678-494aa67a3457
+
+    clustermesh:
+      apiserver:
+        enabled: true
+        service:
+          type: LoadBalancer
+        tls:
+          auto:
+            enabled: true
+            method: cronJob
+            schedule: 0 0 1 */4 *
+      enableMCSAPI: true
+      config:
+        enabled: true      # kita pakai CLI untuk koneksikan (lebih simpel)
+*** add this Lines ***
+        clusters:
+        - ips:
+          - 10.55.35.55    #   --> Your DC cluster API Endpoint IP Address
+          name: dc         #   --> Your DC cluster name
+          port: 2379
+*** Until this Lines ***
+      useAPIServer: true
+    hubble:
+
+kubectl --context=kommander -n arief-workspace-mtnvx-gskts describe helmchartproxies.addons.cluster.x-k8s.io cilium-0198e386-010a-7d73-b678-494aa67a3457
+
+kubectl --context=kommander -n arief-workspace-mtnvx-gskts get helmreleaseproxy | grep cilium
+
+*** Make sure all add.ons cilium status "TRUE" and "DEPLOYED" ***
+
+# Make sure new configuration changes applied to all PODS by Restarting the PODS
+
+kubectl --context=dc -n kube-system rollout restart daemonset cilium
+kubectl --context=drc -n kube-system rollout restart daemonset cilium
+kubectl -n kube-system rollout restart deploy/cilium-operator --context=dc
+kubectl -n kube-system rollout restart deploy/cilium-operator --context=drc
+kubectl --context=dc -n kube-system rollout restart deployment clustermesh-apiserver   
+kubectl --context=drc -n kube-system rollout restart deployment clustermesh-apiserver
+
+*** Check all PODS are UP ***
+kubectl --context=dc -n kube-system get pods -l k8s-app=cilium -o wide
+kubectl --context=drc -n kube-system get pods -l k8s-app=cilium -o wide
+kubectl --context=dc -n kube-system get pods | grep clustermesh
+kubectl --context=drc -n kube-system get pods | grep clustermesh
+
+cilium --context=dc clustermesh status
+cilium --context=drc clustermesh status
 
