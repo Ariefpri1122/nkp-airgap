@@ -494,3 +494,15 @@ kubectl --context=kommander -n arief-workspace-mtnvx-gskts get helmreleaseproxy 
 cilium --context=dc clustermesh status
 cilium --context=drc clustermesh status
 
+
+Check Both POds IP Addreses again:
+A (DC - NGINX)  - 192.168.4.144 (POd)
+                - 10.102.75.111 (Service)
+B (DRC - Rocky) - 172.20.3.113  (Pod)
+
+From both PODS Exec --> Ping each other pods        --> What Happened?
+
+From rocky-pod in DRC:
+- curl -v http://10.102.75.111:80  --> What Happened?
+- curl -v http://nginx-svc.arief-nginx.svc.cluster.local --> What Happened?
+
