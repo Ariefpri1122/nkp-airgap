@@ -410,15 +410,20 @@ If no Ping utils avail:
     apt-get update
     apt-get install -y iputils-ping
 
+# Connect Cilium Clustermesh
+
+cilium --context=dc clustermesh connect --destination-context=drc
+cilium --context=drc clustermesh connect --destination-context=dc
+
+cilium --context=dc clustermesh status
+cilium --context=drc clustermesh status
+
 # Disonnect Cilium Clustermesh
 
 cilium --context=dc clustermesh disconnect --destination-context=drc
 cilium --context=drc clustermesh disconnect --destination-context=dc
 
-# Connect Cilium Clustermesh
 
-cilium --context=dc clustermesh connect --destination-context=drc
-cilium --context=drc clustermesh connect --destination-context=dc
 
 *** Make PERMANENT Connection by Modify Cilium config through helmchartproxies addons ***
 
