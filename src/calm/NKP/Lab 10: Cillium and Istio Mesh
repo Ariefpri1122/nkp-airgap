@@ -491,21 +491,6 @@ kubectl --context=kommander -n arief-workspace-mtnvx-gskts get helmreleaseproxy 
 
 *** Make sure all add.ons cilium status "TRUE" and "DEPLOYED" ***
 
-# Make sure new configuration changes applied to all PODS by Restarting the PODS
-
-kubectl --context=dc -n kube-system rollout restart daemonset cilium
-kubectl --context=drc -n kube-system rollout restart daemonset cilium
-kubectl -n kube-system rollout restart deploy/cilium-operator --context=dc
-kubectl -n kube-system rollout restart deploy/cilium-operator --context=drc
-kubectl --context=dc -n kube-system rollout restart deployment clustermesh-apiserver   
-kubectl --context=drc -n kube-system rollout restart deployment clustermesh-apiserver
-
-*** Check all PODS are UP ***
-kubectl --context=dc -n kube-system get pods -l k8s-app=cilium -o wide
-kubectl --context=drc -n kube-system get pods -l k8s-app=cilium -o wide
-kubectl --context=dc -n kube-system get pods | grep clustermesh
-kubectl --context=drc -n kube-system get pods | grep clustermesh
-
 cilium --context=dc clustermesh status
 cilium --context=drc clustermesh status
 
