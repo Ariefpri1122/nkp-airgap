@@ -212,8 +212,8 @@ From your laptop -- Check avail NKP Ultimate license and its expired Date
         2. license key —> AEAAQ-AAA6Z-57CF6-C7CUH-AVRDV-TT8LD-P9ES2
 
 
-From autoAD VM --> Copy Registry /etc/docker/certs.d/airgap.arief.com\:5000/cert.crt to c:\inetpub\wwwroot 
-    * use winscp to copy it from bastion VM
+Copy Certificate File From BASTION to AUTOADVM
+    * use winscp to copu /etc/docker/certs.d/airgap.arief.com\:5000/cert.crt in BASTION VM to c:\inetpub\wwwroot in AUTOADVM
 
 
 IP Address Management
