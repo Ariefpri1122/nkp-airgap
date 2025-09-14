@@ -496,7 +496,7 @@ EOF
       - Create new resource (+ sing top right corner)
       - Create from form
           App name          : pgadmin
-          container image   : 10.38.106.41:5000/proxy_cache/dpage/pgadmin4
+          container image   : 10.38.106.41:5000/proxy_cache/dpage/pgadmin4		# Change to your Harbor IP Address
           number of pods    : 1
           service           : external
           port              : 80
