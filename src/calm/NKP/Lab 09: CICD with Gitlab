@@ -165,7 +165,7 @@ spec:
   type: LoadBalancer
 
 ==========================================================================================================================
-Input above yaml to /envs/development/deployment.yaml
+Input below yaml to /envs/development/deployment.yaml
 ==========================================================================================================================
 apiVersion: apps/v1
 kind: Deployment
@@ -212,7 +212,7 @@ spec:
   type: LoadBalancer
 
 ==========================================================================================================================
-Input above yaml to /envs/stagging/deployment.yaml with changes in below code line:
+Input below yaml to /envs/stagging/deployment.yaml with changes in below code line:
 ==========================================================================================================================
 apiVersion: apps/v1
 kind: Deployment
