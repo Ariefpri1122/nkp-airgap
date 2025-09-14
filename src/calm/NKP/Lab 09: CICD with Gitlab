@@ -255,11 +255,11 @@ Add below lines 19 --> Modify as necessary (ex: harbor IP address, or other name
 
 CLick Commit Changes 2x
 
-From Gitlab Dashboard - Your NKP Advance Workshop:
+From Gitlab Dashboard - Your workshop_advanced-gitops:
 - Click Code Button (Top Right)
 - Click Copy button Clone with HTTP:
 
-    http://gitlab.arief.com/root/arief-nkp-advance-workshop.git
+    http://gitlab.arief.com/root/workshop_advanced-gitops.git
 
 - Take note of above URL --> make sure the URL match with URL in below script
 
