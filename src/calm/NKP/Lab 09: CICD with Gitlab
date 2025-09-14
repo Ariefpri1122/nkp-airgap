@@ -395,7 +395,7 @@ From code-server (Bastion VM):
             NAME                                               READY   STATUS    RESTARTS   AGE
             ndb-operator-controller-manager-77b896b5f9-xcwmt   2/2     Running   0          29s            
 
-2.  Create NDB Secret from code-server (bastion vm)
+2.  Create NDB Secret from code-server (bastion vm) --> Change the password into your HPOC cluster password
 
 kubens  --> Select Your Project Namespace
 
