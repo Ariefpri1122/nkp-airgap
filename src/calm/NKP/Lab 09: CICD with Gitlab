@@ -24,7 +24,7 @@ Add DNS Host A Record gitlab.arief.com mapped to its IP Address
 Login to gitlab —> username:root with password in —> sudo cat /etc/gitlab/initial_root_password (ssh rocky@gitlab.arief.com)
 Click → Preferences→Password to nutanix/4u
 Login with new username password —> Admin Area (Below Left Menu) - CI/CD - Runners - Click 3 dot menu near ‘Create instance runner’:
-- put "vm_runner" in Tags
+- put "vm-runner" in Tags
 - Click "Create Runner" button
 - Choose "Linux" Operating System
 - Copy Command Line of Registration
