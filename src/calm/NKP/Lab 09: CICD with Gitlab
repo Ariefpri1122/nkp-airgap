@@ -196,11 +196,13 @@ Add CI/CD variables to your app repo:
 - Expand the Variables section: Scroll down to the Variables section and click Expand.
     * Add a new variable: Click Add variable.
 
+		  Visibility: Visible
           Key: GITOPS_USER
           Value: root
 
           Save
 
+		  Visibility: Visible
           Key: GITOPS_TOKEN
           Value: your GitOps token (personal access token or deploy token)
 
