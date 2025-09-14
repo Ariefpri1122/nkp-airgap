@@ -282,14 +282,6 @@ Path                : ./envs/master
 Primary Git Secret  : gitlab-tokens
 Click Save
 
-Go to your NKP Dashboard - Chooce your project workshop - Continous Deployment (CD) - Add GitOps Source
-Name                : gitopsdevlopment
-URL                 : http://gitlab.arief.com/root/workshop_advanced-gitops.git --> Change this to your GITOPS PROJECT URL (Not NKP_Advanced Project)
-Branch              : main
-Path                : ./envs/development
-Primary Git Secret  : gitlab-tokens
-Click Save
-
 Make changes in source code and Examining CI/CD Process
 -------------------------------------------------------
 
