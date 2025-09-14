@@ -651,6 +651,8 @@ spec:
     k8s-app: arief-landon-development
   type: LoadBalancer
 
+CLick Commit Changes 2x
+
 ==== Modify the development apps ====
 
     - From gitlab your NKP Advance Workshop - Repository
