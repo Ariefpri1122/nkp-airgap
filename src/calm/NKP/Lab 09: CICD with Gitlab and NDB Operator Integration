@@ -684,6 +684,12 @@ Click Save
     - Create
     - Wait until snapshot finished
 
+*** While Waiting for snapshot Process ***
+
+    * lets learn about MVC Framework
+
+        --> Access this URL:  https://ntnxbootcamp.notion.site/Understand-MVC-Framework-Concept-4334403550a14720afa824b6ddd51304
+
 9.  Clone a Database
 
 curl -k -u admin:nx2Tech974! https://10.38.106.14:8443/era/v0.9/clusters | jq # --> change password to HPOC password
