@@ -164,6 +164,8 @@ spec:
     k8s-app: arief-landon-master
   type: LoadBalancer
 
+Click Commit Changes 2x
+
 Store GitOps Token in GitLab CI/CD variables in your Workshop Advanced Project (not in workshop_advanced-gitops)
 ----------------------------------------------------------------------------------------------------------------
 
