@@ -505,8 +505,6 @@ EOF
   
           Click show advanced options
 
-          image pull secret : harbor-registry-credentials
-
           Environments variables:
             * PGADMIN_DEFAULT_EMAIL     :     arief.pribadi@nutanix.com
             * PGADMIN_DEFAULT_PASSWORD  :     nutanix/4u
