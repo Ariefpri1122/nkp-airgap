@@ -428,7 +428,7 @@ kubectl get secrets
     ndb-secret                    Opaque   2      80s
     tls-root-ca                   Opaque   1      5d22h
 
-2.  Create NDBServer Resource from code-server (bastion vm)
+2.  Create NDBServer Resource from code-server (bastion vm) --> Change your NDB IP Address
 
 kubectl apply -f - <<EOF
 
