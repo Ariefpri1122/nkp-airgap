@@ -535,7 +535,7 @@ EOF
             Connection - password     :   nutanix/4u
             Click Save Password
             Save
-      * from your laptop/Code-Server VM --> download   
+      * from your laptop/AutoADVM --> download   
       
                 https://raw.githubusercontent.com/Ariefpri1122/nkp-airgap/main/src/calm/singledb.sql
 
