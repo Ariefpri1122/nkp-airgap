@@ -62,7 +62,7 @@ After BP in running status:
 Fork Application to Your Gitlab Repository
 ———————————————————
 
-Login to your gitlab dashboard - Setting - General - Import and Export Settings - Checked —> Github and Repository by URL
+Login to your gitlab dashboard - Admin Button (Left Below) - Setting - General - Import and Export Settings - Checked —> Github and Repository by URL
 Click Save Chages
 
 Click Home (Click Gitlab Logo left top corner) - Projects - Click New Project button - Import Project - Repository by URL
