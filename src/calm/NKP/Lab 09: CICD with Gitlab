@@ -54,6 +54,11 @@ Configure Gitlab_Runner_VM:
 Launch Blueprint —> Name: “Your_init”_Gitlab_Runner
 Add DNS Host A Record runner.arief.com mapped to its IP Address
 
+After BP in running status:
+- Go to Gitlab Dashboard
+- Click "View Runner" button
+- Make sure runner is running in ONLINE status
+
 Fork Application to Your Gitlab Repository
 ———————————————————
 
