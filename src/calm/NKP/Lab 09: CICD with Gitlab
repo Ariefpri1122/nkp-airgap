@@ -367,6 +367,8 @@ From code-server (Bastion VM):
 
     ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBM2C9FLMlL6xXcMRZt6Yjf1cgadN/1S6M8V3M6OQDbD arief.pribadi@nutanix.com
 
+- kubectx --> make sure you choose DC managed cluster
+
 1.  Installation of NDB Operator
 
       helm repo add nutanix-helm-repo https://nutanix.github.io/helm
