@@ -131,16 +131,15 @@ mkdir ~/.aws
 
 cat > ~/.aws/credentials <<EOF
 [ntnx-object-nkp]
-aws_access_key_id = kzj-yB1gXXG1h0_57-15JGVQx4pd29Mo                            #   YOUR_KEY_ID
-aws_secret_access_key = ytexinDnjN2kK1TGvNMWH4Al2ykmo6VV                       #   YOUR_SECRET_KEY
-EOF
+aws_access_key_id = 41fE9vHOMEgtwIg9DtpOus2hmH_G18i_
+aws_secret_access_key = uONdbSZYvPE4AguAcYqODZhya7IIQ1JO
 
 cat > ~/.aws/config <<EOF
 [profile ntnx-object-nkp]
 region = us-east-1
 s3 =
-endpoint_url = http://10.38.106.8:80
-addressing_style = path
+  endpoint_url = http://10.38.102.8:80
+  addressing_style = path
 EOF
 
         - Check list bucket
