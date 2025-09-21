@@ -133,6 +133,7 @@ cat > ~/.aws/credentials <<EOF
 [ntnx-object-nkp]
 aws_access_key_id = 41fE9vHOMEgtwIg9DtpOus2hmH_G18i_
 aws_secret_access_key = uONdbSZYvPE4AguAcYqODZhya7IIQ1JO
+EOF
 
 cat > ~/.aws/config <<EOF
 [profile ntnx-object-nkp]
