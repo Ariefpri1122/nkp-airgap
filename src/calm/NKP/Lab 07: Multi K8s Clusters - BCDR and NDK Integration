@@ -132,7 +132,7 @@ mkdir ~/.aws
 cat > ~/.aws/credentials <<EOF
 [ntnx-object-nkp]
 aws_access_key_id = kzj-yB1gXXG1h0_57-15JGVQx4pd29Mo                            #   YOUR_KEY_ID
-aws_secret_access_key =  ytexinDnjN2kK1TGvNMWH4Al2ykmo6VV                       #   YOUR_SECRET_KEY
+aws_secret_access_key = ytexinDnjN2kK1TGvNMWH4Al2ykmo6VV                       #   YOUR_SECRET_KEY
 EOF
 
 cat > ~/.aws/config <<EOF
