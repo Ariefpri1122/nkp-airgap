@@ -79,7 +79,7 @@ Create more complex application with persistent volue:
 ------------------------------------------------------
 From managed-cluster kubernetes dashboard --> examine installed storage classes: nutanix-volume
 
-Choose your project namespace from kubernetes dashboard
+Choose your name-nginx namespace from kubernetes dashboard
 
 Apply below manifest using Create New Resources - Create from input in kubernetes dashboard
 
