@@ -454,8 +454,8 @@ volumeBindingMode: Immediate
                 --set infraManager.tag=1.2.0 \
                 --set kubeRbacProxy.repository=10.38.106.41:5000/library/ndk/kube-rbac-proxy \
                 --set kubeRbacProxy.tag=v0.17.0 \
-                --set kubectl.repository=10.38.106.41:5000/library/ndk/bitnami-kubectl \
-                --set kubectl.tag=1.30.3 \
+                --set kubectl.repository=10.38.106.41:5000/library/ndk/kubectl \
+                --set kubectl.tag=1.32.3 \
                 --set jobScheduler.repository=10.38.106.41:5000/library/ndk/job-scheduler \
                 --set jobScheduler.tag=1.2.0 \
                 --set tls.server.enable=false \
