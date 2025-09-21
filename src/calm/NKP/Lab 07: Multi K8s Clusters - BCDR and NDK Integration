@@ -421,12 +421,12 @@ volumeBindingMode: Immediate
                 docker image tag ndk/infra-manager:1.2.0 10.38.106.41:5000/library/ndk/infra-manager:1.2.0
                 docker image tag ndk/job-scheduler:1.2.0 10.38.106.41:5000/library/ndk/job-scheduler:1.2.0
                 docker image tag ndk/kube-rbac-proxy:v0.17.0 10.38.106.41:5000/library/ndk/kube-rbac-proxy:v0.17.0
-                docker image tag ndk/kubectl:1.30.3 10.38.106.41:5000/library/ndk/kubectl:1.30.3
+                docker image tag ndk/kubectl:1.32.3 10.38.106.41:5000/library/ndk/kubectl:1.32.3
 
                 docker push 10.38.106.41:5000/library/ndk/infra-manager:1.2.0
                 docker push 10.38.106.41:5000/library/ndk/job-scheduler:1.2.0
                 docker push 10.38.106.41:5000/library/ndk/kube-rbac-proxy:v0.17.0
-                docker push 10.38.106.41:5000/library/ndk/kubectl:1.30.3
+                docker push 10.38.106.41:5000/library/ndk/kubectl:1.32.3
 
                 Open your harbor dashboard and make sure all the images are listed.
 
