@@ -52,7 +52,7 @@ REGISTRY_PASSWORD="nx2Tech974!" #change password to your cluster password
 
 echo $REGISTRY_USERNAME : $REGISTRY_PASSWORD  # --> make sure username and password correct !!!
 
-kubectl create secret generic harbor-registry-credentials \
+kubectl -n arief-nginx create secret generic harbor-registry-credentials \
 --from-literal username=$REGISTRY_USERNAME \
 --from-literal password=$REGISTRY_PASSWORD \
 --from-file=/etc/docker/certs.d/$HARBOR_ADDRESS:5000/ca.crt
