@@ -586,22 +586,6 @@ EOF
 
 7.  Create Developer Branch from your nkp-advance-workshop
 
-    - From gitlab dashboard - got to your NKP advance workshop project
-    - CLick + button beside your nkp-advance-workshop
-    - Click new branch:
-        * Branch Name   :   development
-        * Create From   :   master
-    - Click Create branch
-
-    - Make sure you are in development branch (see the box above you BIG nkp-advance-workshop name with Folder ICON)
-      * Go to Setting (Bottom Left Pane Menu) - Repository
-      * Expand Protected branches
-      * Add Protected branch button
-          Branch                    :   Development
-          Allowed to merge          :   Maintainers
-          Allower to push and merge :   Maintainers
-      * Click Protect button
-
 ==========================================================================================================================
 Input below yaml to /envs/development/deployment.yaml	# --> From workshop_advanced_gitops project
 ==========================================================================================================================
@@ -652,6 +636,22 @@ spec:
   type: LoadBalancer
 
 CLick Commit Changes 2x
+
+    - From gitlab dashboard - got to your NKP advance workshop project
+    - CLick + button beside your nkp-advance-workshop
+    - Click new branch:
+        * Branch Name   :   development
+        * Create From   :   master
+    - Click Create branch
+
+    - Make sure you are in development branch (see the box above you BIG nkp-advance-workshop name with Folder ICON)
+      * Go to Setting (Bottom Left Pane Menu) - Repository
+      * Expand Protected branches
+      * Add Protected branch button
+          Branch                    :   Development
+          Allowed to merge          :   Maintainers
+          Allower to push and merge :   Maintainers
+      * Click Protect button
 
 Go to your NKP Dashboard - Chooce your project workshop - Continous Deployment (CD) - Add GitOps Source
 Name                : gitopsdevlopment
