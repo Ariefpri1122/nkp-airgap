@@ -653,14 +653,6 @@ CLick Commit Changes 2x
           Allower to push and merge :   Maintainers
       * Click Protect button
 
-Go to your NKP Dashboard - Chooce your project workshop - Continous Deployment (CD) - Add GitOps Source
-Name                : gitopsdevlopment
-URL                 : http://gitlab.arief.com/root/workshop_advanced-gitops.git --> Change this to your GITOPS PROJECT URL (Not NKP_Advanced Project)
-Branch              : main
-Path                : ./envs/development
-Primary Git Secret  : gitlab-tokens
-Click Save
-
 ==== Modify the development apps ====
 
     - From gitlab your NKP Advance Workshop - Repository
@@ -675,6 +667,14 @@ Click Save
     - Check your harbor dashboard --> you will finde new library/arief_laravel_development image
     - Deployment.yaml will be executed --> examine Deployment in project-xxx namespace
     - Open the application frontpage by clicking its services external ip address from kubernetes dashboard
+
+Go to your NKP Dashboard - Chooce your project workshop - Continous Deployment (CD) - Add GitOps Source
+Name                : gitopsdevlopment
+URL                 : http://gitlab.arief.com/root/workshop_advanced-gitops.git --> Change this to your GITOPS PROJECT URL (Not NKP_Advanced Project)
+Branch              : main
+Path                : ./envs/development
+Primary Git Secret  : gitlab-tokens
+Click Save
 
 8.  Create Database Snapshot
     - From NDB Dashboard - Data Protection - Time Machines - List
