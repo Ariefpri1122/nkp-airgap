@@ -589,7 +589,7 @@ EOF
 ==========================================================================================================================
 Input below yaml to /envs/development/deployment.yaml	# --> From workshop_advanced_gitops project
 ==========================================================================================================================
-*** Make sure you use correct namepace, harbor IP Address, image tags, and yourname to replace "arief" name based on your CICD pipeline (if you change it) ***
+*** Make sure you use correct namepace, harbor IP Address, and yourname to replace "arief" name based on your CICD pipeline (if you change it) ***
 
 apiVersion: apps/v1
 kind: Deployment
