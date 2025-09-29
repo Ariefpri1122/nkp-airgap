@@ -345,10 +345,9 @@ Save
 
 From Kubernetes Dashboard  -->  Choose Yourname-Project-xxx Namespace - Check Deployment, make sure deployment success (Please be aware that creating new project will create new namespace based on your project name)
 
-Troubleshooting redis card pod:
--------------------------------
+Troubleshooting redis card pod (if its happened)
+------------------------------------------------
 
-This error is by desigend.
   - redis-cart error (this is happened because the image is in docker hub, while other deployment's image use gcp artifact with no auth and limit -- while docker hub has maximum limit):
 
 From Code-Server (Bastion VM):
