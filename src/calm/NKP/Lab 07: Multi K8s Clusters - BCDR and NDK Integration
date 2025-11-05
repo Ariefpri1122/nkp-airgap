@@ -131,25 +131,25 @@ mkdir ~/.aws
 
 cat > ~/.aws/credentials <<EOF
 [ntnx-object-nkp]
-aws_access_key_id = 41fE9vHOMEgtwIg9DtpOus2hmH_G18i_
-aws_secret_access_key = uONdbSZYvPE4AguAcYqODZhya7IIQ1JO
+aws_access_key_id = 41fE9vHOMEgtwIg9DtpOus2hmH_G18i_					# Your object access key
+aws_secret_access_key = uONdbSZYvPE4AguAcYqODZhya7IIQ1JO				# Your object secret key
 EOF
 
 cat > ~/.aws/config <<EOF
 [profile ntnx-object-nkp]
 region = us-east-1
 s3 =
-  endpoint_url = http://10.38.102.8:80
+  endpoint_url = http://10.38.102.8:80									# Your object endpoint
   addressing_style = path
 EOF
 
         - Check list bucket
 
-AWS_PROFILE=ntnx-object-nkp aws s3 ls --endpoint-url http://10.38.106.8:80
+AWS_PROFILE=ntnx-object-nkp aws s3 ls --endpoint-url http://10.38.106.8:80								# Your object endpoint
 
 output ex:  2025-08-03 12:54:22 velero-backup
 
-AWS_PROFILE=ntnx-object-nkp aws s3 ls s3://velero-backup --endpoint-url http://10.38.106.8:80
+AWS_PROFILE=ntnx-object-nkp aws s3 ls s3://velero-backup --endpoint-url http://10.38.106.8:80			# Your object endpoint
 
 output  ex: nothing --> no files yet
 
