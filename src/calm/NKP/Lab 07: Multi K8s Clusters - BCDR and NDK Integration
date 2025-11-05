@@ -259,7 +259,7 @@ velero backup create arief-nginx-backup -n ${WORKSPACE_NAMESPACE} --storage-loca
 
 velero backup describe arief-nginx-backup -n ${WORKSPACE_NAMESPACE}
 
-AWS_PROFILE=ntnx-object-nkp aws s3 ls s3://velero-backup/backups/ --endpoint-url http://10.38.106.8:80
+AWS_PROFILE=ntnx-object-nkp aws s3 ls s3://velero-backup/backups/ --endpoint-url http://10.38.106.8:80										# Your object endpoint
 
     --> nutanix-velero-testbackup shown
 
