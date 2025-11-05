@@ -687,7 +687,7 @@ spec:
 
   initContainers:
     - name: init-decode-secret
-      image: 10.38.106.41:5000/proxy_cache/bitnami/kubectl:latest
+      image: 10.38.106.41:5000/proxy_cache/bitnami/kubectl:latest    # Change the IP into your harbor proxy_cache URL
       command:
         - /bin/sh
         - -c
@@ -708,7 +708,7 @@ spec:
 
   containers:
     - name: main
-      image: 10.38.106.41:5000/proxy_cache/amazon/aws-cli
+      image: 10.38.106.41:5000/proxy_cache/amazon/aws-cli            # Change the IP into your harbor proxy_cache URL
       command:
         - /bin/sh
         - -c
