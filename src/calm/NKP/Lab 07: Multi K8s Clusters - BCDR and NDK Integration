@@ -237,7 +237,7 @@ kubectl get backupstoragelocations -n ${WORKSPACE_NAMESPACE} -oyaml # --> to tro
 
 velero backup create nutanix-velero-testbackup -n ${WORKSPACE_NAMESPACE} --storage-location ntnx-object-nkp --snapshot-volumes=false
 velero backup describe nutanix-velero-testbackup -n ${WORKSPACE_NAMESPACE}
-AWS_PROFILE=ntnx-object-nkp aws s3 ls s3://velero-backup/backups/ --endpoint-url http://10.38.106.8:80
+AWS_PROFILE=ntnx-object-nkp aws s3 ls s3://velero-backup/backups/ --endpoint-url http://10.38.106.8:80										# Your object endpoint
 
     --> nutanix-velero-testbackup shown
 
