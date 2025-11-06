@@ -213,7 +213,7 @@ Add CI/CD variables to your app repo:
     export GITOPS_USER=root
     export GITOPS_TOKEN=glpat-S6KX-JSXCxJGscbLmvuC    # your gitlab token
 
-    git clone http://$GITOPS_USER:$GITOPS_TOKEN@gitlab.arief.com/root/arief-nkp-advance-workshop.git
+    git clone http://$GITOPS_USER:$GITOPS_TOKEN@gitlab.arief.com/root/arief-nkp-advance-workshop.git				# [your name]-nkp-advance-workshop
 
       Cloning into 'arief-nkp-advance-workshop'...
       remote: Enumerating objects: 7686, done.
