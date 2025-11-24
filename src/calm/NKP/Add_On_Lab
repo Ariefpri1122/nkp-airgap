@@ -1,0 +1,17 @@
+- From your Prism Central (PC) dasbboard - Unified Storage - Files
+- Click your File Server (ex: labFS) - Share & Exports - Click New Share or Export
+  * Name                    : laravel
+  * Size                    : 10 GB
+  * Primary Protocol Access : NFS
+  * General Settings        : Default (no change)
+  * Next
+  * NFS Protocol Access     : Default (no change)
+  * Next
+  * Create
+- Click your new laravel share
+  * Copy the Mount Path (ex: labFS.ntnxlab.local:/laravel)
+
+- From Code Proxy (bastion)
+  * sudo mkdir /mnt/laravel
+  * sudo mount -t nfs labFS.ntnxlab.local:/laravel /mnt/nfs_laravel
+  * cd /mnt/nfs_laravel
