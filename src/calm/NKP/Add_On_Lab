@@ -15,3 +15,11 @@
   sudo mkdir /mnt/laravel
   sudo mount -t nfs labFS.ntnxlab.local:/laravel /mnt/laravel
   cd /mnt/laravel
+
+          volumeMounts:
+          - name: laravel-persistent-storage
+            mountPath: /app/public/images/nfs
+      volumes:
+      - name: laravel-persistent-storage
+        persistentVolumeClaim:
+          claimName: laravel-pv-claim-nfs
