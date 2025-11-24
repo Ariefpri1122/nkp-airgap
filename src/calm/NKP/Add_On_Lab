@@ -12,6 +12,6 @@
   * Copy the Mount Path (ex: labFS.ntnxlab.local:/laravel)
 
 - From Code Proxy (bastion)
-  * sudo mkdir /mnt/laravel
-  * sudo mount -t nfs labFS.ntnxlab.local:/laravel /mnt/nfs_laravel
-  * cd /mnt/nfs_laravel
+  sudo mkdir /mnt/laravel
+  sudo mount -t nfs labFS.ntnxlab.local:/laravel /mnt/laravel
+  cd /mnt/laravel
