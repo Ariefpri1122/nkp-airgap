@@ -90,7 +90,7 @@ mySQL Application:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: mysql-pass
+  name: arief-mysql-pass
   type: Opaque
 stringData:
   password: nutanix/4u
@@ -98,7 +98,7 @@ stringData:
 apiVersion: v1
 kind: Service
 metadata:
-  name: wordpress-mysql
+  name: arief-wordpress-mysql
   labels:
     app: wordpress
 spec:
@@ -112,7 +112,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pv-claim
+  name: arief-mysql-pv-claim
   labels:
     app: wordpress
 spec:
@@ -125,7 +125,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wordpress-mysql
+  name: arief-wordpress-mysql
   labels:
     app: wordpress
 spec:
@@ -143,12 +143,12 @@ spec:
     spec:
       containers:
         - image: 10.38.106.41:5000/proxy_cache/mysql:8.0    # Change the IP into your harbor proxy_cache URL
-          name: mysql
+          name: arief-mysql
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql-pass
+                  name: arief-mysql-pass
                   key: password
             - name: MYSQL_DATABASE
               value: wordpress
@@ -157,18 +157,18 @@ spec:
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql-pass
+                  name: arief-mysql-pass
                   key: password
           ports:
             - containerPort: 3306
               name: mysql
           volumeMounts:
-            - name: mysql-persistent-storage
+            - name: arief-mysql-persistent-storage
               mountPath: /var/lib/mysql
       volumes:
-        - name: mysql-persistent-storage
+        - name: arief-mysql-persistent-storage
           persistentVolumeClaim:
-            claimName: mysql-pv-claim
+            claimName: arief-mysql-pv-claim
       imagePullSecrets:
         - name: harbor-registry-credentials
 
@@ -189,7 +189,7 @@ Wordpress Application:
 apiVersion: v1
 kind: Service
 metadata:
-  name: wordpress
+  name: arief-wordpress
   labels:
     app: wordpress
 spec:
@@ -203,7 +203,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: wp-pv-claim
+  name: arief-wp-pv-claim
   labels:
     app: wordpress
 spec:
@@ -216,7 +216,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wordpress
+  name: arief-wordpress
   labels:
     app: wordpress
 spec:
@@ -234,7 +234,7 @@ spec:
         tier: frontend
     spec:
       containers:
-      - image: 10.38.106.41:5000/proxy_cache/wordpress:apache   # Change the IP into your harbor proxy_cache URL
+      - image: 10.54.82.43:5000/proxy_cache/wordpress:apache   # Change the IP into your harbor proxy_cache URL
         name: wordpress
         env:
         - name: WORDPRESS_DB_HOST
@@ -242,7 +242,7 @@ spec:
         - name: WORDPRESS_DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: mysql-pass
+              name: arief-mysql-pass
               key: password
         - name: WORDPRESS_DB_USER
           value: wordpress
@@ -250,12 +250,12 @@ spec:
         - containerPort: 80
           name: wordpress
         volumeMounts:
-        - name: wordpress-persistent-storage
+        - name: arief-wordpress-persistent-storage
           mountPath: /var/www/html
       volumes:
-      - name: wordpress-persistent-storage
+      - name: arief-wordpress-persistent-storage
         persistentVolumeClaim:
-          claimName: wp-pv-claim
+          claimName: arief-wp-pv-claim
       imagePullSecrets:
         - name: harbor-registry-credentials
 
