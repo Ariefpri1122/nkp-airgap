@@ -85,6 +85,8 @@ Apply below manifest using Create New Resources - Create from input in kubernete
 
 *** MAKE SURE YOU CHANGE THE IMAGE URL IN DEPLOYMENT MANIFEST INTO YOUR HARBOR PROXY_CACHE URL ***
 
+*** Change every "arief" name into your name in the manifest and change every harbor IP "10.38.106.41:5000" into your harbor IP address ***
+
 mySQL Application:
 ------------------
 apiVersion: v1
