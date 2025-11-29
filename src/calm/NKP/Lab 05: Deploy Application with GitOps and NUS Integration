@@ -437,7 +437,7 @@ Modify Wordpress Pods into 2 replicas with single PVC Claim
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: nutanix-files
+  name: arief-nutanix-files
 provisioner: csi.nutanix.com
 parameters:
   nfsServerName: labFS
@@ -451,11 +451,11 @@ volumeBindingMode: Immediate
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: wp-pv-claim-nfs
+  name: arief-wp-pv-claim-nfs
   labels:
     app: wordpress
 spec:
-  storageClassName: nutanix-files
+  storageClassName: arief-nutanix-files
   accessModes:
     - ReadWriteMany
   resources:
