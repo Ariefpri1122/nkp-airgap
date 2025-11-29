@@ -434,6 +434,8 @@ Modify Wordpress Pods into 2 replicas with single PVC Claim
   * From - Persistent Volume Claim --> You will see 2 PVC with ReadWriteOnce in nutanix-volume storage class
   * Create new resource - create from input:
 
+    ## change "arief" with your name instead ##
+
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -463,17 +465,17 @@ spec:
       storage: 10Gi
 
 - From kubernetes dashboard - Your Name-nginx name space
-  * From Config and Storage - Storage Classes --> You will see nutanix-files
-  * From Persistent Volume Claim --> wp-pv-claim-nfs with Read-Write-Many to nutanix files storage class
+  * From Config and Storage - Storage Classes --> You will see [yourname]-nutanix-files
+  * From Persistent Volume Claim --> [yourname]-wp-pv-claim-nfs with Read-Write-Many to nutanix files storage class
   * From Cluster - Persistent Volume --> the PV-xxxxxx-xxxxxx (with storage class nutanix-files) has BOND status
 
 - From kubernetes dashboard - Your Name-nginx name space
   * Modify wordpress deployment:
-    - Go to Volumes:
-        - name: wordpress-persistent-storage
+    - Go to Volumes (line 176 approx):
+        - name: [yourname]-wordpress-persistent-storage
           persistentVolumeClaim:
-            claimName: wp-pv-claim --> replace 'wp-pv-claim' to 'wp-pv-claim-nfs'
-    - Go to spec:
+            claimName: [yourname]-wp-pv-claim --> replace '[yourname]-wp-pv-claim' to '[yourname]-wp-pv-claim-nfs'
+    - Go to spec (line 130 approx):
         - replicas: 1 --> change it into replicas: 2 (move your cursor UP NOT DOWN)
     - CLick UPDATE
   * Go to Pods:
