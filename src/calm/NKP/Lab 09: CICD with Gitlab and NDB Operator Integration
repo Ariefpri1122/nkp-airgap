@@ -114,6 +114,10 @@ Folder Structure:
 
 Each Deployment.yaml --> take a not that different deployment will have different "environment labels"
 
+Goto - Settings - CI/CD :
+	- AutoDevops --> Unchecked Default to Auto DevOps pipeline and click SAVE CHANGES
+	- Runners --> Instance runners - Turn on instance runners for this project - DISABLED
+
 
 ==========================================================================================================================
 Input the yaml below to /envs/master/deployment.yaml:
@@ -126,7 +130,7 @@ metadata:
   labels:
     k8s-app: arief-landon-master
   name: arief-landon-master
-  namespace: arief-project-zc6sw
+  namespace: arief-project-zc6sw					# change to your project namespace
 spec:
   replicas: 1
   selector:
@@ -139,7 +143,7 @@ spec:
       name: arief-landon-master
     spec:
       containers:
-        - image: 10.38.106.41:5000/library/arief_laravel_master:v1.0.0-6302a336
+        - image: 10.38.106.41:5000/library/arief_laravel_master:v1.0.0-6302a336			# change to your image link in harbor
           name: arief-landon-master
           resources: {}
       imagePullSecrets:
