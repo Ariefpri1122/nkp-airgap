@@ -92,7 +92,7 @@ mySQL Application:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: arief-mysql-pass
+  name: arief-mysql-pass                # Change to yourname (not "arief")
   type: Opaque
 stringData:
   password: nutanix/4u
@@ -100,7 +100,7 @@ stringData:
 apiVersion: v1
 kind: Service
 metadata:
-  name: arief-wordpress-mysql
+  name: arief-wordpress-mysql            # Change to yourname (not "arief")
   labels:
     app: wordpress
 spec:
@@ -114,7 +114,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: arief-mysql-pv-claim
+  name: arief-mysql-pv-claim            # Change to yourname (not "arief")
   labels:
     app: wordpress
 spec:
@@ -127,7 +127,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: arief-wordpress-mysql
+  name: arief-wordpress-mysql            # Change to yourname (not "arief")
   labels:
     app: wordpress
 spec:
@@ -150,7 +150,7 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: arief-mysql-pass
+                  name: arief-mysql-pass    # Change to yourname (not "arief")
                   key: password
             - name: MYSQL_DATABASE
               value: wordpress
@@ -159,7 +159,7 @@ spec:
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: arief-mysql-pass
+                  name: arief-mysql-pass            # Change to yourname (not "arief")
                   key: password
           ports:
             - containerPort: 3306
@@ -168,9 +168,9 @@ spec:
             - name: arief-mysql-persistent-storage
               mountPath: /var/lib/mysql
       volumes:
-        - name: arief-mysql-persistent-storage
+        - name: arief-mysql-persistent-storage      # Change to yourname (not "arief")
           persistentVolumeClaim:
-            claimName: arief-mysql-pv-claim
+            claimName: arief-mysql-pv-claim          # Change to yourname (not "arief")
       imagePullSecrets:
         - name: harbor-registry-credentials
 
@@ -191,7 +191,7 @@ Wordpress Application:
 apiVersion: v1
 kind: Service
 metadata:
-  name: arief-wordpress
+  name: arief-wordpress              # Change to yourname (not "arief")
   labels:
     app: wordpress
 spec:
@@ -205,7 +205,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: arief-wp-pv-claim
+  name: arief-wp-pv-claim              # Change to yourname (not "arief")
   labels:
     app: wordpress
 spec:
@@ -218,7 +218,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: arief-wordpress
+  name: arief-wordpress                # Change to yourname (not "arief")
   labels:
     app: wordpress
 spec:
@@ -240,11 +240,11 @@ spec:
         name: wordpress
         env:
         - name: WORDPRESS_DB_HOST
-          value: wordpress-mysql
+          value: arief-wordpress-mysql    # Change to yourname (not "arief")
         - name: WORDPRESS_DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: arief-mysql-pass
+              name: arief-mysql-pass      # Change to yourname (not "arief")
               key: password
         - name: WORDPRESS_DB_USER
           value: wordpress
@@ -252,12 +252,12 @@ spec:
         - containerPort: 80
           name: wordpress
         volumeMounts:
-        - name: arief-wordpress-persistent-storage
+        - name: arief-wordpress-persistent-storage        # Change to yourname (not "arief")
           mountPath: /var/www/html
       volumes:
-      - name: arief-wordpress-persistent-storage
+      - name: arief-wordpress-persistent-storage          # Change to yourname (not "arief")
         persistentVolumeClaim:
-          claimName: arief-wp-pv-claim
+          claimName: arief-wp-pv-claim                    # Change to yourname (not "arief")
       imagePullSecrets:
         - name: harbor-registry-credentials
 
@@ -295,18 +295,18 @@ Traefik Ingress Manifest
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: wordpress
+  name: arief-wordpress              # Change to yourname (not "arief")
 spec:
   ingressClassName: kommander-traefik
   rules:
-    - host: wordpress.arief.com       # Change to yourname domain
+    - host: wordpress.arief.com       # Change to yourname domain name (not "arief.com")
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: wordpress
+                name: arief-wordpress  # Change to yourname (not "arief")
                 port:
                   number: 80
 
