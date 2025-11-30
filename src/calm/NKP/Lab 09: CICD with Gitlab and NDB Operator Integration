@@ -157,7 +157,7 @@ metadata:
   labels:
     k8s-app: arief-landon-master
   name: arief-landon-master
-  namespace: arief-project-zc6sw
+  namespace: arief-project-zc6sw						# change to your project namespace
 spec:
   ports:
     - name: tcp-9999-master
