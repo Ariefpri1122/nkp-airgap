@@ -145,7 +145,7 @@ spec:
     spec:
       containers:
         - image: 10.38.106.41:5000/proxy_cache/mysql:8.0    # Change the IP into your harbor proxy_cache URL
-          name: arief-mysql
+          name: arief-mysql                  # Change to yourname (not "arief")          
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
