@@ -257,7 +257,7 @@ Modify script below with the correct information
 
 ** ssh to bastion from your laptop (or from AUTOAD VM) or using web code-server terminal to execute the commands
 
-export IMAGE="nkp-rocky-9.5-release-1.32.3-20250605191120.qcow2"
+export IMAGE="nkp-rocky-9.5-release-1.32.3-20250430150550.qcow2"
 export NUTANIX_USER="admin"
 export NUTANIX_PASSWORD="nx2Tech974!"
 export NUTANIX_ENDPOINT="https://10.38.106.7:9440" # make sure no “/“ at the end of the command and its PrismCentral IP (Not Prism Element)
