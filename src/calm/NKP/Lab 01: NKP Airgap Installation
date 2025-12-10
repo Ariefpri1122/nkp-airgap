@@ -71,12 +71,12 @@ From PC --> Makesure after change IP Pool, click the checked button and click SA
     6. Instal Putty 
     7. Install Angry IP Scanner
 
-6. From AutoAD VM, Download all these files and put all in c:\inetpub\wwwroot 
+6. From AutoAD VM, Download all these files 
     1. nexus-3.82.0-08-linux-x86_64.tar.gz —> https://download.sonatype.com/nexus/3/nexus-3.82.0-08-linux-x86_64.tar.gz
+        - cut and paste this file in c:\inetpub\wwwroot 
     2. Download NKP files from https://portal.nutanix.com/page/downloads?product=nkp
         1. Rocky Linux 9.5-release-1.32.3-20250430150550 for AHV (NKP Version 2.15.1)
         2. nkp-air-gapped-bundle  (NKP Version 2.15.1)
-    3. Put these 3 files in c:\inetpub\wwwroot 
 
 Blueprint Deployment
 --------------------
