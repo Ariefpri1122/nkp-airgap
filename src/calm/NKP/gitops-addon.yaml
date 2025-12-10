@@ -1,0 +1,20 @@
+     # Clone the GitOps repo
+     - git config --global user.email "ci@example.com"
+     - git config --global user.name "CI Bot"
+     - git clone http://$GITOPS_USER:$GITOPS_TOKEN@gitlab.arief.com/root/<yourname>_workshop_advanced-gitops.git
+     - cd <yourname>_workshop_advanced-gitops/envs/$CI_COMMIT_BRANCH
+     
+     # Patch the deployment.yaml image tag
+     - |
+        sed -i "s|image: .*|image: <Harbor IP Address>:5000/library/<yourname>_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG|g" deployment.yaml
+     # Only proceed if there are actual changes
+     - |
+        if git diff --quiet; then
+          echo "No changes to commit"
+        else
+          git config user.email "ci@example.com"
+          git config user.name "GitLab CI"
+          git add deployment.yaml
+          git commit -m "Update image to <yourname>_laravel_$CI_COMMIT_BRANCH:$IMAGE_TAG"
+          git push origin main
+        fi
