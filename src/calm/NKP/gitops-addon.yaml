@@ -1,8 +1,8 @@
      # Clone the GitOps repo
      - git config --global user.email "ci@example.com"
      - git config --global user.name "CI Bot"
-     - git clone http://$GITOPS_USER:$GITOPS_TOKEN@gitlab.arief.com/root/<yourname>_workshop_advanced-gitops.git
-     - cd <yourname>_workshop_advanced-gitops/envs/$CI_COMMIT_BRANCH
+     - git clone http://$GITOPS_USER:$GITOPS_TOKEN@gitlab.arief.com/root/<yourname>_workshop_advanced_gitops.git
+     - cd <yourname>_workshop_advanced_gitops/envs/$CI_COMMIT_BRANCH
      
      # Patch the deployment.yaml image tag
      - |
