@@ -177,7 +177,7 @@ Deploy BP Bastion_VM
         * take note on Bastion_VM IP Address (ex:10.38.20.153)
 
 While waiting:
-    * From Auto AD VM, Open PC GUI - compute - Images - Add Image - Add File - nkp-rocky-9.5-release-1.32.3-20250605191120.qcow2 from c:\inetpub\wwwroot folder - Next - Save
+    * From Auto AD VM, Open PC GUI - compute - Images - Add Image - Add File - nkp-rocky-9.5-release-1.32.3-20250430150550.qcow2 from Download folder - Next - Save
 
     (wait until disk size shown in the dashboard)
 
