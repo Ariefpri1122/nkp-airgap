@@ -23,7 +23,13 @@ URL: https://10.54.59.41/dkp/kommander/dashboard
 Only for Lab 8 : Building Complete CICD Deployment
 --------------------------------------------------
 
-Gitlab IP Address/URL : gitlab.arief.com
+Gitlab IP Address/URL : 10.54.60.106/gitlab.arief.com
+
+Modify your windows VDI
+
+    c:\system32\drivers\etc\hosts
+
+        10.54.60.106  gitlab.arief.com
 
 Gitlab Password:
 username  : root
@@ -33,6 +39,11 @@ PGAdmin password:
 username  : arief.pribadi@nutanix.com 
 password  : nutanix/4u
 
+Harbor IP   :   10.54.60.41
 Harbor URL  :   https://10.54.60.41:5000/
 username    :   nutanix
 password    :   nx2Tech741!
+
+Username: objective_sammet
+Password: RzbxtLAotC9GuY6E9EwCIgLbteOBjqEThR1uzrWDpgv5VPXg6VP8MyZ3Md8Awo7J
+URL: https://10.54.60.41/dkp/kommander/dashboard
