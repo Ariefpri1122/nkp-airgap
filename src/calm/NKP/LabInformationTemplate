@@ -1,0 +1,38 @@
+DC 		      10.54.59.6
+PC		      https://10.54.59.7:9440
+PE		      https://10.54.59.37:9440
+NDB		      10.54.59.14
+Registry	  10.54.59.94
+Airgap		  10.54.59.98
+bastion	    10.54.59.99
+harbor		  10.54.59.41
+harbor url 	https://10.54.59.41:5000
+pgadmin	    10.54.59.56
+traefic		  10.54.59.53
+
+Cluster Password:
+username    :   admin
+password    :   nx2Tech741!
+
+Kubernetes Password:
+Username: nifty_goldberg
+Password: JbZcBmn7hO9xAkoeWxbCPTsMpe4AcIfXy2rnXM8WiM5qanro0FxXVyG928RRrGRo
+URL: https://10.54.59.41/dkp/kommander/dashboard
+
+==================================================
+Only for Lab 8 : Building Complete CICD Deployment
+--------------------------------------------------
+
+Gitlab IP Address/URL : gitlab.arief.com
+
+Gitlab Password:
+username  : root
+password  : nutanix/4u
+
+PGAdmin password:
+username  : arief.pribadi@nutanix.com 
+password  : nutanix/4u
+
+Harbor URL  :   https://10.54.60.41:5000/
+username    :   nutanix
+password    :   nx2Tech741!
