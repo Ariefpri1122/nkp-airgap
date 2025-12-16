@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: <yourname>-landon-master
+  name: <yourname>-landon-master
+  namespace: <yourname>-project-xxxxxx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: <yourname>-landon-master
+  template:
+    metadata:
+      labels:
+        k8s-app: <yourname>-landon-master
+      name: <yourname>-landon-master
+    spec:
+      containers:
+        - image: <your harbor IP address>:5000/library/<yourname>_laravel_master:v1.0.0-xxxxxxx
+          name: <yourname>-landon-master
+          resources: {}
+      imagePullSecrets:
+        - name: harbor-registry-credentials
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    k8s-app: <yourname>-landon-master
+  name: <yourname>-landon-master
+  namespace: <yourname>-project-xxxxx
+spec:
+  ports:
+    - name: tcp-9999-master
+      port: 9999
+      protocol: TCP
+      targetPort: 9999
+  selector:
+    k8s-app: <yourname>-landon-master
+  type: LoadBalancer
