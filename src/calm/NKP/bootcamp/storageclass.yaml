@@ -1,0 +1,27 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: <yourname>-nutanix-files
+provisioner: csi.nutanix.com
+parameters:
+  nfsServerName: labFS
+  nfsServer: labFS.ntnxlab.local
+  nfsPath: <yourname>-wordpress
+  storageType: NutanixFiles
+  squashType: root-squash
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: <yourname>-wp-pv-claim-nfs
+  labels:
+    app: wordpress
+spec:
+  storageClassName: <yourname>-nutanix-files
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
