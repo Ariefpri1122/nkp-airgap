@@ -18,7 +18,7 @@ Multi-Cluster HPOC:
                                             *****************************************
 
 * Note that IP Address range in HPOC Secondary VLAN is —> x.x.x.132 - x.x.x.254
-* IPAM range    :   x.x.x.134-x.x.x.253 --> Need to be modified to x.x.x.225-x.x.x.253 (please configure ip pool in default vlan in prism element/central)
+* IPAM range    :   x.x.x.134-x.x.x.253 --> Need to be modified to x.x.x.189-x.x.x.253 (please configure ip pool in default vlan in prism element/central)
                                             ******************************************
 
 SingleNode-Cluster HPOC:
