@@ -1,6 +1,11 @@
 id: pg_to_delta_pipeline
 namespace: ingestion
 
+triggers:
+  - id: every_5_minutes
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "*/5 * * * *"
+
 tasks:
   - id: pg_to_bronze
     type: io.kestra.plugin.scripts.shell.Script
