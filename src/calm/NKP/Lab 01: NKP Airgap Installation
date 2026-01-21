@@ -213,37 +213,9 @@ From your laptop -- Check avail NKP Ultimate license and its expired Date
 
 
 Copy Certificate File From BASTION to AUTOADVM
-    * use winscp to copu /etc/docker/certs.d/airgap.arief.com\:5000/cert.crt in BASTION VM to c:\inetpub\wwwroot in AUTOADVM
+    * from AUTODC VM:
+        - use winscp to copy /etc/docker/certs.d/airgap.arief.com\:5000/cert.crt in BASTION VM to c:\inetpub\wwwroot in AUTOADVM
 
-
-IP Address Management
-----------------------
-Multi-Cluster HPOC:
-* Note that IP Address range in HPOC Primary VLAN is —> x.x.x.1 - x.x.x.126
-* IPAM range    :   changed to x.x.x.60-x.x.x.125
-
-* Note that IP Address range in HPOC Secondary VLAN is —> x.x.x.132 - x.x.x.254
-* IPAM range    :   changed to x.x.x.161-x.x.x.253 
-
-# End Point IP and MetalLB IP Range --> cannot be part of IPAM range and cannot be in the range which PC/PE/CVM/AHV/AD in it
-# End Point IP --> Must be checked (using ping and IP Scanner) before use
-# MetallB IP Range --> need at least consist of 10 IPs
-
-Example Multi-Node Cluster:
-Endpoint		: 	x.x.x.40 --> Confirmed Check PING and IP Scanner before use (ex: 10.38.106.40)
-LB Range		:	x.x.x.41-x.x.x.51 --> Confirmed Check PING and IP Scanner before use (ex: 10.38.106.41-10.38.106.51)
-
-SingleNode-Cluster HPOC:
-* Note that IP Address range in HPOC Primary VLAN is —> x.x.x.129 - x.x.x.190
-* IPAM range    :   changed to x.x.x.161-x.x.x.189 
-
-# End Point IP and MetalLB IP Range --> cannot be part of IPAM range and cannot be in the range which PC/PE/CVM/AHV/AD in it
-# End Point IP --> Must be checked (using ping and IP scanner) before use
-# MetallB IP Range --> need at least consist of 10 IPs
-
-Example SingleNode Cluster:
-Endpoint		: 	x.x.x.160 --> Confirmed Check PING and IP Scanner before use
-LB Range		:	x.x.x.140-x.x.x.150 --> Confirmed Check PING and IP Scanner before use
 
 Modify script below with the correct information
 1. PC Password
