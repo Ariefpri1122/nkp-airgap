@@ -208,8 +208,8 @@ From your laptop -- Check avail NKP Ultimate license and its expired Date
     2. search by “nkp” find NKP Ultimate license and with long expiry date
     3. Note the “cluster name” —> Take a note of its "cluster name" and "license key"
     4. Example:
-        1. nkp cluster name —> airgapped-hm-nkp-demo-2
-        2. license key —> AEAAQ-AAA6Z-57CF6-C7CUH-AVRDV-TT8LD-P9ES2
+        1. nkp cluster name —> ale-nkp-mgmt-t01
+        2. license key —> AEAAG-AAA62-UW2X5-ZU43W-WME92-YDQP5-QZKMV
 
 
 Copy Certificate File From BASTION to AUTOADVM
@@ -268,7 +268,7 @@ export AIRGAP_REGISTRY_CACERT="/etc/docker/certs.d/airgap.arief.com:5000/cert.cr
 export AIRGAP_REGISTRY_URL="https://airgap.arief.com:5000"
 export AIRGAP_REGISTRY_USERNAME="admin"
 export AIRGAP_REGISTRY_PASSWORD="nutanix/4u"
-export NKP_CLUSTER_NAME="airgapped-hm-nkp-demo-2" # Important: same name with the cluster of NKP Ultimate and license key
+export NKP_CLUSTER_NAME="ale-nkp-mgmt-t01" # Important: same name with the cluster of NKP Ultimate and license key
 export SUBNET="primary-PHX-POC334"
 export CONTROLPLANE_VIP="10.38.106.40" # Confirmed Check PING before use
 export METALLB_IP_RANGE="10.38.106.41-10.38.106.51" 
