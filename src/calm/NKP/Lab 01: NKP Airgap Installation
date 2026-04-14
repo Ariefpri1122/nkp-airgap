@@ -30,6 +30,7 @@ From PC --> Makesure after change IP Pool, click the checked button and click SA
 
 2. Shutdown autoad Vm —> Configure the VM:
 - increase and update autoad VM Core to 2 and increase memory to 16GB 
+- Add additional Disk 200GB
 - Power on the VM
 - Configure AUTOAD VM Disk Layout
     * Right click windows logo (top down corner) - Disk Manager - right click disk1 - Online 
