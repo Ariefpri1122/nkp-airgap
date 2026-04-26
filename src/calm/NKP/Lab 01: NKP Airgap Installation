@@ -2,11 +2,11 @@ Deploy NKP Cluster Commander AirGap Method
 ------------------------------------------ 
 
 1. Reserved HPOC
-    1. PC = pc.2024.3.1.5
+    1. PC = pc.2024.3.1.14
     2. AOS = 6.10
     3. Self Service Enabled
-    4. NDB 2.8
-    5. Files 5.10
+    4. NDB 2.8.1.1
+    5. Files 5.1.1.2
     6. Object enabled with object store created
 
     Images:
