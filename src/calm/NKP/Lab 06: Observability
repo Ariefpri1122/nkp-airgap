@@ -34,6 +34,7 @@ From your managed-cluster nkp dashboard - Projects - click 3 dots menu your proj
 save
 
 kubectl get namespaces --show-labels
+kubens --> choose yourname-project-xxx namespace
 
 kubectl rollout restart deployment adservice
 kubectl rollout restart deployment cartservice
