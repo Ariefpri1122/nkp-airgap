@@ -65,3 +65,13 @@ From NKP Dashboard - Your Workspace - CLusters - view details your cluster:
 		* ex: name: objective_chaplygin-10.38.106.53 (Managed Cluster) --> for managed cluster
 		* ex: name: objective_chaplygin-10.38.106.41 (Kommander) --> for commander cluster
 	- use kubectx to switch between cluster-context
+
+From NKP Dashboard - Your workspace - Clusters - click 3 dot menu:
+- Download kubeconfig
+- Drag and drop that file to your VSCode Web
+- From Terminal in VSCode Web, execute:
+
+KUBECONFIG=<your_control_plane_cluster_name>.conf:<yourname>-nkp-kubeconfig.yaml kubectl config view --flatten > <yourname>.conf
+export KUBECONFIG=<yourname>.conf
+kubectx --> choose <yourname>-nkp
+kubectl get nodes -o wide
