@@ -4,10 +4,10 @@ PE		      https://10.54.59.37:9440
 NDB		      10.54.59.14
 Registry	  10.54.59.94
 Airgap		  10.54.59.98
-bastion	    10.54.59.99
+bastion	      10.54.59.99
 harbor		  10.54.59.41
-harbor url 	https://10.54.59.41:5000
-pgadmin	    10.54.59.56
+harbor url 	  https://10.54.59.41:5000
+pgadmin	      10.54.59.56
 traefic		  10.54.59.53
 
 Cluster Password:
@@ -18,6 +18,8 @@ Kubernetes Password:
 Username: nifty_goldberg
 Password: JbZcBmn7hO9xAkoeWxbCPTsMpe4AcIfXy2rnXM8WiM5qanro0FxXVyG928RRrGRo
 URL: https://10.54.59.41/dkp/kommander/dashboard
+
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBM2C9FLMlL6xXcMRZt6Yjf1cgadN/1S6M8V3M6OQDbD arief.pribadi@nutanix.com
 
 ==================================================
 Only for Lab 8 : Building Complete CICD Deployment
@@ -38,12 +40,3 @@ password  : nutanix/4u
 PGAdmin password:
 username  : arief.pribadi@nutanix.com 
 password  : nutanix/4u
-
-Harbor IP   :   10.54.60.41
-Harbor URL  :   https://10.54.60.41:5000/
-username    :   nutanix
-password    :   nx2Tech741!
-
-Username: objective_sammet
-Password: RzbxtLAotC9GuY6E9EwCIgLbteOBjqEThR1uzrWDpgv5VPXg6VP8MyZ3Md8Awo7J
-URL: https://10.54.60.41/dkp/kommander/dashboard
