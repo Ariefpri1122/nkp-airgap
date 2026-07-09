@@ -2,23 +2,23 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    k8s-app: <yourname>-landon-master
-  name: <yourname>-landon-master
-  namespace: <yourname>-project-xxxxxx
+    k8s-app: <yourname>-landon-master  # Edit with yourname
+  name: <yourname>-landon-master  # Edit with yourname
+  namespace: <yourname>-project-laravel-xxxxxx  # Edit with yourname and correct namespace
 spec:
   replicas: 1
   selector:
     matchLabels:
-      k8s-app: <yourname>-landon-master
+      k8s-app: <yourname>-landon-master   # Edit with yourname
   template:
     metadata:
       labels:
-        k8s-app: <yourname>-landon-master
-      name: <yourname>-landon-master
+        k8s-app: <yourname>-landon-master   # Edit with yourname
+      name: <yourname>-landon-master   # Edit with yourname
     spec:
       containers:
-        - image: <your harbor IP address>:5000/library/<yourname>_laravel_master:v1.0.0-xxxxxxx
-          name: <yourname>-landon-master
+        - image: <your harbor IP address>:5000/library/<yourname>_laravel_master:v1.0.0-xxxxxxx   # Edit with harbor IP, yourname image with exact unique tag -- use harbor artifact copy to make sure
+          name: <yourname>-landon-master  # Edit with yourname
           resources: {}
       imagePullSecrets:
         - name: harbor-registry-credentials
@@ -29,9 +29,9 @@ kind: Service
 metadata:
   annotations:
   labels:
-    k8s-app: <yourname>-landon-master
-  name: <yourname>-landon-master
-  namespace: <yourname>-project-xxxxx
+    k8s-app: <yourname>-landon-master  # Edit with yourname
+  name: <yourname>-landon-master  # Edit with yourname
+  namespace: <yourname>-project-laravel-xxxxxx  # Edit with yourname and correct namespace
 spec:
   ports:
     - name: tcp-9999-master
@@ -39,5 +39,5 @@ spec:
       protocol: TCP
       targetPort: 9999
   selector:
-    k8s-app: <yourname>-landon-master
+    k8s-app: <yourname>-landon-master   # Edit with yourname
   type: LoadBalancer
